@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+    <!-- 开启注解包扫描-->
+    <context:component-scan base-package="com.zja.*"/>
+
+    <!--使用默认的 Servlet 来响应静态文件 -->
+    <mvc:default-servlet-handler/>
+
+    <!--引入资源 .xml-->
+    <import resource="classpath:aop.xml"/>
+
+    <!-- 开启springMVC 注解驱动 -->
+    <mvc:annotation-driven>
+        <mvc:message-converters register-defaults="false">
+            <!-- 将StringHttpMessageConverter的默认编码设为UTF-8 ，解决返回给前端中文乱码-->
+            <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+                <constructor-arg value="UTF-8"/>
+            </bean>
+            <!-- 将Jackson2HttpMessageConverter的默认格式化输出设为true -->
+            <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+                <property name="prettyPrint" value="true"/>
+                <property name="supportedMediaTypes">
+                    <list>
+                        <!-- 优先使用该媒体类型,为了解决IE浏览器下,返回JSON数据的下载问题 -->
+                        <value>application/json;charset=UTF-8</value>
+                        <value>text/html;charset=UTF-8</value>
+                        <value>text/json;charset=UTF-8</value>
+                    </list>
+                </property>
+                <!-- 使用内置日期工具进行处理 -->
+                <property name="objectMapper">
+                    <bean class="com.fasterxml.jackson.databind.ObjectMapper">
+                        <property name="dateFormat">
+                            <bean class="java.text.SimpleDateFormat">
+                                <constructor-arg type="java.lang.String" value="yyyy-MM-dd"/>
+                            </bean>
+                        </property>
+                    </bean>
+                </property>
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+
+    <!-- 增加application.properties文件 -->
+    <context:property-placeholder
+            location="classpath*:application.properties" />
+
+    <!-- 配置视图解析器 -->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"
+          id="internalResourceViewResolver">
+        <!-- 前缀 ：/WEB-INF/jsp/和/WEB-INF/html/-->
+        <property name="prefix" value="/WEB-INF/jsp/"/>
+        <!-- 后缀 ：.jsp和.html-->
+        <property name="suffix" value=".jsp"/>
+    </bean>
+
+    <!-- =====================配置自定义拦截器==================== -->
+    <!--配置拦截器-->
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/mvc/**"/>
+            <mvc:exclude-mapping path="/mvc/login"/>
+            <bean class="com.zja.MyInterceptors.MyFirstInterceptor"/>
+        </mvc:interceptor>
+        <mvc:interceptor>
+            <mvc:mapping path="/mvc/**"/>
+            <bean class="com.zja.MyInterceptors.MySecondInterceptor"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
+
+    <!--配置全局异常处理器-->
+    <bean class="com.zja.AuthException.NoAuthExceptionResolver"/>
+
+    <!-- =================== springmvc文件上传和下载 ================== -->
+    <!--配置文件上传-->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="maxUploadSize" value="102400000"/>
+        <property name="maxUploadSizePerFile" value="10240000"/>
+        <property name="defaultEncoding" value="utf-8"/>
+    </bean>
+
+    <!-- =================== swagger2 config ================== -->
+    <bean class="com.zja.config.Swagger2Config"/>
+    <mvc:resources mapping="swagger-ui.html" location="classpath:/META-INF/resources/"/>
+    <mvc:resources mapping="/webjars/**" location="classpath:/META-INF/resources/webjars/"/>
+
+</beans>

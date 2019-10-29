@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  <packaging>pom</packaging>
+
+  <name>spring5x</name>
+
+  <groupId>com.zja</groupId>
+  <artifactId>spring5x</artifactId>
+  <version>1.0-SNAPSHOT</version>
+
+  <modules>
+    <module>spring5x-base</module>
+    <module>spring5x-swagger2</module>
+    <module>spring5x-springmvc</module>
+    <module>spring5x-mybatis-druid-base</module>
+  </modules>
+
+  <properties>
+    <!--spring5.x 至少需要jdk1.8及以上版本-->
+    <spring.version>5.0.9.RELEASE</spring.version>
+    <!--jdk必须 >=1.8-->
+    <jdk.version>1.8</jdk.version>
+    <!--maven 版本-->
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.plugin.version>3.6.0</maven.compiler.plugin.version>
+    <mavne.surefire.plugin.version>2.19.1</mavne.surefire.plugin.version>
+    <maven-war-plugin.version>2.6</maven-war-plugin.version>
+
+    <servlet.version>4.0.1</servlet.version>
+  </properties>
+
+  <!--定义编译时的配置项-->
+  <build>
+    <pluginManagement>
+      <plugins>
+        <!--maven的编译插件-->
+        <plugin>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>${maven.compiler.plugin.version}</version>
+          <configuration>
+            <!--开发版本-->
+            <source>${jdk.version}</source>
+            <!--.class文件版本-->
+            <target>${jdk.version}</target>
+            <!--打包后的编码-->
+            <encoding>${project.build.sourceEncoding}</encoding>
+          </configuration>
+        </plugin>
+        <!--打包跳过测试-->
+        <plugin>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>${mavne.surefire.plugin.version}</version>
+          <configuration>
+            <skip>true</skip>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+
+</project>
