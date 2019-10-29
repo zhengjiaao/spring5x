@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!--指定配置文件的位置-->
+    <context:property-placeholder location="classpath:jedisCluster.properties" ignore-unresolvable="true"/>
+
+    <!--初始化连接池配置-->
+    <bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+        <property name="maxIdle" value="${redis.maxIdle}"/>
+        <property name="maxTotal" value="${redis.maxTotal}"/>
+    </bean>
+
+    <!--配置 jedis 连接池 (集群)-->
+    <bean id="jedisCluster" class="redis.clients.jedis.JedisCluster">
+        <constructor-arg name="nodes">
+            <set>
+                <bean class="redis.clients.jedis.HostAndPort">
+                    <constructor-arg name="host" value="${redis.host_1}"/>
+                    <constructor-arg name="port" value="${redis.port_1}"/>
+                </bean>
+                <bean class="redis.clients.jedis.HostAndPort">
+                    <constructor-arg name="host" value="${redis.host_2}"/>
+                    <constructor-arg name="port" value="${redis.port_2}"/>
+                </bean>
+                <bean class="redis.clients.jedis.HostAndPort">
+                    <constructor-arg name="host" value="${redis.host_3}"/>
+                    <constructor-arg name="port" value="${redis.port_3}"/>
+                </bean>
+            </set>
+        </constructor-arg>
+        <constructor-arg name="timeout" value="${redis.timeout}"/>
+    </bean>
+
+</beans>

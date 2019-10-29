@@ -99,6 +99,23 @@
             <scope>provided</scope>
         </dependency>
 
+        <!--jackson 解决 spring-mvc.xml 配置的MappingJackson2HttpMessageConverter 错误-->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>2.9.4</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.9.4</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>2.9.4</version>
+        </dependency>
+
         <!--spring5.x 集成swagger2-->
         <dependency>
             <groupId>io.springfox</groupId>
