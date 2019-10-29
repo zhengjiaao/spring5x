@@ -39,21 +39,13 @@ SpringWork项目整合了Spring常用的一些关键性技术，使用组件化�
 
 [Spring Email](https://docs.spring.io/spring/docs/5.0.12.RELEASE/spring-framework-reference/integration.html#mail-introduction)
 
-##### 技术方案
-
-[查看详情](springwork-mail/README.md)
-
 #### Spring + Mybatis
 
 ##### 官方文档
 
 [Spring Mybatis](http://www.mybatis.org/mybatis-3/zh/index.html)
 
-##### 技术方案
 
-[查看详情](springwork-mybatis/README.md)
 
-#### 文档继续维护中
+#### 文档继续维护中...
 
-### 快速构建项目
-[Spring组件化构建](https://www.pomit.cn/java/spring/spring.html)
