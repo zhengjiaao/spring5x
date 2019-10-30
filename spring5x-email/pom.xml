@@ -9,10 +9,10 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
     <groupId>com.zja</groupId>
-    <artifactId>spring5x-base</artifactId>
+    <artifactId>spring5x-email</artifactId>
     <packaging>war</packaging>
 
-    <name>spring5x-base</name>
+    <name>spring5x-email</name>
 
     <!--说明：spring5.x-base模块是spring5.x基础框架，其它模块都是以此模块为基础扩展的-->
     <properties>
@@ -119,6 +119,26 @@
             <version>2.9.4</version>
         </dependency>
 
+        <!--邮件发送依赖包-->
+        <!--<dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context-support</artifactId>
+            <version>${spring.version}</version>
+        </dependency>-->
+
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+            <version>1.4.7</version>
+        </dependency>
+        <!--模板引擎-->
+        <!--这里采用的是 beetl,beetl 性能很卓越并且功能也很全面 官方文档地址 <a href="http://ibeetl.com/guide/#beetl">-->
+        <dependency>
+            <groupId>com.ibeetl</groupId>
+            <artifactId>beetl</artifactId>
+            <version>2.9.7</version>
+        </dependency>
+
         <!--测试相关依赖-->
         <dependency>
             <groupId>junit</groupId>
@@ -127,10 +147,11 @@
             <scope>test</scope>
         </dependency>
 
+
     </dependencies>
 
     <build>
-        <finalName>spring5x-base</finalName>
+        <finalName>spring5x-email</finalName>
         <plugins>
             <!--maven的编译插件-->
             <plugin>

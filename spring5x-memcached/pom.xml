@@ -9,10 +9,10 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
     <groupId>com.zja</groupId>
-    <artifactId>spring5x-base</artifactId>
+    <artifactId>spring5x-memcached</artifactId>
     <packaging>war</packaging>
 
-    <name>spring5x-base</name>
+    <name>spring5x-memcached</name>
 
     <!--说明：spring5.x-base模块是spring5.x基础框架，其它模块都是以此模块为基础扩展的-->
     <properties>
@@ -119,18 +119,17 @@
             <version>2.9.4</version>
         </dependency>
 
-        <!--测试相关依赖-->
+        <!--memcached java 客户端-->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.12</version>
-            <scope>test</scope>
+            <groupId>com.googlecode.xmemcached</groupId>
+            <artifactId>xmemcached</artifactId>
+            <version>2.4.5</version>
         </dependency>
 
     </dependencies>
 
     <build>
-        <finalName>spring5x-base</finalName>
+        <finalName>spring5x-memcached</finalName>
         <plugins>
             <!--maven的编译插件-->
             <plugin>
