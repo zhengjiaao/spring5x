@@ -18,6 +18,7 @@
     <module>spring5x-redis</module>
     <module>spring5x-memcached</module>
     <module>spring5x-email</module>
+    <module>spring5x-task</module>
   </modules>
 
   <properties>

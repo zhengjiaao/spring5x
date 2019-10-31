@@ -45,11 +45,12 @@
 
     <!-- 增加application.properties文件 -->
     <context:property-placeholder
-            location="classpath*:application.properties" />
+            location="classpath:application.properties" />
 
-    <!--aop xml配置-->
-    <import resource="classpath:aop.xml"/>
-
+    <!--spring task定时任务 xml配置-->
+    <!--<import resource="classpath:META-INF/spring/spring-task.xml"/>-->
+    <!--spring quartz定时任务 xml配置-->
+    <import resource="classpath:META-INF/spring/spring-quartz.xml"/>
 
     <!-- 配置视图解析器 -->
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"
@@ -59,35 +60,5 @@
         <!-- 后缀 ：.jsp和.html-->
         <property name="suffix" value=".jsp"/>
     </bean>
-
-    <!-- =====================配置自定义拦截器==================== -->
-    <!--配置拦截器-->
-    <mvc:interceptors>
-        <mvc:interceptor>
-            <mvc:mapping path="/mvc/**"/>
-            <mvc:exclude-mapping path="/mvc/login"/>
-            <bean class="com.zja.MyInterceptors.MyFirstInterceptor"/>
-        </mvc:interceptor>
-        <mvc:interceptor>
-            <mvc:mapping path="/mvc/**"/>
-            <bean class="com.zja.MyInterceptors.MySecondInterceptor"/>
-        </mvc:interceptor>
-    </mvc:interceptors>
-
-    <!--配置全局异常处理器-->
-    <bean class="com.zja.AuthException.NoAuthExceptionResolver"/>
-
-    <!-- =================== springmvc文件上传和下载 ================== -->
-    <!--配置文件上传-->
-    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
-        <property name="maxUploadSize" value="102400000"/>
-        <property name="maxUploadSizePerFile" value="10240000"/>
-        <property name="defaultEncoding" value="utf-8"/>
-    </bean>
-
-    <!-- =================== swagger2 config ================== -->
-    <bean class="com.zja.config.Swagger2Config"/>
-    <mvc:resources mapping="swagger-ui.html" location="classpath:/META-INF/resources/"/>
-    <mvc:resources mapping="/webjars/**" location="classpath:/META-INF/resources/webjars/"/>
 
 </beans>

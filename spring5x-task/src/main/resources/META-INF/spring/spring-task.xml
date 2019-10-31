@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
+
+    <!--Spring Scheduling 定时任务xml 配置-->
+
+    <!--配置定时任务-->
+    <bean id="task" class="com.zja.task.Task"/>
+    <task:scheduled-tasks scheduler="myScheduler">
+        <!--基于间隔的触发器，其中间隔是从上一个任务的  完成时间  开始计算, 时间单位值以毫秒为单位。-->
+        <task:scheduled ref="task" method="methodA" fixed-delay="5000" initial-delay="1000"/>
+        <!--基于间隔的触发器，其中间隔是从上一个任务的  开始时间  开始测量的。-->
+        <task:scheduled ref="task" method="methodB" fixed-rate="5000"/>
+        <!-- cron 表达式-->
+        <task:scheduled ref="task" method="methodC" cron="0/10 * * * * ?"/>
+    </task:scheduled-tasks>
+
+    <!--定义任务调度器线程池的大小-->
+    <task:scheduler id="myScheduler" pool-size="10"/>
+
+    <!--定义任务执行器的线程池大小、等待队列的容量、和拒绝策略-->
+    <task:executor
+            id="executorWithPoolSizeRange"
+            pool-size="5-25"
+            queue-capacity="100"
+            rejection-policy="CALLER_RUNS"/>
+    <!--拒绝策略默认值为 ABORT
+        CALLER_RUNS 来限制入栈任务
+        DISCARD 删除当前任务
+        DISCARD_OLDEST 将任务放在队列的头部。-->
+
+    <!--允许在任何 Spring 管理的对象上检测@Async 和@Scheduled 注释, 如果存在，将生成用于异步执行带注释的方法的代理。-->
+    <task:annotation-driven/>
+
+</beans>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd"
+       default-autowire="byType">
+
+    <!-- 1、配置Job类 ：也可通过注解bean配置-->
+    <bean id="quartzTask" class="com.zja.quartz.QuartzTask"/>
+
+    <!--2、控制台打印 任务JobDetail-->
+    <bean id="consolePrintJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="quartzTask" />          <!--执行类的实例-->
+        <property name="targetMethod" value="execute" />                   <!--执行方法-->
+        <property name="concurrent" value="false" />    <!-- 是否并发执行 -->
+        <property name="name" value="print" />      <!-- 任务名称-->
+        <property name="group" value="console" /> <!-- 任务组-->
+        <property name="arguments">   <!--参数列表-->
+            <list></list>
+        </property>
+    </bean>
+
+    <!-- 3、简单触发器SimpleTrigger：只支持按照一定频度调用任务，如每20秒执行一次等 -->
+    <bean id="consolePrintSimpleTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+        <property name="jobDetail" ref="consolePrintJob"/>
+        <property name="startDelay" value="1000"/>  <!-- 1秒后开始 -->
+        <property name="repeatInterval" value="20000"/>  <!-- 每20秒执行一次 -->
+    </bean>
+
+    <!--3、控制台打印 触发器CronTrigger：支持到指定时间运行一次，如每天12:00运行一次等，比较强大-->
+    <bean id="consolePrintCronTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="consolePrintJob" />
+        <!--cron表达式在线生成地址：http://cron.qqe2.com/ -->
+        <property name="cronExpression" value="0 0/1 * * * ? " />       <!--测试，从0开启每分钟执行一次-->
+        <!--<property name="cronExpression" value="0 0 3 * * ?" />-->        <!--每天凌晨3点执行一次-->
+    </bean>
+
+    <!-- 4、调度器scheduler -->
+    <bean id="schedulerFactoryBean" class="org.springframework.scheduling.quartz.SchedulerFactoryBean"
+          autowire="no">
+        <property name="triggers">
+            <list>
+                <!--SimpleTrigger 触发器测试-->
+                <ref bean="consolePrintSimpleTrigger" />
+                <!--CronTrigger 触发器测试-->
+                <ref bean="consolePrintCronTrigger" />
+            </list>
+        </property>
+    </bean>
+</beans>
+
