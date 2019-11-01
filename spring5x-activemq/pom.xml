@@ -9,13 +9,13 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
     <groupId>com.zja</groupId>
-    <artifactId>spring5x-swagger2</artifactId>
+    <artifactId>spring5x-activemq</artifactId>
     <packaging>war</packaging>
 
-    <!--说明：spring5.x-web模块是从spring5.x-base基础框架拷贝加以扩展的-->
+    <name>spring5x-activemq</name>
+
+    <!--说明：spring5.x-base模块是spring5.x基础框架，其它模块都是以此模块为基础扩展的-->
     <properties>
-        <!--项目多环境配置-->
-        <profiles.dir>src/main/profiles</profiles.dir>
         <!--spring5.x 至少需要jdk1.8及以上版本-->
         <spring.version>5.0.9.RELEASE</spring.version>
         <!--jdk必须 >=1.8-->
@@ -26,9 +26,6 @@
         <mavne.surefire.plugin.version>2.19.1</mavne.surefire.plugin.version>
         <maven-war-plugin.version>2.6</maven-war-plugin.version>
         <servlet.version>4.0.1</servlet.version>
-
-        <!--spring5.x集成swagger2-->
-        <springfox.version>2.9.2</springfox.version>
     </properties>
 
     <dependencies>
@@ -99,7 +96,7 @@
             <scope>provided</scope>
         </dependency>
 
-        <!--jackson 解决 spring-mvc.xml 配置的MappingJackson2HttpMessageConverter 错误-->
+        <!--jackson  默认采用 Jackson 将对象进行序列化和反序列化-->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
@@ -114,10 +111,6 @@
                     <artifactId>jackson-annotations</artifactId>
                     <groupId>com.fasterxml.jackson.core</groupId>
                 </exclusion>
-                <exclusion>
-                    <artifactId>jackson-core</artifactId>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -126,85 +119,47 @@
             <version>2.9.4</version>
         </dependency>
 
-        <!--spring5.x 集成swagger2-->
+        <!--测试相关依赖-->
         <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
-            <version>${springfox.version}</version>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!--jms-activemq消息中间插件-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jms</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.jms</groupId>
+            <artifactId>javax.jms-api</artifactId>
+            <version>2.0.1</version>
+        </dependency><!--少了会报错 Caused by: java.lang.NoClassDefFoundError: javax/jms/JMSContext-->
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-core</artifactId>
+            <version>5.7.0</version>
             <exclusions>
-                <exclusion>
-                    <artifactId>slf4j-api</artifactId>
-                    <groupId>org.slf4j</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>spring-aop</artifactId>
-                    <groupId>org.springframework</groupId>
-                </exclusion>
                 <exclusion>
                     <artifactId>spring-context</artifactId>
                     <groupId>org.springframework</groupId>
                 </exclusion>
-                <exclusion>
-                    <artifactId>spring-beans</artifactId>
-                    <groupId>org.springframework</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jackson-annotations</artifactId>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                </exclusion>
             </exclusions>
         </dependency>
+
         <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger-ui</artifactId>
-            <version>${springfox.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.9.6</version>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-nop</artifactId>
+            <version>1.7.24</version>
         </dependency>
 
     </dependencies>
 
-    <profiles>
-        <!--本地开发环境-->
-        <profile>
-            <id>local</id>
-            <properties>
-                <profiles.active>local</profiles.active>
-            </properties>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-        </profile>
-        <!--测试环境-->
-        <profile>
-            <id>test</id>
-            <properties>
-                <profiles.active>test</profiles.active>
-            </properties>
-        </profile>
-        <!--生产环境-->
-        <profile>
-            <id>product</id>
-            <properties>
-                <profiles.active>product</profiles.active>
-            </properties>
-        </profile>
-    </profiles>
-
     <build>
-        <finalName>spring5x-swagger2</finalName>
-        <resources>
-            <resource>
-                <directory>src/main/profiles/${profiles.active}</directory>
-            </resource>
-            <resource>
-                <directory>src/main/resources</directory>
-            </resource>
-        </resources>
-
+        <finalName>spring5x-activemq</finalName>
         <plugins>
             <!--maven的编译插件-->
             <plugin>

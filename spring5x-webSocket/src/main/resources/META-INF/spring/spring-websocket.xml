@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:websocket="http://www.springframework.org/schema/websocket"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/websocket http://www.springframework.org/schema/websocket/spring-websocket.xsd">
+
+    <!--配置 webSocket-->
+    <bean id="customHandler" class="com.zja.websocket.CustomHandler"/>
+    <websocket:handlers>
+        <!--指定 webSocket 地址-->
+        <websocket:mapping path="/socket" handler="customHandler"/>
+        <!--webSocket 握手-->
+        <websocket:handshake-interceptors>
+            <bean class="com.zja.websocket.CustomHandshakeInterceptor"/>
+        </websocket:handshake-interceptors>
+    </websocket:handlers>
+
+</beans>

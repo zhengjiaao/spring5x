@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:jsm="http://www.springframework.org/schema/jms"
+       xmlns:jms="http://www.springframework.org/schema/c"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/jms
+       http://www.springframework.org/schema/jms/spring-jms.xsd">
+
+    <!--导入公共配置-->
+    <import resource="spring-ActiveMQ.xml"/>
+
+    <!-- ==========================三、消费者 ：接收消息============================  -->
+
+    <!--消息监听器注入bean中-->
+    <!--queue队列监听器-->
+    <bean id="queueTextListener" class="com.zja.activemq.consumer.QueueTextListener"/>
+    <bean id="queueObjectListener" class="com.zja.activemq.consumer.QueueObjectListener"/>
+    <!--topic主题监听器-->
+    <bean id="topicTextListener" class="com.zja.activemq.consumer.TopicTextListener"/>
+    <bean id="topicObjectListener" class="com.zja.activemq.consumer.TopicObjectListener"/>
+    <!--公共监听器-->
+    <bean id="consumerMessageListener" class="com.zja.activemq.consumer.ConsumerMessageListener"/>
+
+    <!--配置消息监听容器 : 配置一个监听器 (不推荐)-->
+    <!--<bean id="jmsCotainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+        <property name="connectionFactory" ref="connectionFactoty"/>
+        &lt;!&ndash;queueDestination队列目的地，topicDestination主题目的地&ndash;&gt;
+        <property name="destination" ref="topicDestination"/>
+        &lt;!&ndash;消息消费者监听器&ndash;&gt;
+        <property name="messageListener" ref="topicMessageListener"/>
+    </bean>-->
+
+    <!-- 定义Queue监听器 : 配置多个监听器 (推荐) -->
+    <jsm:listener-container destination-type="queue" connection-factory="connectionFactoty">
+        <!-- TODO 每添加一个queue的监听，都需要在这里添加一个配置 -->
+        <!-- 这样配置就可以方便的对多个队列监听 , 每增加一个队列只需要添加一个 jms:listener -->
+        <!-- destination:队列名称, ref:指向对应的监听器对象 -->
+
+        <!--destination 是上面配置的 队列模式_文本消息-设置Text消息队列的名字 -->
+        <jsm:listener destination="queue.Text" ref="queueTextListener"/>
+        <!--destination 是上面配置的 队列模式_对象消息-设置对象消息队列的名字 -->
+        <jsm:listener destination="queue.Object" ref="queueObjectListener"/>
+
+        <!--公共监听器配置-->
+        <jsm:listener destination="queue.Text" ref="consumerMessageListener"/>
+    </jsm:listener-container>
+
+    <!-- 定义Topic监听器 : 配置多个监听器 (推荐)-->
+    <jsm:listener-container destination-type="topic" connection-factory="connectionFactoty">
+        <!-- TODO 每添加一个topic的监听，都需要在这里添加一个配置 -->
+        <!-- 这样配置就可以方便的对多个队列监听 , 每增加一个主题只需要添加一个 jms:listener -->
+        <!-- destination:主题名称, ref:指向对应的监听器对象 -->
+
+        <!--destination 是上面 配置的主题模式_文本消息-设置Text消息主题的名字 -->
+        <jsm:listener destination="topic.Text" ref="topicTextListener"/>
+        <!--destination 是上面 配置的主题模式_对象消息-设置对象消息主题的名字 -->
+        <jsm:listener destination="topic.Object" ref="topicObjectListener"/>
+
+        <!--公共监听器配置-->
+        <jsm:listener destination="topic.Text" ref="consumerMessageListener"/>
+    </jsm:listener-container>
+
+</beans>

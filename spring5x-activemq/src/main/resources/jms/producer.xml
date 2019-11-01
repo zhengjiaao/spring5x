@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!--导入公共配置-->
+    <import resource="spring-ActiveMQ.xml"/>
+
+    <!-- ==========================二、生产者 ：发送消息============================  -->
+
+    <!--对象类型转换器：只发送文本消息不用配置 -->
+    <bean id="objectMessageConverter" class="com.zja.util.ObjectMessageConverter"/>
+
+    <!--queue(队列模式)：配置jmsQueueTemplate，用于发送mq消息-->
+    <bean id="jmsQueueTemplate" class="org.springframework.jms.core.JmsTemplate">
+        <property name="connectionFactory" ref="connectionFactoty"/>
+        <!--队列模式（点对点）-->
+        <property name="pubSubDomain" value="false"/>
+        <!--消息转换器-->
+        <property name="messageConverter" ref="objectMessageConverter"/>
+    </bean>
+    <!--生产者：发送消息-->
+    <bean class="com.zja.activemq.producer.ProducerServiceImpl"/>
+
+
+    <!--Topic(主题模式)；配置jmsTopicTemplate，用于发送mq消息-->
+    <bean id="jmsTopicTemplate" class="org.springframework.jms.core.JmsTemplate">
+        <property name="connectionFactory" ref="connectionFactoty"/>
+        <!--主题模式（一对多）-->
+        <property name="pubSubDomain" value="false"/>
+        <!--消息转换器-->
+        <property name="messageConverter" ref="objectMessageConverter"/>
+        <!-- 测试阶段：消息不持久化 -->
+        <property name="explicitQosEnabled" value="true"></property>
+        <!--超时时间-->
+        <property name="receiveTimeout" value="10000" />
+    </bean>
+
+</beans>

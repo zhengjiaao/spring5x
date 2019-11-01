@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:jsm="http://www.springframework.org/schema/jms"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/jms
+       http://www.springframework.org/schema/jms/spring-jms.xsd">
+
+    <!-- ==========================一、生产者和消费者的公共配置 ：连接池-目的地-模式============================  -->
+
+    <!-- 1、ActiveMQ 连接工厂 ConnectionFactory -->
+    <bean id="targetConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+        <property name="brokerURL" value="tcp://192.168.2.42:61616"/>
+    </bean>
+
+    <!--Spring Caching 连接工厂(类似数据库线程池的东西，减少连接的创建。) -->
+    <!-- 2、由于jmsTemplate每次发送消息都需要创建连接和创建session了，所以引入这个类似连接池的连接工厂，优化Mq的性能 -->
+    <bean id="connectionFactoty" class="org.springframework.jms.connection.SingleConnectionFactory">
+        <!-- 目标连接工厂 指向 ActiveMq工厂 -->
+        <property name="targetConnectionFactory" ref="targetConnectionFactory"/>
+    </bean>
+
+    <!-- 3、ActiveMQ提供的目的地 -->
+
+    <!--队列模式_文本消息：一个队列的目的地，点对点的-->
+    <bean id="queueTextDestination" class="org.apache.activemq.command.ActiveMQQueue">
+        <!-- 设置Text消息队列的名字 -->
+        <constructor-arg value="queue.Text"/> <!--队列 构造函数参数-->
+    </bean>
+
+    <!--队列模式_对象消息：一个队列的目的地，点对点的-->
+    <bean id="queueObjectDestination" class="org.apache.activemq.command.ActiveMQQueue">
+        <!-- 设置对象消息队列的名字 -->
+        <constructor-arg value="queue.Object"/> <!--队列 构造函数参数-->
+    </bean>
+
+    <!--主题模式_文本消息：一个主题目的地，发布订阅模式-->
+    <bean id="topicTextDestination" class="org.apache.activemq.command.ActiveMQTopic">
+        <!-- 设置Text消息主题的名字 -->
+        <constructor-arg value="topic.Text"/> <!--主题 构造函数参数-->
+    </bean>
+
+    <!--主题模式_对象消息：一个主题目的地，发布订阅模式-->
+    <bean id="topicObjectDestination" class="org.apache.activemq.command.ActiveMQTopic">
+        <!-- 设置对象消息主题的名字 -->
+        <constructor-arg value="topic.Object"/> <!--主题 构造函数参数-->
+    </bean>
+
+
+    <!-- ==========================二、生产者 ：发送消息============================  -->
+
+    <!--对象类型转换器：只发送文本消息不用配置 -->
+    <bean id="objectMessageConverter" class="com.zja.util.ObjectMessageConverter"/>
+
+    <!--queue(队列模式)：配置jmsQueueTemplate，用于发送mq消息-->
+    <bean id="jmsQueueTemplate" class="org.springframework.jms.core.JmsTemplate">
+        <property name="connectionFactory" ref="connectionFactoty"/>
+        <!--队列模式（点对点）-->
+        <property name="pubSubDomain" value="false"/>
+        <!--消息转换器-->
+        <property name="messageConverter" ref="objectMessageConverter"/>
+    </bean>
+    <!--生产者：发送消息-->
+    <bean class="com.zja.activemq.producer.ProducerServiceImpl"/>
+
+
+    <!--Topic(主题模式)；配置jmsTopicTemplate，用于发送mq消息-->
+    <bean id="jmsTopicTemplate" class="org.springframework.jms.core.JmsTemplate">
+        <property name="connectionFactory" ref="connectionFactoty"/>
+        <!--主题模式（一对多）-->
+        <property name="pubSubDomain" value="false"/>
+        <!--消息转换器-->
+        <property name="messageConverter" ref="objectMessageConverter"/>
+        <!-- 测试阶段：消息不持久化 -->
+        <property name="explicitQosEnabled" value="true"></property>
+        <!--超时时间-->
+        <property name="receiveTimeout" value="10000" />
+    </bean>
+
+
+    <!-- ==========================三、消费者 ：接收消息============================  -->
+    <!--消息监听器注入bean中-->
+    <!--queue队列监听器-->
+    <bean id="queueTextListener" class="com.zja.activemq.consumer.QueueTextListener"/>
+    <bean id="queueObjectListener" class="com.zja.activemq.consumer.QueueObjectListener"/>
+    <!--topic主题监听器-->
+    <bean id="topicTextListener" class="com.zja.activemq.consumer.TopicTextListener"/>
+    <bean id="topicObjectListener" class="com.zja.activemq.consumer.TopicObjectListener"/>
+    <!--公共监听器-->
+    <bean id="consumerMessageListener" class="com.zja.activemq.consumer.ConsumerMessageListener"/>
+
+    <!--配置消息监听容器 : 配置一个监听器 (不推荐)-->
+    <!--<bean id="jmsCotainer" class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+        <property name="connectionFactory" ref="connectionFactoty"/>
+        &lt;!&ndash;queueDestination队列目的地，topicDestination主题目的地&ndash;&gt;
+        <property name="destination" ref="topicDestination"/>
+        &lt;!&ndash;消息消费者监听器&ndash;&gt;
+        <property name="messageListener" ref="topicMessageListener"/>
+    </bean>-->
+
+    <!-- 定义Queue监听器 : 配置多个监听器 (推荐) -->
+    <jsm:listener-container destination-type="queue" connection-factory="connectionFactoty">
+        <!-- TODO 每添加一个queue的监听，都需要在这里添加一个配置 -->
+        <!-- 这样配置就可以方便的对多个队列监听 , 每增加一个队列只需要添加一个 jms:listener -->
+        <!-- destination:队列名称, ref:指向对应的监听器对象 -->
+
+        <!--destination 是上面配置的 队列模式_文本消息-设置Text消息队列的名字 -->
+        <jsm:listener destination="queue.Text" ref="queueTextListener"/>
+        <!--destination 是上面配置的 队列模式_对象消息-设置对象消息队列的名字 -->
+        <jsm:listener destination="queue.Object" ref="queueObjectListener"/>
+
+        <!--公共监听器配置-->
+        <jsm:listener destination="queue.Text" ref="consumerMessageListener"/>
+    </jsm:listener-container>
+
+    <!-- 定义Topic监听器 : 配置多个监听器 (推荐)-->
+    <jsm:listener-container destination-type="topic" connection-factory="connectionFactoty">
+        <!-- TODO 每添加一个topic的监听，都需要在这里添加一个配置 -->
+        <!-- 这样配置就可以方便的对多个队列监听 , 每增加一个主题只需要添加一个 jms:listener -->
+        <!-- destination:主题名称, ref:指向对应的监听器对象 -->
+
+        <!--destination 是上面 配置的主题模式_文本消息-设置Text消息主题的名字 -->
+        <jsm:listener destination="topic.Text" ref="topicTextListener"/>
+        <!--destination 是上面 配置的主题模式_对象消息-设置对象消息主题的名字 -->
+        <jsm:listener destination="topic.Object" ref="topicObjectListener"/>
+
+        <!--公共监听器配置-->
+        <jsm:listener destination="topic.Text" ref="consumerMessageListener"/>
+    </jsm:listener-container>
+
+</beans>
