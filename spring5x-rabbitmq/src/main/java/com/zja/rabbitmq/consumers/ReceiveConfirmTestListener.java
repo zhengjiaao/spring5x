@@ -6,7 +6,7 @@ import org.springframework.amqp.rabbit.listener.api.ChannelAwareMessageListener;
 
 /**
  * @author ZhengJa
- * @description 回调
+ * @description 消费者应答模式：(发送确认,接收确认)
  * @data 2019/11/4
  */
 public class ReceiveConfirmTestListener implements ChannelAwareMessageListener {

@@ -47,8 +47,14 @@
     <context:property-placeholder
             location="classpath:application.properties" ignore-unresolvable="true"/>
 
-    <!--RabbitMQ-->
-    <import resource="spring-RabbitMQ.xml"/>
+    <!--RabbitMQ 总配置-->
+    <!--<import resource="spring-RabbitMQ.xml"/>-->
+
+    <!--RabbitMQ 拆分配置-->
+    <!--生产者配置：发送消息-->
+    <import resource="classpath:rabbitmq/producer.xml"/>
+    <!--消费者配置：接收消息-->
+    <import resource="classpath:rabbitmq/consumer.xml"/>
 
     <!-- 配置视图解析器 -->
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"

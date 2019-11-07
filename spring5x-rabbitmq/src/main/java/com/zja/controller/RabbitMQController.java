@@ -10,11 +10,11 @@ import java.io.UnsupportedEncodingException;
 
 /**
  * @author ZhengJa
- * @description RabbitMQ 测试
+ * @description RabbitMQ 配置文件: spring-RabbitMQ.xml
  * @data 2019/11/4
  */
 @RestController
-@RequestMapping("rest/rabbit")
+@RequestMapping("rest/rabbitmq")
 public class RabbitMQController {
 
     //Spring AMQP 提供了 RabbitTemplate 来简化 RabbitMQ 发送和接收消息操作,是实现AmqpTemplate接口具有amqpTemplate功能
@@ -54,8 +54,6 @@ public class RabbitMQController {
         rabbitTemplate.convertAndSend("mq.topicExchange", "mq.byte.send", firstReceived);
         return "success";
     }
-
-
 
     /**  ReturnCallback 和  ConfirmCallback  **/
 

@@ -8,7 +8,7 @@ import org.springframework.amqp.core.MessageListener;
  * @description 对象接收消息
  * @data 2019/11/4
  */
-public class ObjectConsumer implements MessageListener {
+public class QueueObjectConsumer implements MessageListener {
 
     /**
      * 消费者接收消息

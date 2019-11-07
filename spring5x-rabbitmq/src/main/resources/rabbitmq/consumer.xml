@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/rabbit http://www.springframework.org/schema/rabbit/spring-rabbit.xsd">
+
+    <!-- 三、消费者(监听器)配置：接收消息 -->
+
+    <!-- **1、引入RabbitMQ公共配置** -->
+    <import resource="common.xml"/>
+
+    <!-- **2、队列 ：生产者已经创建队列，此处可以省略不写**-->
+
+    <!-- **3、交换机 ：指将交换机与队列绑定在一块，也可以在rabbitMq的控制台上手动绑定** -->
+    <!-- 其实发送端已经绑定过，也没必要绑定，此处可以省略不写 -->
+
+
+    <!-- **4、消息接收者（必须实现监听器）** -->
+    <bean id="queueStr1Consumer" class="com.zja.rabbitmq.consumers.QueueStr1Consumer"/>
+    <bean id="queueStr2Consumer" class="com.zja.rabbitmq.consumers.QueueStr2Consumer"/>
+    <bean id="queueStr3Consumer" class="com.zja.rabbitmq.consumers.QueueStr3Consumer"/>
+    <bean id="queueStr4Consumer" class="com.zja.rabbitmq.consumers.QueueStr4Consumer"/>
+    <bean id="queueStr5Consumer" class="com.zja.rabbitmq.consumers.QueueStr5Consumer"/>
+    <bean id="queueByteConsumer" class="com.zja.rabbitmq.consumers.QueueByteConsumer"/>
+    <bean id="queueObjectConsumer" class="com.zja.rabbitmq.consumers.QueueObjectConsumer"/>
+    <bean id="receiveConfirmTestListener" class="com.zja.rabbitmq.consumers.ReceiveConfirmTestListener"/>
+
+    <!-- **5、队列监听器：观察 监听模式 当有消息到达时会通知监听在对应的队列上的监听对象** -->
+    <rabbit:listener-container connection-factory="connectionFactory">
+        <rabbit:listener  queues="queue.str1"  ref="queueStr1Consumer"/>
+    </rabbit:listener-container>
+    <rabbit:listener-container connection-factory="connectionFactory" >
+        <rabbit:listener  queues="queue.str2"  ref="queueStr2Consumer"/>
+    </rabbit:listener-container>
+    <rabbit:listener-container connection-factory="connectionFactory" >
+        <rabbit:listener  queues="queue.str3"  ref="queueStr3Consumer"/>
+    </rabbit:listener-container>
+    <rabbit:listener-container connection-factory="connectionFactory" >
+        <rabbit:listener  queues="queue.str4"  ref="queueStr4Consumer"/>
+    </rabbit:listener-container>
+    <!--参数中有一个acknowledge=“manual”，是对应答机制的配置，手动应答,标识的是消息确认机制为手动的确认-->
+    <rabbit:listener-container connection-factory="connectionFactory" acknowledge="manual">
+        <rabbit:listener  queues="queue.str5"  ref="queueStr5Consumer"/>
+    </rabbit:listener-container>
+    <rabbit:listener-container connection-factory="connectionFactory">
+        <rabbit:listener queues="queue.byte" ref="queueByteConsumer"/>
+    </rabbit:listener-container>
+    <rabbit:listener-container connection-factory="connectionFactory" >
+        <rabbit:listener  queues="queue.Object"  ref="queueObjectConsumer"/>
+    </rabbit:listener-container>
+
+</beans>

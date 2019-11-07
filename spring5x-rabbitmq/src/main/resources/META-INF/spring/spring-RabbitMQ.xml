@@ -5,10 +5,12 @@
        xmlns:rabbit="http://www.springframework.org/schema/rabbit"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/rabbit http://www.springframework.org/schema/rabbit/spring-rabbit.xsd">
 
+    <!--RabbitMQ 简单配置 总配置 -->
+
     <!--扫描 rabbit 包 自动声明交换器、队列、绑定关系-->
     <!--<context:component-scan base-package="com.zja.config"/>-->
 
-    <context:property-placeholder location="classpath:rabbitmq.properties" ignore-unresolvable="true"/>
+    <context:property-placeholder location="classpath:rabbitmq/rabbitmq.properties" ignore-unresolvable="true"/>
 
     <!--1、声明连接工厂-->
     <rabbit:connection-factory id="connectionFactory"
@@ -23,14 +25,7 @@
     auto-startup 指定是否自动声明上下文中的队列,交换和绑定, 默认值为 true。-->
     <rabbit:admin connection-factory="connectionFactory" auto-startup="true"/>
 
-    <!-- 给模板指定转换器 --><!-- mandatory必须设置true,return callback才生效 -->
-    <!--<rabbit:template id="amqpTemplate"	connection-factory="connectionFactory"
-                     confirm-callback="rabbitConfirmCallback"
-                     return-callback="rabbitReturnCallback"
-                     mandatory="true"
-    />-->
-
-    <!-- rabbitTemplate 消息模板类：给模板指定转换器,Spring AMQP 提供了 RabbitTemplate 来简化 RabbitMQ 发送和接收消息操作-->
+    <!-- 2、rabbitTemplate 消息模板类：给模板指定转换器,Spring AMQP 提供了 RabbitTemplate 来简化 RabbitMQ 发送和接收消息操作-->
     <bean id="rabbitTemplate" class="org.springframework.amqp.rabbit.core.RabbitTemplate">
         <!--连接工厂-->
         <constructor-arg ref="connectionFactory"></constructor-arg>
@@ -78,11 +73,10 @@
     </rabbit:direct-exchange>
 
     <!-- 消息接收者 -->
-    <bean id="queue1Consumer" class="com.zja.rabbitmq.consumers.Queue1Consumer"/>
-    <bean id="queue2Consumer" class="com.zja.rabbitmq.consumers.Queue2Consumer"/>
-    <bean id="remotingConsumer" class="com.zja.rabbitmq.consumers.RemotingConsumer"/>
-    <bean id="byteConsumer" class="com.zja.rabbitmq.consumers.ByteConsumer"/>
-    <bean id="receiveConfirmTestListener" class="com.zja.rabbitmq.consumers.ReceiveConfirmTestListener"/>
+    <bean id="queue1Consumer" class="com.zja.rabbitmq.consumers.QueueStr1Consumer"/>
+    <bean id="queue2Consumer" class="com.zja.rabbitmq.consumers.QueueStr2Consumer"/>
+    <bean id="queue3Consumer" class="com.zja.rabbitmq.consumers.QueueStr3Consumer"/>
+    <bean id="byteConsumer" class="com.zja.rabbitmq.consumers.QueueByteConsumer"/>
 
     <!-- queue litener 观察 监听模式 当有消息到达时会通知监听在对应的队列上的监听对象 -->
     <rabbit:listener-container connection-factory="connectionFactory" >
@@ -91,18 +85,11 @@
     <rabbit:listener-container connection-factory="connectionFactory" >
         <rabbit:listener  queues="mq.queue2"  ref="queue2Consumer"/>
     </rabbit:listener-container>
-    <!--<rabbit:listener-container connection-factory="connectionFactory" >
-        <rabbit:listener  queues="mq.remoting"  ref="remotingConsumer"/>
-    </rabbit:listener-container>-->
     <rabbit:listener-container connection-factory="connectionFactory" >
-        <rabbit:listener  queues="mq.remoting"  ref="receiveConfirmTestListener"/>
+        <rabbit:listener  queues="mq.remoting"  ref="queue3Consumer"/>
     </rabbit:listener-container>
     <rabbit:listener-container connection-factory="connectionFactory">
         <rabbit:listener queues="mq.byte" ref="byteConsumer"/>
     </rabbit:listener-container>
-
-    <!--<rabbit:listener-container connection-factory="connectionFactory"  acknowledge="manual">
-        <rabbit:listener  queues="mq.queue2"  ref="receiveConfirmTestListener"/>
-    </rabbit:listener-container>-->
 
 </beans>

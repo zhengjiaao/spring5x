@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/rabbit http://www.springframework.org/schema/rabbit/spring-rabbit.xsd">
+
+    <!-- 二、生产者配置：发送消息 -->
+
+    <!--引入RabbitMQ公共配置-->
+    <import resource="common.xml"/>
+
+    <!-- **1、配置发送消息模板类** -->
+
+    <!-- 1、rabbitTemplate 发送消息模板类：给模板指定转换器,Spring AMQP 提供了 RabbitTemplate 来简化 RabbitMQ 发送和接收消息操作-->
+    <bean id="rabbitTemplate" class="org.springframework.amqp.rabbit.core.RabbitTemplate">
+        <!--连接工厂-->
+        <constructor-arg ref="connectionFactory"></constructor-arg>
+        <!--发送方消息转换器-->
+        <!--<property name="messageConverter" ref="byteMessageConverter"/>-->
+        <!--消息确认回调 -->
+        <property name="confirmCallback" ref="rabbitConfirmCallback"/>
+        <!-- mandatory必须设置true,returnCallback才生效 -->
+        <property name="returnCallback" ref="rabbitReturnCallback"/>
+        <property name="mandatory" value="true"/>
+    </bean>
+    <!--如果消息没有到exchange,则confirm回调,ack=false -->
+    <!--如果消息到达exchange,则confirm回调,ack=true -->
+    <bean id="rabbitConfirmCallback" class="com.zja.rabbitmq.callback.RabbitConfirmCallback"/>
+    <!--exchange到queue成功,则不回调return -->
+    <!--exchange到queue失败,则回调return(需设置mandatory=true,否则不回回调,消息就丢了) -->
+    <bean id="rabbitReturnCallback" class="com.zja.rabbitmq.callback.RabbitReturnCallback"/>
+    <!-- 发送方消息转换器 -->
+    <bean id="byteMessageConverter" class="com.zja.rabbitmq.converter.BytesMessageConverter"/>
+
+
+    <!-- 三、队列和交换机配置 -->
+
+    <!--**1、队列**-->
+
+    <!--可以在 xml 采用如下方式声明交换机、队列、绑定管理 但是建议使用代码方式声明 方法更加灵活且可以采用链调用-->
+    <!--定义队列queue说明：durable:是否持久化(队列持久化，就算断电队列也不会消失，但是消息会丢失)
+            exclusive: 仅创建者可以使用的私有队列，断开后自动删除
+            auto_delete: 当所有消费客户端连接断开后，是否自动删除队列-->
+    <rabbit:queue name="queue.str1" durable="true" auto-delete="false" exclusive="false"/>
+    <rabbit:queue name="queue.str2" durable="true" auto-delete="false" exclusive="false"/>
+    <rabbit:queue name="queue.str3" durable="true" auto-delete="false" exclusive="false"/>
+    <rabbit:queue name="queue.str4" durable="true" auto-delete="false" exclusive="false"/>
+    <rabbit:queue name="queue.str5" durable="true" auto-delete="false" exclusive="false"/>
+    <rabbit:queue name="queue.byte" durable="true" auto-delete="false" exclusive="false"/>
+    <rabbit:queue name="queue.Object" durable="true" auto-delete="false" exclusive="false"/>
+
+
+    <!-- **2、交换机** -->
+
+    <!--fanout-exchange 广播式交换机,交换机名称 mq.fanout.exchange : 一个发送到交换机的消息都会被转发到与该交换机绑定的所有队列上-->
+    <rabbit:fanout-exchange name="mq.fanout.exchange" durable="true" auto-delete="false">
+        <!-- 该处把需要数据的队列与路由绑定一起，如果手动在控制台绑定就不需要此代码 -->
+        <rabbit:bindings>
+            <!--往名字为mq.fanout.exchange的路由里面发送数据，客户端中只要是与该路由绑定在一起的队列都会收到相关消息，
+            这类似全频广播，发送端不管队列是谁，都由客户端自己去绑定，谁需要数据谁去绑定自己的处理队列-->
+            <!-- 绑定队列：通过广播式交换机发送给所有队列 , 注意：不需要路由键-->
+            <rabbit:binding queue="queue.str1"/>
+            <rabbit:binding queue="queue.str2"/>
+        </rabbit:bindings>
+    </rabbit:fanout-exchange>
+
+    <!--topic-exchange 主题交换机(常用),交换机名称 mq.topic.exchange ：发送端不只按固定的routing key发送消息，而是按字符串“匹配”发送，接收端同样如此-->
+    <rabbit:topic-exchange name="mq.topic.exchange" durable="true" auto-delete="false">
+        <rabbit:bindings>
+            <!--通过路由键 routing key或匹配模式 发送字符串给 队列(可以是多个)，注意：需要路由键 -->
+            <rabbit:binding queue="queue.str1" pattern="routingKey.send.str.1"/>
+
+            <!--mq.byte.send 发送字节数据(推荐) -->
+            <rabbit:binding queue="queue.byte" pattern="routingKey.send.byte"/>
+
+            <!--当路由键为str4.hello.str3 ，两个消费队列都可以收到消息;
+                当路由键为str4.hello.aaa ，只有绑定了str4.#的队列才可以收到消息;
+                当路由键为bbb.hello.str3 ，只有绑定了*.*.str3的队列才可收到消息-->
+            <rabbit:binding queue="queue.str3" pattern="*.*.str3"/>
+            <rabbit:binding queue="queue.str4" pattern="str4.#"/>
+
+        </rabbit:bindings>
+    </rabbit:topic-exchange>
+
+    <!--direct-exchange 直连交换机,交换机名称 mq.direct.exchange : 要求该消息与一个特定的路由键完全匹配,一对一的匹配才会转发-->
+    <rabbit:direct-exchange name="mq.direct.exchange" durable="true" auto-delete="false">
+        <rabbit:bindings>
+            <!--direct exchange: 所有消息发送到 direct exchange 的消息被转发到 routing key 中指定的queue，注意：需要路由键-->
+            <rabbit:binding queue="queue.str2" key="routingKey.send.str.2"/>
+            <rabbit:binding queue="queue.str3" key="routingKey.send.str.3"/>
+            <rabbit:binding queue="queue.str5" key="routingKey.send.str.5"/>
+        </rabbit:bindings>
+    </rabbit:direct-exchange>
+
+    <!--headers-exchange Headers交换机(不常用，也不推荐用),交换机名称 mq.headers.exchange : 非路由键，除此之外，header 交换器和 direct 交换器完全一致，但是性能却差很多，因此基本上不会用到该交换器-->
+    <!--<rabbit:headers-exchange name="mq.headers.exchange" durable="true" auto-delete="false">
+        <rabbit:bindings>
+            &lt;!&ndash;注意：非路由键&ndash;&gt;
+            <rabbit:binding queue="queue.str4" key="routingKey.send.str.4"/>
+        </rabbit:bindings>
+    </rabbit:headers-exchange>-->
+
+
+</beans>

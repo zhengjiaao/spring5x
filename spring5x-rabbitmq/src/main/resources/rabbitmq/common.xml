@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/rabbit http://www.springframework.org/schema/rabbit/spring-rabbit.xsd">
+
+    <!-- 一、 RabbitMQ 公共配置：连接 -->
+
+    <!--扫描 rabbit 包 自动声明交换器、队列、绑定关系-->
+    <!--<context:component-scan base-package="com.zja.rabbitmq.*"/>-->
+
+    <context:property-placeholder location="classpath:rabbitmq/rabbitmq.properties" ignore-unresolvable="true"/>
+
+    <!--1、声明连接工厂-->
+    <rabbit:connection-factory id="connectionFactory"
+                               addresses="${rabbitmq.addresses}"
+                               username="${rabbitmq.username}"
+                               password="${rabbitmq.password}"
+                               virtual-host="${rabbitmq.virtual-host}"
+                               publisher-returns="${rabbitmq.publisher-returns}"
+                               publisher-confirms="${rabbitmq.publisher-confirms}"/>
+
+    <!--创建一个管理器（org.springframework.amqp.rabbit.core.RabbitAdmin），用于管理交换，队列和绑定。
+    auto-startup 指定是否自动声明上下文中的队列,交换和绑定, 默认值为 true。-->
+    <rabbit:admin connection-factory="connectionFactory" auto-startup="true"/>
+
+</beans>

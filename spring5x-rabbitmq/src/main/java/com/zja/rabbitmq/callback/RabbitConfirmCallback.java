@@ -5,7 +5,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
 /**
  * @author ZhengJa
- * @description 确认后回调
+ * @description 确认后回调方
  * @data 2019/11/4
  */
 public class RabbitConfirmCallback implements RabbitTemplate.ConfirmCallback {

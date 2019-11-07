@@ -8,7 +8,7 @@ import java.io.UnsupportedEncodingException;
 
 /**
  * @author ZhengJa
- * @description 失败后回调 :消息发送失败返回监听器
+ * @description 失败后return回调 :消息发送失败返回监听器
  * @data 2019/11/4
  */
 public class RabbitReturnCallback implements RabbitTemplate.ReturnCallback{

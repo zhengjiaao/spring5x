@@ -8,10 +8,10 @@ import java.io.UnsupportedEncodingException;
 
 /**
  * @author ZhengJa
- * @description 消费者接收字节数据
+ * @description 消费者1
  * @data 2019/11/4
  */
-public class ByteConsumer implements MessageListener {
+public class QueueStr1Consumer implements MessageListener {
 
     /**
      * 消费者接收消息
@@ -20,13 +20,13 @@ public class ByteConsumer implements MessageListener {
      */
     @Override
     public void onMessage(Message message) {
-        System.out.println("进入ByteConsumer 的监听器");
-
         MessageProperties m=message.getMessageProperties();
-
-        byte[] body = message.getBody();
+        //System.out.println("m "+m);
+        String msg= null;
         try {
-            System.out.println("ByteConsumer消费掉了:  "+new String(body,"utf-8"));
+            //utf-8 解决 消费者接收中文消息乱码
+            msg = new String (message.getBody(),"utf-8");
+            System.out.println("QueueStr1Consumer消费掉了:  "+msg);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
