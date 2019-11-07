@@ -127,17 +127,18 @@
             <scope>test</scope>
         </dependency>
 
-        <!--jms-activemq消息中间插件-->
+        <!--ActiveMQ 消息中间插件-->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-jms</artifactId>
             <version>${spring.version}</version>
         </dependency>
+        <!--jms连接工厂-->
         <dependency>
             <groupId>javax.jms</groupId>
             <artifactId>javax.jms-api</artifactId>
             <version>2.0.1</version>
-        </dependency><!--少了会报错 Caused by: java.lang.NoClassDefFoundError: javax/jms/JMSContext-->
+        </dependency>
         <dependency>
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-core</artifactId>

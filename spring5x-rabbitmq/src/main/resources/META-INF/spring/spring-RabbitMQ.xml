@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/rabbit http://www.springframework.org/schema/rabbit/spring-rabbit.xsd">
+
+    <!--扫描 rabbit 包 自动声明交换器、队列、绑定关系-->
+    <!--<context:component-scan base-package="com.zja.config"/>-->
+
+    <context:property-placeholder location="classpath:rabbitmq.properties" ignore-unresolvable="true"/>
+
+    <!--1、声明连接工厂-->
+    <rabbit:connection-factory id="connectionFactory"
+                               addresses="${rabbitmq.addresses}"
+                               username="${rabbitmq.username}"
+                               password="${rabbitmq.password}"
+                               virtual-host="${rabbitmq.virtual-host}"
+                               publisher-returns="${rabbitmq.publisher-returns}"
+                               publisher-confirms="${rabbitmq.publisher-confirms}"/>
+
+    <!--创建一个管理器（org.springframework.amqp.rabbit.core.RabbitAdmin），用于管理交换，队列和绑定。
+    auto-startup 指定是否自动声明上下文中的队列,交换和绑定, 默认值为 true。-->
+    <rabbit:admin connection-factory="connectionFactory" auto-startup="true"/>
+
+    <!-- 给模板指定转换器 --><!-- mandatory必须设置true,return callback才生效 -->
+    <!--<rabbit:template id="amqpTemplate"	connection-factory="connectionFactory"
+                     confirm-callback="rabbitConfirmCallback"
+                     return-callback="rabbitReturnCallback"
+                     mandatory="true"
+    />-->
+
+    <!-- rabbitTemplate 消息模板类：给模板指定转换器,Spring AMQP 提供了 RabbitTemplate 来简化 RabbitMQ 发送和接收消息操作-->
+    <bean id="rabbitTemplate" class="org.springframework.amqp.rabbit.core.RabbitTemplate">
+        <!--连接工厂-->
+        <constructor-arg ref="connectionFactory"></constructor-arg>
+        <!--消息确认回调 -->
+        <property name="confirmCallback" ref="rabbitConfirmCallback"/>
+        <!-- mandatory必须设置true,returnCallback才生效 -->
+        <property name="returnCallback" ref="rabbitReturnCallback"/>
+        <property name="mandatory" value="true"/>
+    </bean>
+    <!--如果消息没有到exchange,则confirm回调,ack=false -->
+    <!--如果消息到达exchange,则confirm回调,ack=true -->
+    <bean id="rabbitConfirmCallback" class="com.zja.rabbitmq.callback.RabbitConfirmCallback"/>
+    <!--exchange到queue成功,则不回调return -->
+    <!--exchange到queue失败,则回调return(需设置mandatory=true,否则不回回调,消息就丢了) -->
+    <bean id="rabbitReturnCallback" class="com.zja.rabbitmq.callback.RabbitReturnCallback"/>
+
+
+    <!--可以在 xml 采用如下方式声明交换机、队列、绑定管理 但是建议使用代码方式声明 方法更加灵活且可以采用链调用-->
+    <!--定义queue  说明：durable:是否持久化 exclusive: 仅创建者可以使用的私有队列，断开后自动删除 auto_delete: 当所有消费客户端连接断开后，是否自动删除队列-->
+    <rabbit:queue name="mq.queue1" durable="true" auto-delete="false" exclusive="false"/>
+    <rabbit:queue name="mq.queue2" durable="true" auto-delete="false" exclusive="false"/>
+    <rabbit:queue name="mq.remoting" durable="true" auto-delete="false" exclusive="false"/>
+    <rabbit:queue name="mq.byte" durable="true" auto-delete="false" exclusive="false"/>
+
+    <!--定义 主题 topic-exchange 交换机 路由键 mq.queueExchange -->
+    <rabbit:topic-exchange name="mq.topicExchange" durable="true" auto-delete="false">
+        <rabbit:bindings>
+            <!--mq.queueAll.send 发送字符串给所有队列 -->
+            <rabbit:binding queue="mq.queue1" pattern="mq.queueAll.send"/>
+            <rabbit:binding queue="mq.queue2" pattern="mq.queueAll.send"/>
+
+            <!--mq.queue2.send 发送字符串给mq.queue2队列 -->
+            <rabbit:binding queue="mq.queue2" pattern="mq.queue2.send"/>
+            <!--mq.byte.send 发送字节数据(推荐) -->
+            <rabbit:binding queue="mq.byte" pattern="mq.byte.send"/>
+        </rabbit:bindings>
+    </rabbit:topic-exchange>
+
+    <!--定义direct-exchange 交换机  路由键 mq.remotingExchange -->
+    <rabbit:direct-exchange name="mq.directExchange" durable="true" auto-delete="false">
+        <rabbit:bindings>
+            <!--mq.remoting.send 发送字符串给mq.remoting队列 -->
+            <rabbit:binding queue="mq.remoting" key="mq.remoting.send"/>
+        </rabbit:bindings>
+    </rabbit:direct-exchange>
+
+    <!-- 消息接收者 -->
+    <bean id="queue1Consumer" class="com.zja.rabbitmq.consumers.Queue1Consumer"/>
+    <bean id="queue2Consumer" class="com.zja.rabbitmq.consumers.Queue2Consumer"/>
+    <bean id="remotingConsumer" class="com.zja.rabbitmq.consumers.RemotingConsumer"/>
+    <bean id="byteConsumer" class="com.zja.rabbitmq.consumers.ByteConsumer"/>
+    <bean id="receiveConfirmTestListener" class="com.zja.rabbitmq.consumers.ReceiveConfirmTestListener"/>
+
+    <!-- queue litener 观察 监听模式 当有消息到达时会通知监听在对应的队列上的监听对象 -->
+    <rabbit:listener-container connection-factory="connectionFactory" >
+        <rabbit:listener  queues="mq.queue1"  ref="queue1Consumer"/>
+    </rabbit:listener-container>
+    <rabbit:listener-container connection-factory="connectionFactory" >
+        <rabbit:listener  queues="mq.queue2"  ref="queue2Consumer"/>
+    </rabbit:listener-container>
+    <!--<rabbit:listener-container connection-factory="connectionFactory" >
+        <rabbit:listener  queues="mq.remoting"  ref="remotingConsumer"/>
+    </rabbit:listener-container>-->
+    <rabbit:listener-container connection-factory="connectionFactory" >
+        <rabbit:listener  queues="mq.remoting"  ref="receiveConfirmTestListener"/>
+    </rabbit:listener-container>
+    <rabbit:listener-container connection-factory="connectionFactory">
+        <rabbit:listener queues="mq.byte" ref="byteConsumer"/>
+    </rabbit:listener-container>
+
+    <!--<rabbit:listener-container connection-factory="connectionFactory"  acknowledge="manual">
+        <rabbit:listener  queues="mq.queue2"  ref="receiveConfirmTestListener"/>
+    </rabbit:listener-container>-->
+
+</beans>

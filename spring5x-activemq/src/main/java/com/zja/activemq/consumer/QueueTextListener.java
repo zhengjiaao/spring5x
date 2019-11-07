@@ -12,7 +12,11 @@ import javax.jms.TextMessage;
  */
 public class QueueTextListener implements MessageListener {
 
-    //接收 TextMessage消息信息，没加转换器之前接收到的是文本消息
+    /**
+     * 接收 TextMessage消息信息，没加转换器之前接收到的是文本消息
+     * @param message 文本消息（一般直接传输json字符串，所以可以认为文本消息是最通用的）
+     * @return void
+     */
     @Override
     public void onMessage(Message message) {
         System.out.println("进入 QueueTextListener 监听器");

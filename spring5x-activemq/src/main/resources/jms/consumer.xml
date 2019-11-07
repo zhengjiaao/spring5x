@@ -9,7 +9,7 @@
        http://www.springframework.org/schema/jms/spring-jms.xsd">
 
     <!--导入公共配置-->
-    <import resource="spring-ActiveMQ.xml"/>
+    <import resource="common.xml"/>
 
     <!-- ==========================三、消费者 ：接收消息============================  -->
 

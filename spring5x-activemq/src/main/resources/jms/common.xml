@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:jsm="http://www.springframework.org/schema/jms"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/jms
+       http://www.springframework.org/schema/jms/spring-jms.xsd">
+
+    <!-- ==========================一、生产者和消费者的公共配置 ：连接池-目的地-模式============================  -->
+
+    <!-- 1、ActiveMQ 连接工厂 ConnectionFactory -->
+    <bean id="targetConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+        <property name="brokerURL" value="tcp://192.168.2.42:61616"/>
+        <!-- 是否异步发送 -->
+        <property name="useAsyncSend" value="true" />
+        <!-- Session缓存数量 -->
+        <property name="sessionTaskRunner" value="10" />
+    </bean>
+
+    <!--Spring Caching 连接工厂(类似数据库线程池的东西，减少连接的创建。) -->
+    <!-- 2、由于jmsTemplate每次发送消息都需要创建连接和创建session了，所以引入这个类似连接池的连接工厂，优化Mq的性能 -->
+    <bean id="connectionFactoty" class="org.springframework.jms.connection.SingleConnectionFactory">
+        <!-- 目标连接工厂 指向 ActiveMq工厂 -->
+        <property name="targetConnectionFactory" ref="targetConnectionFactory"/>
+    </bean>
+
+    <!-- 3、ActiveMQ提供的目的地 -->
+
+    <!--队列模式_文本消息：一个队列的目的地，点对点的-->
+    <bean id="queueTextDestination" class="org.apache.activemq.command.ActiveMQQueue">
+        <!-- 设置Text消息队列的名字 -->
+        <constructor-arg value="queue.Text"/> <!--队列 构造函数参数-->
+    </bean>
+
+    <!--队列模式_对象消息：一个队列的目的地，点对点的-->
+    <bean id="queueObjectDestination" class="org.apache.activemq.command.ActiveMQQueue">
+        <!-- 设置对象消息队列的名字 -->
+        <constructor-arg value="queue.Object"/> <!--队列 构造函数参数-->
+    </bean>
+
+    <!--主题模式_文本消息：一个主题目的地，发布订阅模式-->
+    <bean id="topicTextDestination" class="org.apache.activemq.command.ActiveMQTopic">
+        <!-- 设置Text消息主题的名字 -->
+        <constructor-arg value="topic.Text"/> <!--主题 构造函数参数-->
+    </bean>
+
+    <!--主题模式_对象消息：一个主题目的地，发布订阅模式-->
+    <bean id="topicObjectDestination" class="org.apache.activemq.command.ActiveMQTopic">
+        <!-- 设置对象消息主题的名字 -->
+        <constructor-arg value="topic.Object"/> <!--主题 构造函数参数-->
+    </bean>
+
+</beans>

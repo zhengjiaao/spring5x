@@ -21,6 +21,7 @@
     <module>spring5x-task</module>
     <module>spring5x-websocket</module>
     <module>spring5x-activemq</module>
+    <module>spring5x-rabbitmq</module>
   </modules>
 
   <properties>
