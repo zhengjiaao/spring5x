@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/c"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!--引入memcached配置-->
+    <context:property-placeholder location="classpath:memcached/memcached.properties" ignore-unresolvable="true"/>
+
+    <bean id="memcachedClientBuilder" class="net.rubyeye.xmemcached.XMemcachedClientBuilder">
+        <constructor-arg name="addressList" value="${memcached.host}"/>
+    </bean>
+
+    <bean id="memcachedClient" factory-bean="memcachedClientBuilder" factory-method="build"
+          destroy-method="shutdown"/>
+
+    <!-- 注入自定义工具类写的类 -->
+    <bean id="xMemcachedUtil" class="com.zja.util.XMemcachedUtil"/>
+
+</beans>

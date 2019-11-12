@@ -47,6 +47,8 @@
     <context:property-placeholder
             location="classpath:application.properties" />
 
+    <import resource="classpath:memcached/spring-xmemcache.xml"/>
+
     <!-- 配置视图解析器 -->
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"
           id="internalResourceViewResolver">
