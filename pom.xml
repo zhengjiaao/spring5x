@@ -22,6 +22,7 @@
     <module>spring5x-websocket</module>
     <module>spring5x-activemq</module>
     <module>spring5x-rabbitmq</module>
+    <module>spring5x-mongodb</module>
   </modules>
 
   <properties>

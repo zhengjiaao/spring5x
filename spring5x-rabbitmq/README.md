@@ -1,18 +1,9 @@
-# spring5.x-rabbimq 高级篇
-
-[TOC]
-
-由于之前已经贴出一份简单RabbitMQ配置，这里不详细说配置了，直接都是全配置，代码不全的区github下拉看具体代码。
-
-简单配置地址: [RabbitMQ 简单配置]()
-
+![spring5.x-rabbitmq.png](https://upload-images.jianshu.io/upload_images/15645795-96e8423e99e4808b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 
 spring-rabbitmq 此模块是从spring5x-base 基础模块扩展过来的
-
 spring5x-base模块是一个非常干净的spring5.x+springMVC架构
-
-如果没有搭建spring5x-base模块，请参考 [spring5x-base模块搭建](spring5.x-base.md)
+如果没有搭建spring5x-base模块，请参考  [spring5x-base模块搭建](https://www.jianshu.com/p/8612404cf1d6)
 
 
 
@@ -20,25 +11,59 @@ spring5x-base模块是一个非常干净的spring5.x+springMVC架构
 
 **基于spring5x-base 基础模块 新增功能：**
 
-- 1、spring 集成RabbitMQ 及高级使用
+- 1、spring 集成RabbitMQ 及使用
+- 2、ConfirmCallback的使用及触发的一种场景
+- 3、ReturnCallback的使用及触发的一种场景
 
-
+安装RabbitMQ:
+[RabbitMQ 介绍和安装](https://www.jianshu.com/p/f19e19486adf)
 
 建议了解：RabbitMQ 图解
-
 https://blog.csdn.net/bestmy/article/details/84304964
-
 https://blog.csdn.net/qq_29914837/article/details/92739464
-
 https://www.cnblogs.com/yinfengjiujian/p/9115539.html
 
+spring5.x-rabbimq 高级篇: [spring5.x-rabbimq 高级篇](https://www.jianshu.com/p/f570d06b2b4a)
 
 
-### 1、spring 集成RabbitMQ 及高级使用
+
+### 1、spring 集成RabbitMQ 及使用
 
 ****
 
-common.xml   RabbitMQ 公共配置
+pom.xml
+
+```xml
+		<!--spring rabbitmq 整合依赖-->
+        <dependency>
+            <groupId>org.springframework.amqp</groupId>
+            <artifactId>spring-rabbit</artifactId>
+            <version>2.1.10.RELEASE</version>
+        </dependency>
+        <!--rabbitmq 传输对象序列化依赖了这个包-->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.9.8</version>
+        </dependency>
+
+```
+
+> 注：也可以这样单独引用，spring-rabbit 内部包含了好多模块
+
+rabbitmq.properties
+
+```properties
+#默认java连接端口
+rabbitmq.addresses=localhost:5672
+rabbitmq.username=guest
+rabbitmq.password=guest
+# 虚拟主机，等价于名称空间，默认为 / ，如果想使用其他名称空间必须先用图形界面或者管控台添加，程序不会自动创建
+rabbitmq.virtual-host=/
+
+```
+
+spring-RabbitMQ.xml
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -48,296 +73,649 @@ common.xml   RabbitMQ 公共配置
        xmlns:rabbit="http://www.springframework.org/schema/rabbit"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/rabbit http://www.springframework.org/schema/rabbit/spring-rabbit.xsd">
 
-    <!-- 一、 RabbitMQ 公共配置：连接 -->
+    <!--扫描 rabbit 包 自动声明交换器、队列、绑定关系，启动了springmvc注解扫描这里可以注释掉-->
+    <!--<context:component-scan base-package="com.zja.config"/>-->
 
-    <!--扫描 rabbit 包 自动声明交换器、队列、绑定关系-->
-    <!--<context:component-scan base-package="com.zja.rabbitmq.*"/>-->
+    <!--引入rabbitmq.properties配置-->
+    <context:property-placeholder location="classpath:rabbitmq.properties" ignore-unresolvable="true"/>
 
-    <context:property-placeholder location="classpath:rabbitmq/rabbitmq.properties" ignore-unresolvable="true"/>
-
-    <!--1、声明连接工厂-->
+    <!--声明连接工厂-->
     <rabbit:connection-factory id="connectionFactory"
                                addresses="${rabbitmq.addresses}"
                                username="${rabbitmq.username}"
                                password="${rabbitmq.password}"
-                               virtual-host="${rabbitmq.virtual-host}"
-                               publisher-returns="${rabbitmq.publisher-returns}"
-                               publisher-confirms="${rabbitmq.publisher-confirms}"/>
+                               virtual-host="${rabbitmq.virtual-host}" />
 
     <!--创建一个管理器（org.springframework.amqp.rabbit.core.RabbitAdmin），用于管理交换，队列和绑定。
     auto-startup 指定是否自动声明上下文中的队列,交换和绑定, 默认值为 true。-->
     <rabbit:admin connection-factory="connectionFactory" auto-startup="true"/>
 
+    <!--声明 template 的时候需要声明 id 不然会抛出异常-->
+    <rabbit:template id="rabbitTemplate" connection-factory="connectionFactory"/>
+
+    <!--可以在 xml 采用如下方式声明交换机、队列、绑定管理 但是建议使用代码方式声明 方法更加灵活且可以采用链调用-->
+    <!--定义queue  说明：durable:是否持久化 exclusive: 仅创建者可以使用的私有队列，断开后自动删除 auto_delete: 当所有消费客户端连接断开后，是否自动删除队列-->
+    <rabbit:queue name="mq.queue1" durable="true" auto-delete="false" exclusive="false"/>
+    <rabbit:queue name="mq.queue2" durable="true" auto-delete="false" exclusive="false"/>
+    <rabbit:queue name="mq.remoting" durable="true" auto-delete="false" exclusive="false"/>
+    <rabbit:queue name="mq.byte" durable="true" auto-delete="false" exclusive="false"/>
+
+    <!--定义 主题 topic-exchange 交换机 路由键 mq.queueExchange -->
+    <rabbit:topic-exchange name="mq.topicExchange" durable="true" auto-delete="false">
+        <rabbit:bindings>
+            <!--mq.queueAll.send 发送字符串给所有队列 -->
+            <rabbit:binding queue="mq.queue1" pattern="mq.queueAll.send"/>
+            <rabbit:binding queue="mq.queue2" pattern="mq.queueAll.send"/>
+
+            <!--mq.queue2.send 发送字符串给mq.queue2队列 -->
+            <rabbit:binding queue="mq.queue2" pattern="mq.queue2.send"/>
+            <!--mq.byte.send 发送字节数据(推荐) -->
+            <rabbit:binding queue="mq.byte" pattern="mq.byte.send"/>
+        </rabbit:bindings>
+    </rabbit:topic-exchange>
+
+    <!--定义direct-exchange 交换机  路由键 mq.remotingExchange -->
+    <rabbit:direct-exchange name="mq.directExchange" durable="true" auto-delete="false">
+        <rabbit:bindings>
+            <!--mq.remoting.send 发送字符串给mq.remoting队列 -->
+            <rabbit:binding queue="mq.remoting" key="mq.remoting.send"/>
+        </rabbit:bindings>
+    </rabbit:direct-exchange>
+
+    <!-- 消息接收者 -->
+    <bean id="queue1Consumer" class="com.zja.rabbitmq.consumers.Queue1Consumer"/>
+    <bean id="queue2Consumer" class="com.zja.rabbitmq.consumers.Queue2Consumer"/>
+    <bean id="remotingConsumer" class="com.zja.rabbitmq.consumers.RemotingConsumer"/>
+    <bean id="byteConsumer" class="com.zja.rabbitmq.consumers.ByteConsumer"/>
+
+    <!-- queue litener 观察 监听模式 当有消息到达时会通知监听在对应的队列上的监听对象 -->
+    <rabbit:listener-container connection-factory="connectionFactory" >
+        <rabbit:listener  queues="mq.queue1"  ref="queue1Consumer"/>
+    </rabbit:listener-container>
+    <rabbit:listener-container connection-factory="connectionFactory" >
+        <rabbit:listener  queues="mq.queue2"  ref="queue2Consumer"/>
+    </rabbit:listener-container>
+    <rabbit:listener-container connection-factory="connectionFactory" >
+        <rabbit:listener  queues="mq.remoting"  ref="remotingConsumer"/>
+    </rabbit:listener-container>
+    <rabbit:listener-container connection-factory="connectionFactory">
+        <rabbit:listener queues="mq.byte" ref="byteConsumer"/>
+    </rabbit:listener-container>
+
 </beans>
 
 ```
 
-producer.xml  生产者：发送消息
+
+
+**消费者(接收消息)：**
+
+Queue1Consumer.java
+
+```java
+package com.zja.rabbitmq.consumers;
+
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageListener;
+import org.springframework.amqp.core.MessageProperties;
+
+import java.io.UnsupportedEncodingException;
+
+/**
+ * @author ZhengJa
+ * @description 消费者1
+ * @data 2019/11/4
+ */
+public class Queue1Consumer implements MessageListener {
+
+    /**
+     * 消费者接收消息
+     * @param message 推荐使用字节
+     * @return void
+     */
+    @Override
+    public void onMessage(Message message) {
+        System.out.println("进入Queue1Consumer 的监听器");
+
+        MessageProperties m=message.getMessageProperties();
+        //System.out.println("m "+m);
+        String msg= null;
+        try {
+            //utf-8 解决 消费者接收中文消息乱码
+            msg = new String (message.getBody(),"utf-8");
+            System.out.println("Queue1Consumer消费掉了:  "+msg);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+```
+
+Queue2Consumer.java
+
+```java
+package com.zja.rabbitmq.consumers;
+
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageListener;
+import org.springframework.amqp.core.MessageProperties;
+
+import java.io.UnsupportedEncodingException;
+
+/**
+ * @author ZhengJa
+ * @description 消费者2
+ * @data 2019/11/4
+ */
+public class Queue2Consumer implements MessageListener {
+
+    /**
+     * 消费者接收消息
+     * @param message 推荐使用字节
+     * @return void
+     */
+    @Override
+    public void onMessage(Message message) {
+        System.out.println("进入Queue2Consumer 的监听器");
+        MessageProperties m=message.getMessageProperties();
+        //System.out.println("m "+m);
+        String msg= null;
+        try {
+            //utf-8 解决 消费者接收中文消息乱码
+            msg = new String (message.getBody(),"utf-8");
+            System.out.println("Queue2Consumer消费掉了:  "+msg);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+```
+
+RemotingConsumer.java
+
+```java
+package com.zja.rabbitmq.consumers;
+
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageListener;
+import org.springframework.amqp.core.MessageProperties;
+
+import java.io.UnsupportedEncodingException;
+
+/**
+ * @author ZhengJa
+ * @description 消费者
+ * @data 2019/11/4
+ */
+public class RemotingConsumer implements MessageListener {
+
+    /**
+     * 消费者接收消息
+     * @param message 推荐使用字节
+     * @return void
+     */
+    @Override
+    public void onMessage(Message message) {
+        System.out.println("进入RemotingConsumer 监听器");
+        MessageProperties m=message.getMessageProperties();
+        //System.out.println("m "+m);
+        String msg= null;
+        try {
+            //utf-8 解决 消费者接收中文消息乱码
+            msg = new String (message.getBody(),"utf-8");
+            System.out.println("RemotingConsumer消费掉了:  "+msg);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+```
+
+ByteConsumer.java
+
+```java
+package com.zja.rabbitmq.consumers;
+
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageListener;
+import org.springframework.amqp.core.MessageProperties;
+
+import java.io.UnsupportedEncodingException;
+
+/**
+ * @author ZhengJa
+ * @description 消费者接收字节数据
+ * @data 2019/11/4
+ */
+public class ByteConsumer implements MessageListener {
+
+    /**
+     * 消费者接收消息
+     * @param message 推荐使用字节
+     * @return void
+     */
+    @Override
+    public void onMessage(Message message) {
+        System.out.println("进入ByteConsumer 的监听器");
+
+        MessageProperties m=message.getMessageProperties();
+
+        byte[] body = message.getBody();
+        try {
+            System.out.println("ByteConsumer消费掉了:  "+new String(body,"utf-8"));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+```
+
+RabbitMQController.java 测试接口
+
+```java
+package com.zja.controller;
+
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+
+/**
+ * @author ZhengJa
+ * @description RabbitMQ 测试
+ * @data 2019/11/4
+ */
+@RestController
+@RequestMapping("rest/rabbit")
+public class RabbitMQController {
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    @RequestMapping("/sendMsg")
+    @ResponseBody
+    public String sendAmqbMsg() {
+        String allReceived = "我的路由键 mq.topicExchange 符合 mq.queue1、mq.queue2和mq.remoting 的要求，我应该被三个个监听器接收到";
+        rabbitTemplate.convertAndSend("mq.topicExchange", "mq.queueAll.send", allReceived);
+        return "success";
+    }
+
+    @RequestMapping("/sendMsg2")
+    @ResponseBody
+    public String sendAmqbMsg2() {
+        String firstReceived = "我的路由键 mq.topicExchange 只符合 mq.queue2 的要求，只能被 mq.queue2 接收到";
+        rabbitTemplate.convertAndSend("mq.topicExchange", "mq.queue2.send", firstReceived);
+        return "success";
+    }
+
+    @RequestMapping("/sendMsg3")
+    @ResponseBody
+    public String sendAmqbMsg3() {
+        String firstReceived = "我的路由键 mq.directExchange 只符合 mq.remoting 的要求，只能被 mq.remoting 接收到";
+        rabbitTemplate.convertAndSend("mq.directExchange", "mq.remoting.send", firstReceived);
+        return "success";
+    }
+
+    @RequestMapping("/sendMsg4")
+    @ResponseBody
+    public String sendAmqbMsg4() {
+        String firstReceived = "我的路由键 mq.topicExchange 只符合 mq.byte 的要求，只能被 mq.byte 接收到";
+        rabbitTemplate.convertAndSend("mq.topicExchange", "mq.byte.send", firstReceived);
+        return "success";
+    }
+}
+
+```
+
+> 浏览器调用接口，查看控制台打印信息。
+
+
+
+### 2、ConfirmCallback的使用及触发的一种场景
+
+****
+
+目前回调存在ConfirmCallback和ReturnCallback两者。他们的区别在于：
+
+> 1、如果消息没有到exchange,则ConfirmCallback回调,ack=false
+> 2、如果消息到达exchange,则ConfirmCallback回调,ack=true
+> 3、exchange到queue成功,则不回调ReturnCallback
+
+
+
+rabbitmq.properties
+
+```properties
+# 开启发送确认
+#消息发送到交换机确认机制,是否确认回调
+#如果没有本条配置信息，当消费者收到生产者发送的消息后，生产者无法收到确认成功的回调信息
+rabbitmq.publisher-confirms=true
+
+```
+
+>rabbitmq.properties 添加 开启回调机制
+
+spring-RabbitMQ.xml
 
 ```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rabbit="http://www.springframework.org/schema/rabbit"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/rabbit http://www.springframework.org/schema/rabbit/spring-rabbit.xsd">
+	<!--声明连接工厂-->
+    <rabbit:connection-factory id="connectionFactory"
+                               addresses="${rabbitmq.addresses}"
+                               username="${rabbitmq.username}"
+                               password="${rabbitmq.password}"
+                               virtual-host="${rabbitmq.virtual-host}"
+                               publisher-confirms="${rabbitmq.publisher-confirms}"/>
 
-    <!-- 二、生产者配置：发送消息 -->
 
-    <!--引入RabbitMQ公共配置-->
-    <import resource="common.xml"/>
+	<!--声明 template 的时候需要声明 id 不然会抛出异常-->
+    <!--<rabbit:template id="rabbitTemplate" connection-factory="connectionFactory"/>-->
 
-    <!-- **1、配置发送消息模板类** -->
-
-    <!-- 1、rabbitTemplate 发送消息模板类：给模板指定转换器,Spring AMQP 提供了 RabbitTemplate 来简化 RabbitMQ 发送和接收消息操作-->
+    <!-- rabbitTemplate 消息模板类：给模板指定转换器 -->
     <bean id="rabbitTemplate" class="org.springframework.amqp.rabbit.core.RabbitTemplate">
         <!--连接工厂-->
         <constructor-arg ref="connectionFactory"></constructor-arg>
-        <!--发送方消息转换器-->
-        <!--<property name="messageConverter" ref="byteMessageConverter"/>-->
         <!--消息确认回调 -->
         <property name="confirmCallback" ref="rabbitConfirmCallback"/>
-        <!-- mandatory必须设置true,returnCallback才生效 -->
-        <property name="returnCallback" ref="rabbitReturnCallback"/>
-        <property name="mandatory" value="true"/>
     </bean>
     <!--如果消息没有到exchange,则confirm回调,ack=false -->
     <!--如果消息到达exchange,则confirm回调,ack=true -->
     <bean id="rabbitConfirmCallback" class="com.zja.rabbitmq.callback.RabbitConfirmCallback"/>
-    <!--exchange到queue成功,则不回调return -->
-    <!--exchange到queue失败,则回调return(需设置mandatory=true,否则不回回调,消息就丢了) -->
-    <bean id="rabbitReturnCallback" class="com.zja.rabbitmq.callback.RabbitReturnCallback"/>
-    <!-- 发送方消息转换器 -->
-    <bean id="byteMessageConverter" class="com.zja.rabbitmq.converter.BytesMessageConverter"/>
 
+	<!--可以在 xml 采用如下方式声明交换机、队列、绑定管理 但是建议使用代码方式声明 方法更加灵活且可以采用链调用-->
+    <!--定义queue  说明：durable:是否持久化 exclusive: 仅创建者可以使用的私有队列，断开后自动删除 auto_delete: 当所有消费客户端连接断开后，是否自动删除队列-->
+    <rabbit:queue name="mq.queue1" durable="true" auto-delete="false" exclusive="false"/>
 
-    <!-- 三、队列和交换机配置 -->
-
-    <!--**1、队列**-->
-
-    <!--可以在 xml 采用如下方式声明交换机、队列、绑定管理 但是建议使用代码方式声明 方法更加灵活且可以采用链调用-->
-    <!--定义队列queue说明：durable:是否持久化(队列持久化，就算断电队列也不会消失，但是消息会丢失)
-            exclusive: 仅创建者可以使用的私有队列，断开后自动删除
-            auto_delete: 当所有消费客户端连接断开后，是否自动删除队列-->
-    <rabbit:queue name="queue.str1" durable="true" auto-delete="false" exclusive="false"/>
-    <rabbit:queue name="queue.str2" durable="true" auto-delete="false" exclusive="false"/>
-    <rabbit:queue name="queue.str3" durable="true" auto-delete="false" exclusive="false"/>
-    <rabbit:queue name="queue.str4" durable="true" auto-delete="false" exclusive="false"/>
-    <rabbit:queue name="queue.str5" durable="true" auto-delete="false" exclusive="false"/>
-    <rabbit:queue name="queue.byte" durable="true" auto-delete="false" exclusive="false"/>
-    <rabbit:queue name="queue.Object" durable="true" auto-delete="false" exclusive="false"/>
-
-
-    <!-- **2、交换机** -->
-
-    <!--fanout-exchange 广播式交换机,交换机名称 mq.fanout.exchange : 一个发送到交换机的消息都会被转发到与该交换机绑定的所有队列上-->
-    <rabbit:fanout-exchange name="mq.fanout.exchange" durable="true" auto-delete="false">
-        <!-- 该处把需要数据的队列与路由绑定一起，如果手动在控制台绑定就不需要此代码 -->
+	<!--定义 主题 topic-exchange 交换机 路由键 mq.queueExchange -->
+    <rabbit:topic-exchange name="mq.topicExchange" durable="true" auto-delete="false">
         <rabbit:bindings>
-            <!--往名字为mq.fanout.exchange的路由里面发送数据，客户端中只要是与该路由绑定在一起的队列都会收到相关消息，
-            这类似全频广播，发送端不管队列是谁，都由客户端自己去绑定，谁需要数据谁去绑定自己的处理队列-->
-            <!-- 绑定队列：通过广播式交换机发送给所有队列 , 注意：不需要路由键-->
-            <rabbit:binding queue="queue.str1"/>
-            <rabbit:binding queue="queue.str2"/>
-        </rabbit:bindings>
-    </rabbit:fanout-exchange>
-
-    <!--topic-exchange 主题交换机(常用),交换机名称 mq.topic.exchange ：发送端不只按固定的routing key发送消息，而是按字符串“匹配”发送，接收端同样如此-->
-    <rabbit:topic-exchange name="mq.topic.exchange" durable="true" auto-delete="false">
-        <rabbit:bindings>
-            <!--通过路由键 routing key或匹配模式 发送字符串给 队列(可以是多个)，注意：需要路由键 -->
-            <rabbit:binding queue="queue.str1" pattern="routingKey.send.str.1"/>
-
-            <!--mq.byte.send 发送字节数据(推荐) -->
-            <rabbit:binding queue="queue.byte" pattern="routingKey.send.byte"/>
-
-            <!--当路由键为str4.hello.str3 ，两个消费队列都可以收到消息;
-                当路由键为str4.hello.aaa ，只有绑定了str4.#的队列才可以收到消息;
-                当路由键为bbb.hello.str3 ，只有绑定了*.*.str3的队列才可收到消息-->
-            <rabbit:binding queue="queue.str3" pattern="*.*.str3"/>
-            <rabbit:binding queue="queue.str4" pattern="str4.#"/>
-
+            <!--mq.queueAll.send 发送字符串给所有队列 -->
+            <rabbit:binding queue="mq.queue1" pattern="mq.queueAll.send"/>
         </rabbit:bindings>
     </rabbit:topic-exchange>
 
-    <!--direct-exchange 直连交换机,交换机名称 mq.direct.exchange : 要求该消息与一个特定的路由键完全匹配,一对一的匹配才会转发-->
-    <rabbit:direct-exchange name="mq.direct.exchange" durable="true" auto-delete="false">
-        <rabbit:bindings>
-            <!--direct exchange: 所有消息发送到 direct exchange 的消息被转发到 routing key 中指定的queue，注意：需要路由键-->
-            <rabbit:binding queue="queue.str2" key="routingKey.send.str.2"/>
-            <rabbit:binding queue="queue.str3" key="routingKey.send.str.3"/>
-            <rabbit:binding queue="queue.str5" key="routingKey.send.str.5"/>
-        </rabbit:bindings>
-    </rabbit:direct-exchange>
-
-    <!--headers-exchange Headers交换机(不常用，也不推荐用),交换机名称 mq.headers.exchange : 非路由键，除此之外，header 交换器和 direct 交换器完全一致，但是性能却差很多，因此基本上不会用到该交换器-->
-    <!--<rabbit:headers-exchange name="mq.headers.exchange" durable="true" auto-delete="false">
-        <rabbit:bindings>
-            &lt;!&ndash;注意：非路由键&ndash;&gt;
-            <rabbit:binding queue="queue.str4" key="routingKey.send.str.4"/>
-        </rabbit:bindings>
-    </rabbit:headers-exchange>-->
-
-
-</beans>
-
 ```
 
-consumer.xml  消费者：接收消息
+>1、添加属性： publisher-confirms
+>
+>2、注释掉之前的rabbitTemplate写法，重构并添加消息回调 confirmCallback 属性
+>
+>3、添加 自定义 RabbitConfirmCallback  回调处理
 
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rabbit="http://www.springframework.org/schema/rabbit"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/rabbit http://www.springframework.org/schema/rabbit/spring-rabbit.xsd">
-
-    <!-- 三、消费者(监听器)配置：接收消息 -->
-
-    <!-- **1、引入RabbitMQ公共配置** -->
-    <import resource="common.xml"/>
-
-    <!-- **2、队列 ：生产者已经创建队列，此处可以省略不写**-->
-
-    <!-- **3、交换机 ：指将交换机与队列绑定在一块，也可以在rabbitMq的控制台上手动绑定** -->
-    <!-- 其实发送端已经绑定过，也没必要绑定，此处可以省略不写 -->
-
-
-    <!-- **4、消息接收者（必须实现监听器）** -->
-    <bean id="queueStr1Consumer" class="com.zja.rabbitmq.consumers.QueueStr1Consumer"/>
-    <bean id="queueStr2Consumer" class="com.zja.rabbitmq.consumers.QueueStr2Consumer"/>
-    <bean id="queueStr3Consumer" class="com.zja.rabbitmq.consumers.QueueStr3Consumer"/>
-    <bean id="queueStr4Consumer" class="com.zja.rabbitmq.consumers.QueueStr4Consumer"/>
-    <bean id="queueStr5Consumer" class="com.zja.rabbitmq.consumers.QueueStr5Consumer"/>
-    <bean id="queueByteConsumer" class="com.zja.rabbitmq.consumers.QueueByteConsumer"/>
-    <bean id="queueObjectConsumer" class="com.zja.rabbitmq.consumers.QueueObjectConsumer"/>
-    <bean id="receiveConfirmTestListener" class="com.zja.rabbitmq.consumers.ReceiveConfirmTestListener"/>
-
-    <!-- **5、队列监听器：观察 监听模式 当有消息到达时会通知监听在对应的队列上的监听对象** -->
-    <rabbit:listener-container connection-factory="connectionFactory">
-        <rabbit:listener  queues="queue.str1"  ref="queueStr1Consumer"/>
-    </rabbit:listener-container>
-    <rabbit:listener-container connection-factory="connectionFactory" >
-        <rabbit:listener  queues="queue.str2"  ref="queueStr2Consumer"/>
-    </rabbit:listener-container>
-    <rabbit:listener-container connection-factory="connectionFactory" >
-        <rabbit:listener  queues="queue.str3"  ref="queueStr3Consumer"/>
-    </rabbit:listener-container>
-    <rabbit:listener-container connection-factory="connectionFactory" >
-        <rabbit:listener  queues="queue.str4"  ref="queueStr4Consumer"/>
-    </rabbit:listener-container>
-    <!--参数中有一个acknowledge=“manual”，是对应答机制的配置，手动应答,标识的是消息确认机制为手动的确认-->
-    <rabbit:listener-container connection-factory="connectionFactory" acknowledge="manual">
-        <rabbit:listener  queues="queue.str5"  ref="queueStr5Consumer"/>
-    </rabbit:listener-container>
-    <rabbit:listener-container connection-factory="connectionFactory">
-        <rabbit:listener queues="queue.byte" ref="queueByteConsumer"/>
-    </rabbit:listener-container>
-    <rabbit:listener-container connection-factory="connectionFactory" >
-        <rabbit:listener  queues="queue.Object"  ref="queueObjectConsumer"/>
-    </rabbit:listener-container>
-
-</beans>
-
-```
-
-spring-mvc.xml 配置
-
-```xml
-	<!--RabbitMQ 拆分配置-->
-    <!--生产者配置：发送消息-->
-    <import resource="classpath:rabbitmq/producer.xml"/>
-    <!--消费者配置：接收消息-->
-    <import resource="classpath:rabbitmq/consumer.xml"/>
-
-```
-
-
-
-ProducerMQController.java 生产者部分代码，其余代码，去github上看
+RabbitConfirmCallback.java
 
 ```java
-/**  ========ReturnCallback 和  ConfirmCallback=========  **/
+package com.zja.rabbitmq.callback;
 
-    /**ConfirmCallback ：消息到达交换机 confirm被回调，返回ack=true
-     * 1、exchange,queue 都正确,confirm被回调, ack=true
-     * @param
-     * @return java.lang.String
-     */
-    @RequestMapping("confirm/sendMsg")
-    public String sendAmqbMsg5() {
-        String firstReceived = " 此 mq.direct.exchange 交换机存在，队列也存在 ";
-        rabbitTemplate.convertAndSend("mq.direct.exchange", "routingKey.send.str.5", firstReceived);
-        return "success";
-    }
+import org.springframework.amqp.rabbit.connection.CorrelationData;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
-    /**ConfirmCallback: 消息无法到达交换机 confirm被回调，返回ack=false
-     * 2、exchange 错误,queue 正确,confirm被回调, ack=false
-     * @param
-     * @return java.lang.String
+/**
+ * @author ZhengJa
+ * @description 确认后回调
+ * @data 2019/11/4
+ */
+public class RabbitConfirmCallback implements RabbitTemplate.ConfirmCallback {
+    
+    /**如果消息没有到exchange,则confirm回调,ack=false
+     * 如果消息到达exchange,则confirm回调,ack=true
+     * @param correlationData 消息唯一标识
+     * @param ack 确认结果
+     * @param cause 失败原因
+     * @return void 
      */
-    @RequestMapping("confirm/sendMsg2")
-    public String sendAmqbMsg6() {
-        String firstReceived = " 此 mq.NotExchange 交换机不存在，无法到达交换机！！ ";
-        rabbitTemplate.convertAndSend("mq.NotExchange", "routingKey.send.str.5", firstReceived);
-        return "success";
+    @Override
+    public void confirm(CorrelationData correlationData, boolean ack, String cause) {
+        System.out.println("消息唯一标识："+correlationData);
+        System.out.println("确认结果："+ack);
+        System.out.println("失败原因："+cause);
     }
-
-    /**ReturnCallback：消息无法从交换机到达队列，返回被监听ReturnCallback，正确到达队列，不被监听
-     * 3、exchange 正确,queue 错误 ,confirm被回调, ack=true; return被回调 replyText:NO_ROUTE
-     * @param
-     * @return java.lang.String
-     */
-    @RequestMapping("return/sendMsg")
-    public String sendAmqbMsg7() {
-        // 返回 ReturnCallback 并被监听到
-        String firstReceived = "存在 mq.topic.exchange 交换机,不存在的 No.mq.send 队列绑定的路由键，无法到达队列";
-        rabbitTemplate.convertAndSend("mq.topic.exchange", "No.mq.send", firstReceived);
-        return "success";
-    }
-
-    /**ReturnCallback：消息无法从交换机到达队列，返回被监听ReturnCallback，正确到达队列，不被监听
-     * 4、exchange 错误,queue 错误,confirm被回调, ack=false
-     * @param
-     * @return java.lang.String
-     */
-    @RequestMapping("return/sendMsg2")
-    public String sendAmqbMsg8() {
-        String firstReceived = "不存在 mq.NotExchange 交换机,无法到达交换机.";
-        rabbitTemplate.convertAndSend("mq.NotExchange", "No.mq.send", firstReceived);
-        return "success";
-    }
+}
 
 ```
 
-ReturnCallback 和  ConfirmCallback 测试接口，控制打印效果：
+RabbitMQController.java
 
-````python
-进入 RabbitConfirmCallback：ack消息到达(true)/没有(false)到达 exchange
-消息唯一标识：null
-确认结果 ack：true
-失败原因：null
-QueueStr5Consumer消费掉了:   此 mq.direct.exchange 交换机存在，队列也存在 
+```java
+package com.zja.controller;
+
+import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.io.UnsupportedEncodingException;
+
+/**
+ * @author ZhengJa
+ * @description RabbitMQ 测试
+ * @data 2019/11/4
+ */
+@RestController
+@RequestMapping("rest/rabbit")
+public class RabbitMQController {
+
+    //Spring AMQP 提供了 RabbitTemplate 来简化 RabbitMQ 发送和接收消息操作,是实现AmqpTemplate接口具有amqpTemplate功能
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    //测试 ConfirmCallback 失败
+    @RequestMapping("/sendMsg5")
+    public String sendAmqbMsg5() {
+        String firstReceived = "路由键不存在 mq.NotExchange ";
+        rabbitTemplate.convertAndSend("mq.NotExchange", "mq.queueAll.send", firstReceived);
+        return "success";
+    }
     
+    //测试 ConfirmCallback 成功
+    @RequestMapping("/sendMsg6")
+    public String sendAmqbMsg6() {
+        String firstReceived = "路由键存在 mq.topicExchange  ";
+        rabbitTemplate.convertAndSend("mq.topicExchange", "mq.queueAll.send", firstReceived);
+        return "success";
+    }
+
+}
+
+
+```
+
+
+
+失败返回返回效果：
+
+```python
 进入 RabbitConfirmCallback：ack消息到达(true)/没有(false)到达 exchange
 消息唯一标识：null
 确认结果 ack：false
 失败原因：channel error; protocol method: #method<channel.close>(reply-code=404, reply-text=NOT_FOUND - no exchange 'mq.NotExchange' in vhost '/', class-id=60, method-id=40)
- 
+
+```
+
+成功返回效果：
+
+```python
+进入 RabbitConfirmCallback：ack消息到达(true)/没有(false)到达 exchange
+消息唯一标识：null
+确认结果 ack：true
+失败原因：null
+
+```
+
+
+
+
+
+### 3、ReturnCallback的使用及触发的一种场景
+
+****
+
+目前回调存在ConfirmCallback和ReturnCallback两者。他们的区别在于：
+
+> 1、如果消息没有到exchange,则ConfirmCallback回调,ack=false
+> 2、如果消息到达exchange,则ConfirmCallback回调,ack=true
+> 3、exchange到queue成功,则不回调ReturnCallback
+
+
+
+rabbitmq.properties
+
+```properties
+# 开启发送失败退回
+#消息成功则不返回，启动消息失败返回：比如路由不到队列时触发回调
+rabbitmq.publisher-returns=true
+
+```
+
+spring-RabbitMQ.xml
+
+```xml
+    <!--声明连接工厂-->
+    <rabbit:connection-factory id="connectionFactory"
+                               addresses="${rabbitmq.addresses}"
+                               username="${rabbitmq.username}"
+                               password="${rabbitmq.password}"
+                               virtual-host="${rabbitmq.virtual-host}"
+                               publisher-returns="${rabbitmq.publisher-returns}"/>
+
+    <!--创建一个管理器（org.springframework.amqp.rabbit.core.RabbitAdmin），用于管理交换，队列和绑定。
+    auto-startup 指定是否自动声明上下文中的队列,交换和绑定, 默认值为 true。-->
+    <rabbit:admin connection-factory="connectionFactory" auto-startup="true"/>
+
+    <!--声明 template 的时候需要声明 id 不然会抛出异常-->
+    <!--<rabbit:template id="rabbitTemplate" connection-factory="connectionFactory"/>-->
+
+    <!-- rabbitTemplate 消息模板类：给模板指定转换器 -->
+    <bean id="rabbitTemplate" class="org.springframework.amqp.rabbit.core.RabbitTemplate">
+        <!--连接工厂-->
+        <constructor-arg ref="connectionFactory"></constructor-arg>
+        <!-- mandatory必须设置true,returnCallback才生效 -->
+        <property name="returnCallback" ref="rabbitReturnCallback"/>
+        <property name="mandatory" value="true"/>
+    </bean>
+    <!--exchange到queue成功,则不回调return -->
+    <!--exchange到queue失败,则回调return(需设置mandatory=true,否则不回回调,消息就丢了) -->
+    <bean id="rabbitReturnCallback" class="com.zja.rabbitmq.callback.RabbitReturnCallback"/>
+
+
+<!--可以在 xml 采用如下方式声明交换机、队列、绑定管理 但是建议使用代码方式声明 方法更加灵活且可以采用链调用-->
+    <!--定义queue  说明：durable:是否持久化 exclusive: 仅创建者可以使用的私有队列，断开后自动删除 auto_delete: 当所有消费客户端连接断开后，是否自动删除队列-->
+    <rabbit:queue name="mq.queue1" durable="true" auto-delete="false" exclusive="false"/>
+
+	<!--定义 主题 topic-exchange 交换机 路由键 mq.queueExchange -->
+    <rabbit:topic-exchange name="mq.topicExchange" durable="true" auto-delete="false">
+        <rabbit:bindings>
+            <!--mq.queueAll.send 发送字符串给所有队列 -->
+            <rabbit:binding queue="mq.queue1" pattern="mq.queueAll.send"/>
+        </rabbit:bindings>
+    </rabbit:topic-exchange>
+
+```
+
+> 1、添加：publisher-returns 属性
+>
+> 2、rabbitTemplate 新增属性returnCallback、mandatory必须设置true,return callback才生效
+>
+> 3、添加 RabbitReturnCallback 回调后的监听器
+
+RabbitReturnCallback.java
+
+```java
+package com.zja.rabbitmq.callback;
+
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+
+/**
+ * @author ZhengJa
+ * @description 失败后回调
+ * @data 2019/11/4
+ */
+public class RabbitReturnCallback implements RabbitTemplate.ReturnCallback{
+    @Override
+    public void returnedMessage(Message message, int replyCode, String replyText, String exchange, String routingKey) {
+        System.out.println(" ==== >> 进入 RabbitReturnCallback 回调 : ");
+        System.out.println("消息主体 message : "+message);
+        System.out.println("消息主体 message : "+replyCode);
+        System.out.println("描述："+replyText);
+        System.out.println("消息使用的交换器 exchange : "+exchange);
+        System.out.println("消息使用的路由键 routing : "+routingKey);
+    }
+}
+
+```
+
+RabbitMQController.java
+
+```java
+package com.zja.controller;
+
+import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.io.UnsupportedEncodingException;
+
+/**
+ * @author ZhengJa
+ * @description RabbitMQ 测试
+ * @data 2019/11/4
+ */
+@RestController
+@RequestMapping("rest/rabbit")
+public class RabbitMQController {
+
+    //Spring AMQP 提供了 RabbitTemplate 来简化 RabbitMQ 发送和接收消息操作,是实现AmqpTemplate接口具有amqpTemplate功能
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    //测试 ReturnCallback
+    @RequestMapping("/sendMsg7")
+    public String sendAmqbMsg7() {
+        String firstReceived = "路由键存在 mq.topicExchange 发送给 不存在的 No.mq.send 返回 ReturnCallback 并被监听到";
+        rabbitTemplate.convertAndSend("mq.topicExchange", "No.mq.send", firstReceived);
+        return "success";
+    }
+}
+
+
+```
+
+返回效果：
+
+```python
 进入 RabbitReturnCallback 回调 --> exchange到queue失败
-返回消息内容 : 存在 mq.topic.exchange 交换机,不存在的 No.mq.send 队列绑定的路由键，无法到达队列
+返回消息内容 : 路由键存在 mq.topicExchange 发送给 不存在的 No.mq.send 返回 ReturnCallback 并被监听到
 消息回复代码 : 312
 描述 : NO_ROUTE
-消息使用的交换器 exchange : mq.topic.exchange
+消息使用的交换器 exchange : mq.topicExchange
 消息使用的路由键 routing : No.mq.send
-进入 RabbitConfirmCallback：ack消息到达(true)/没有(false)到达 exchange
-消息唯一标识：null
-确认结果 ack：true
-失败原因：null
 
-进入 RabbitConfirmCallback：ack消息到达(true)/没有(false)到达 exchange
-消息唯一标识：null
-确认结果 ack：false
-失败原因：channel error; protocol method: #method<channel.close>(reply-code=404, reply-text=NOT_FOUND - no exchange 'mq.NotExchange' in vhost '/', class-id=60, method-id=40)
+```
 
-````
+
+
+
+
+## github 地址：
+
+- [https://github.com/zhengjiaao/spring5x](https://links.jianshu.com/go?to=https%3A%2F%2Fgithub.com%2Fzhengjiaao%2Fspring5x)
+
+
+
+## 博客地址
+
+- 简书：https://www.jianshu.com/u/70d69269bd09
+- 掘金： https://juejin.im/user/5d82daeef265da03ad14881b/posts
+
+
 
 
 
