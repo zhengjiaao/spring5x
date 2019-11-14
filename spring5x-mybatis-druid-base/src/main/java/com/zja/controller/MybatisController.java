@@ -1,11 +1,14 @@
 package com.zja.controller;
 
-import com.zja.dao.UserDao;
+import com.zja.entity.UserEntity;
+import com.zja.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  * @author ZhengJa
@@ -17,10 +20,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class MybatisController {
 
     @Autowired
-    private UserDao userDao;
+    private UserService userService;
 
     @GetMapping("get/user/byid")
-    public Object queryUserById(@RequestParam Integer id){
-        return userDao.queryUserById(id).get(0);
+    public Object queryUserById(@RequestParam Integer id) {
+        //注意不可直接get(0)返回，可能获取的值为null
+        List<UserEntity> userEntities = userService.queryUserById(id);
+        if (userEntities.size() == 0) {
+            throw new RuntimeException("查询数据为null");
+        }
+        return userService.queryUserById(id).get(0);
     }
+
 }

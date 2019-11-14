@@ -23,6 +23,7 @@
     <module>spring5x-activemq</module>
     <module>spring5x-rabbitmq</module>
     <module>spring5x-mongodb</module>
+    <module>spring5x-hibernate5</module>
   </modules>
 
   <properties>

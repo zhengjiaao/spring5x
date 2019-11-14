@@ -146,7 +146,7 @@ spring-druid.xml
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.1.xsd">
     <!--指定配置文件的位置-->
-    <context:property-placeholder location="classpath:jdbc.properties" ignore-unresolvable="true"/>
+    <context:property-placeholder location="classpath:properties/jdbc.properties" ignore-unresolvable="true"/>
 
     <!--配置 druid 数据源 关于更多的配置项 可以参考官方文档 <a href="https://github.com/alibaba/druid/wiki/DruidDataSource%E9%85%8D%E7%BD%AE%E5%B1%9E%E6%80%A7%E5%88%97%E8%A1%A8" > -->
     <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
@@ -660,7 +660,7 @@ spring-mvc.xml 完整配置
 
     <!-- 增加application.properties文件 -->
     <context:property-placeholder
-            location="classpath:application.properties" ignore-unresolvable="true"/>
+            location="classpath:properties/application.properties" ignore-unresolvable="true"/>
 
     <!--资源 druid.xml 配置-->
     <import resource="classpath:META-INF/spring/spring-druid.xml"/>
@@ -669,7 +669,7 @@ spring-mvc.xml 完整配置
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
         <property name="dataSource" ref="dataSource"/>
         <!--指定 mapper 文件所在的位置-->
-        <property name="mapperLocations" value="classpath*:/META-INF/spring/mappers/**/*.xml"/>
+        <property name="mapperLocations" value="classpath*:/mappers/**/*.xml"/>
         <property name="configLocation" value="classpath:META-INF/spring/mybatis-config.xml"/>
     </bean>
 

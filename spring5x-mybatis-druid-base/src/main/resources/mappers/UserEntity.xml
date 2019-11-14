@@ -1,0 +1,26 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zja.dao.UserDao">
+    <!--按id查询某个用户信息-->
+    <select id="queryUserById" resultType="com.zja.entity.UserEntity">
+        select id, username, age, createdate from userentity t where t.id=#{id}
+    </select>
+    <!--查询所有数据-->
+    <select id="queryAllUser" resultMap="BaseResultMap">
+        select * from userentity
+    </select>
+    <!--插入数据-->
+    <insert id="addEmp" parameterType="emp">
+        insert into emp(empno,ename,sal,comm,job) values(#{empno},#{ename},#{sal},#{comm},#{job,jdbcType=VARCHAR})
+    </insert>
+    <!--更新数据-->
+    <update id="updateEmp" parameterType="emp">
+        update emp set ename=#{ename},job=#{job},sal=#{sal},comm=#{comm} where empno=#{empno}
+    </update>
+    <!--删除数据-->
+    <delete id="delEmpById" parameterType="int">
+        update emp set flag=0 where empno=#{empno}
+    </delete>
+</mapper>

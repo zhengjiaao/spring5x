@@ -2,8 +2,8 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:tx="http://www.springframework.org/schema/tx"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
     <!-- 开启注解包扫描-->
     <context:component-scan base-package="com.zja.*"/>
@@ -45,36 +45,7 @@
 
     <!-- 增加application.properties文件 -->
     <context:property-placeholder
-            location="classpath:properties/application.properties" ignore-unresolvable="true"/>
-
-    <!--资源 druid.xml 配置-->
-    <import resource="classpath:META-INF/spring/spring-druid.xml"/>
-
-    <!--配置 mybatis 会话工厂 -->
-    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
-        <property name="dataSource" ref="dataSource"/>
-        <!--指定 mapper 文件所在的位置-->
-        <property name="mapperLocations" value="classpath*:/mappers/**/*.xml"/>
-        <property name="configLocation" value="classpath:META-INF/spring/mybatis-config.xml"/>
-    </bean>
-
-    <!--扫描注册接口 -->
-    <!--作用:从接口的基础包开始递归搜索，并将它们注册为 MapperFactoryBean(只有至少一种方法的接口才会被注册;, 具体类将被忽略)-->
-    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-        <!--指定会话工厂 -->
-        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
-        <!-- 指定 mybatis 接口所在的包 -->
-        <property name="basePackage" value="com.zja.dao"/>
-    </bean>
-
-    <!--定义事务管理器-->
-    <bean id="transactionManager"
-          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-        <property name="dataSource" ref="dataSource"/>
-    </bean>
-
-    <!-- 开启事务注解@Transactional 支持 -->
-    <tx:annotation-driven/>
+            location="classpath:application.properties" />
 
     <!-- 配置视图解析器 -->
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"
