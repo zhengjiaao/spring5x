@@ -36,7 +36,7 @@ public class XMemcachedController {
 
         //保存到Memcached缓存中
         //boolean result = memcachedClient.set("xmemcached", 0, "使用 xmemcached 存储数据");
-        boolean result = xMemcachedUtil.addCache("xmemcached","使用 xmemcached 存储数据",0);
+        boolean result = xMemcachedUtil.add("xmemcached","使用 xmemcached 存储数据",0);
 
         System.out.println("保存结果 result= "+result);
 
