@@ -3,24 +3,148 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.zja.dao.UserDao">
+
+    <!--构造函数-->
+    <resultMap id="BaseResultMap" type="com.zja.entity.UserEntity">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="username" property="userName" jdbcType="VARCHAR"/>
+        <result column="age" property="age" jdbcType="VARCHAR"/>
+        <result column="createtime" property="createTime" jdbcType="DATE"/>
+    </resultMap>
+
+    <!--记录计数：用于分页-->
+    <resultMap id="recordCounts" type="java.lang.Long">
+        <result column="recordCounts" jdbcType="BIGINT"/>
+    </resultMap>
+
+    <!--sql语句字段-->
+    <sql id="Base_Column_List">
+        id, username, age, createtime
+    </sql>
+
     <!--按id查询某个用户信息-->
-    <select id="queryUserById" resultType="com.zja.entity.UserEntity">
-        select id, username, age, createdate from userentity t where t.id=#{id}
+    <select id="queryUserById" resultType="userEntity">
+        select
+        <include refid="Base_Column_List"/>
+        from userentity t where t.id=#{id}
     </select>
+
     <!--查询所有数据-->
     <select id="queryAllUser" resultMap="BaseResultMap">
         select * from userentity
     </select>
-    <!--插入数据-->
-    <insert id="addEmp" parameterType="emp">
-        insert into emp(empno,ename,sal,comm,job) values(#{empno},#{ename},#{sal},#{comm},#{job,jdbcType=VARCHAR})
+
+    <!--静态插入数据:所有数据库通用方法-->
+    <insert id="insertUser" parameterType="userEntity">
+        insert into userentity(id, username, age, createtime)
+        values (#{id,jdbcType=INTEGER}, #{userName,jdbcType=VARCHAR}, #{age,jdbcType=INTEGER}, #{createTime,jdbcType=DATE})
     </insert>
-    <!--更新数据-->
-    <update id="updateEmp" parameterType="emp">
-        update emp set ename=#{ename},job=#{job},sal=#{sal},comm=#{comm} where empno=#{empno}
+
+    <!--动态(trim)插入数据：使用 mysql id自增-->
+    <insert id="insertUserMysql" parameterType="userEntity">
+        insert into userentity
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null and id !=0 ">
+                id,
+            </if>
+            <if test='userName != null and userName != "" '>
+                username,
+            </if>
+            <if test="age != null and age !=0 ">
+                age,
+            </if>
+            <if test="createTime != null">
+                createtime,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null and id != 0 ">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test='userName != null and userName != "" '>
+                #{userName,jdbcType=VARCHAR},
+            </if>
+            <if test="age != null and age !=0 ">
+                #{age,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=DATE},
+            </if>
+        </trim>
+    </insert>
+
+    <!--动态(trim)插入数据： 使用 oracle id序列为SEQ_MY_HIBERNATE -->
+    <insert id="insertUserOracle" parameterType="userEntity">
+        insert into userentity
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            id,
+            <if test='userName != null and userName != "" '>
+                username,
+            </if>
+            <if test="age != null and age !=0 ">
+                age,
+            </if>
+            <if test="createTime != null">
+                createtime,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            SEQ_MY_HIBERNATE.NEXTVAL,
+            <if test='userName != null and userName != "" '>
+                #{userName,jdbcType=VARCHAR},
+            </if>
+            <if test="age != null and age !=0 ">
+                #{age,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=DATE},
+            </if>
+        </trim>
+    </insert>
+
+    <!--mybatis+mysql批量插入数据：使用 mysql id自增-->
+    <insert id="mysqlBatchSaveUser" parameterType="java.util.List" useGeneratedKeys="false">
+        insert into userentity(username, age, createtime) values
+        <foreach collection="userEntityList" item="item" index="index" separator=",">
+        (#{item.userName}, #{item.age}, #{item.createTime})
+        </foreach>
+    </insert>
+
+    <!--mybatis+oracle批量插入数据： oracle id不使用序列自增 -->
+    <!--oracle+mybatis批量插入遇到问题：（已解决）
+        1、id不能使用序列,没有提交之前，是无法获取下次序列的递增值，导致主键唯一约束异常
+        2、oracle+mybatis批量插入报错的解决办法（命令未执行结束）-->
+    <insert id="oracleBatchSaveUser" parameterType="java.util.List">
+        insert into userentity
+        (id, username, age, createtime)
+        select t.* from
+        (
+        <foreach collection="userEntityList" item="item" separator="union all">
+            select #{item.id}, #{item.userName}, #{item.age}, #{item.createTime} from dual
+        </foreach>
+        ) t
+    </insert>
+
+    <!--动态更新数据-->
+    <update id="updateUser" parameterType="userEntity">
+        update userentity
+        <set>
+            <if test='userName != null and userName != "" '>
+                username = #{userName},
+            </if>
+            <if test="age != null and age !=0">
+                age = #{age},
+            </if>
+            <if test="createTime != null">
+                createtime = #{createTime},
+            </if>
+        </set>
+        where id=#{id}
     </update>
+
     <!--删除数据-->
-    <delete id="delEmpById" parameterType="int">
-        update emp set flag=0 where empno=#{empno}
+    <delete id="delUser">
+        delete from userentity where id=#{id}
     </delete>
+
 </mapper>

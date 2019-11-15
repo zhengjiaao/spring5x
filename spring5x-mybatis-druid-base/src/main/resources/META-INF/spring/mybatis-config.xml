@@ -3,6 +3,17 @@
         PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-config.dtd">
 
+
+<!--mybatis配置顺序说明-->
+<!--
+配置文件中的位置必须符合要求，否则会报错，顺序如下:
+properties?, settings?,
+typeAliases?, typeHandlers?,
+objectFactory?,objectWrapperFactory?,
+ plugins?,
+environments?, databaseIdProvider?, mappers?
+-->
+
 <!-- mybatis 配置文件 -->
 <configuration>
     <settings>
@@ -17,14 +28,23 @@
         <package name="com.zja.entity"/> <!-- 默认实体类的别名:类名 推荐使用类名首字母小写 -->
     </typeAliases>
 
-    <!--<plugins>
-        &lt;!&ndash; com.github.pagehelper为PageHelper类所在包名 &ndash;&gt;
+    <!--Mybatis-PageHelper分页插件-->
+    <plugins>
+        <!-- com.github.pagehelper为PageHelper类所在包名 -->
         <plugin interceptor="com.github.pagehelper.PageInterceptor">
-            &lt;!&ndash; 3.3.0版本可用 - 分页参数合理化，默认false禁用 &ndash;&gt;
-            &lt;!&ndash; 启用合理化时，如果pageNum<1会查询第一页，如果pageNum>pages会查询最后一页 &ndash;&gt;
-            &lt;!&ndash; 禁用合理化时，如果pageNum<1或pageNum>pages会返回空数据 &ndash;&gt;
-            <property name="reasonable" value="true"/>
+            <!-- 配置参数:默认可不配置,属性参数配置都是可选的-->
+            <!--<property name="param1" value="value1"/>-->
+
+            <!-- 大于3.3.0版本可用 - 分页参数合理化，默认false禁用 -->
+            <!-- 启用合理化时，如果pageNum<1会查询第一页，如果pageNum>pages会查询最后一页 -->
+            <!-- 禁用合理化时，如果pageNum<1或pageNum>pages会返回空数据 -->
+            <!--<property name="reasonable" value="true"/>-->
+            <!-- 方言：默认自动识别，设置数据库类型 Oracle,Mysql,MariaDB,SQLite,Hsqldb,PostgreSQL等等常用数据库-->
+            <!--<property name="dialect" value="mysql"/>-->
+            <!-- 该参数默认为false -->
+            <!-- 设置为true时，使用RowBounds分页会进行count查询 -->
+            <!--<property name="rowBoundsWithCount" value="true"/>-->
         </plugin>
-    </plugins>-->
+    </plugins>
 
 </configuration>

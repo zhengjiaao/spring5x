@@ -9,3 +9,4 @@ create table userentity
 	createtime TIMESTAMP(6),
 	age NUMBER(19)
 );
+COMMIT;
