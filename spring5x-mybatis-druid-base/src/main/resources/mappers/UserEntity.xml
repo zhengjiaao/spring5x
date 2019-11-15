@@ -12,11 +12,6 @@
         <result column="createtime" property="createTime" jdbcType="DATE"/>
     </resultMap>
 
-    <!--记录计数：用于分页-->
-    <resultMap id="recordCounts" type="java.lang.Long">
-        <result column="recordCounts" jdbcType="BIGINT"/>
-    </resultMap>
-
     <!--sql语句字段-->
     <sql id="Base_Column_List">
         id, username, age, createtime
