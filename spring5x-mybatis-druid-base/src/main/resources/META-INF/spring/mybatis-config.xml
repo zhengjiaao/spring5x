@@ -21,8 +21,6 @@ environments?, databaseIdProvider?, mappers?
         <setting name="mapUnderscoreToCamelCase" value="true"/>
         <!-- 打印查询 sql -->
         <setting name="logImpl" value="STDOUT_LOGGING"/>
-        <!--开启二级缓存,全局总开关，这里关闭，mapper中开启二级缓存也没用-->
-        <setting name="cacheEnabled" value="false"/>
     </settings>
 
     <!-- 配置XML中实体类完全限定名的冗余 -->
