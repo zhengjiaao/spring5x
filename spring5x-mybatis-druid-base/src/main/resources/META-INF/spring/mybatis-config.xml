@@ -17,15 +17,16 @@ environments?, databaseIdProvider?, mappers?
 <!-- mybatis 配置文件 -->
 <configuration>
     <settings>
-        <!-- 开启驼峰命名 -->
+        <!-- 开启驼峰命名： user_name字段 = userName属性 -->
         <setting name="mapUnderscoreToCamelCase" value="true"/>
         <!-- 打印查询 sql -->
         <setting name="logImpl" value="STDOUT_LOGGING"/>
     </settings>
 
-    <!-- 配置实体类的别名 -->
+    <!-- 配置XML中实体类完全限定名的冗余 -->
     <typeAliases>
-        <package name="com.zja.entity"/> <!-- 默认实体类的别名:类名 推荐使用类名首字母小写 -->
+        <!-- 扫描包：建议使用的时候和类名一致 -->
+        <package name="com.zja.entity"/>
     </typeAliases>
 
     <!--Mybatis-PageHelper分页插件-->

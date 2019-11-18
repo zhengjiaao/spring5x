@@ -4,21 +4,26 @@
 
 <mapper namespace="com.zja.dao.UserDao">
 
-    <!--构造函数-->
-    <resultMap id="BaseResultMap" type="com.zja.entity.UserEntity">
+    <!--resultMap
+        id:resultMap 唯一标识
+        type:返回结果集对应java实体类型
+        autoMapping:默认完成映射，如果已经开启驼峰匹配，可以解决驼峰匹配-->
+    <resultMap id="BaseResultMap" type="com.zja.entity.UserEntity" autoMapping="true">
         <id column="id" property="id" jdbcType="INTEGER"/>
         <result column="username" property="userName" jdbcType="VARCHAR"/>
         <result column="age" property="age" jdbcType="VARCHAR"/>
         <result column="createtime" property="createTime" jdbcType="DATE"/>
     </resultMap>
 
-    <!--sql语句字段-->
+    <!--sql语句片段
+        <sql id=""></sql>
+        <include refId="" />-->
     <sql id="Base_Column_List">
         id, username, age, createtime
     </sql>
 
     <!--按id查询某个用户信息-->
-    <select id="queryUserById" resultType="userEntity">
+    <select id="queryUserById" resultType="UserEntity">
         select
         <include refid="Base_Column_List"/>
         from userentity t where t.id=#{id}
@@ -30,13 +35,13 @@
     </select>
 
     <!--静态插入数据:所有数据库通用方法-->
-    <insert id="insertUser" parameterType="userEntity">
+    <insert id="insertUser" parameterType="UserEntity">
         insert into userentity(id, username, age, createtime)
         values (#{id,jdbcType=INTEGER}, #{userName,jdbcType=VARCHAR}, #{age,jdbcType=INTEGER}, #{createTime,jdbcType=DATE})
     </insert>
 
     <!--动态(trim)插入数据：使用 mysql id自增-->
-    <insert id="insertUserMysql" parameterType="userEntity">
+    <insert id="insertUserMysql" parameterType="UserEntity">
         insert into userentity
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null and id !=0 ">
@@ -69,7 +74,7 @@
     </insert>
 
     <!--动态(trim)插入数据： 使用 oracle id序列为SEQ_MY_HIBERNATE -->
-    <insert id="insertUserOracle" parameterType="userEntity">
+    <insert id="insertUserOracle" parameterType="UserEntity">
         insert into userentity
         <trim prefix="(" suffix=")" suffixOverrides=",">
             id,
@@ -121,7 +126,7 @@
     </insert>
 
     <!--动态更新数据-->
-    <update id="updateUser" parameterType="userEntity">
+    <update id="updateUser" parameterType="UserEntity">
         update userentity
         <set>
             <if test='userName != null and userName != "" '>
