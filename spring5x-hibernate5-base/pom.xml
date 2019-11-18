@@ -9,10 +9,10 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
     <groupId>com.zja</groupId>
-    <artifactId>spring5x-hibernate5</artifactId>
+    <artifactId>spring5x-hibernate5-base</artifactId>
     <packaging>war</packaging>
 
-    <name>spring5x-hibernate5</name>
+    <name>spring5x-hibernate5-base</name>
 
     <!--说明：spring5.x-base模块是spring5.x基础框架，其它模块都是以此模块为基础扩展的-->
     <properties>
@@ -195,7 +195,7 @@
     </dependencies>
 
     <build>
-        <finalName>spring5x-hibernate5</finalName>
+        <finalName>spring5x-hibernate5-base</finalName>
         <plugins>
             <!--maven的编译插件-->
             <plugin>
