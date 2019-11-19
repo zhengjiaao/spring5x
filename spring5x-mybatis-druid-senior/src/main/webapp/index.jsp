@@ -6,7 +6,7 @@
 <body>
 <h1>这是首页面</h1>
 
-<a href="http://localhost:8080/spring5x-mybatis-druid-base/swagger-ui.html">点击-->进入swagger页面测试</a>
+<a href="http://localhost:8080/spring5x-mybatis-druid-senior/swagger-ui.html">点击-->进入swagger页面测试</a>
 
 </body>
 </html>

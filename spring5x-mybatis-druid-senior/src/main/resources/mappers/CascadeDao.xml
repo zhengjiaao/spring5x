@@ -1,0 +1,133 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zja.dao.CascadeDao">
+
+    <!--根据订单id查询用户信息(一对一)，一个订单对应一个用户 -->
+    <select id="getOrderAndUserByOrdersId" resultMap="ordersAndUsers">
+    SELECT * FROM orders o, userentity u WHERE o.userid=u.id AND o.ordersid=#{ordersId}
+    </select>
+    <!--ordersAndUsers: 订单对用户(一对一)-->
+    <resultMap id="ordersAndUsers" type="OrdersEntity" autoMapping="true">
+        <id property="ordersId" column="ordersid"/>
+        <result property="ordersName" column="ordersname"/>
+        <result property="userId" column="userid"/>
+        <!-- 映射 :实体类 -->
+        <association property="userEntity" javaType="UserEntity">
+            <id column="id" property="id" jdbcType="INTEGER"/>
+            <result column="username" property="userName" jdbcType="VARCHAR"/>
+            <result column="age" property="age" jdbcType="VARCHAR"/>
+            <result column="createtime" property="createTime" jdbcType="DATE"/>
+        </association>
+    </resultMap>
+
+    <!--根据用户id查询所有订单信息(一对多)，一个用户对应多个订单 -->
+    <select id="getUserAndOrdersByUserId" resultMap="usersAndOrders">
+    SELECT u.id,u.username,u.age,u.createtime,o.ordersid,o.ordersname,o.userid
+    FROM userentity u, orders o
+    WHERE u.id=o.userid AND u.id=#{userId}
+    </select>
+    <!--usersAndOrders: 用户对订单(一对多)-->
+    <resultMap id="usersAndOrders" type="UserEntity" autoMapping="true">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="username" property="userName" jdbcType="VARCHAR"/>
+        <result column="age" property="age" jdbcType="VARCHAR"/>
+        <result column="createtime" property="createTime" jdbcType="DATE"/>
+        <!-- 映射 ： list-->
+        <collection property="ordersEntityList" ofType="com.zja.entity.OrdersEntity" fetchType="lazy">
+            <id column="ordersid" property="ordersId" jdbcType="INTEGER"/>
+            <result column="ordersname" property="ordersName" jdbcType="VARCHAR"/>
+            <result column="userid" property="userId" jdbcType="INTEGER"/>
+        </collection>
+    </resultMap>
+
+    <!-- （多对多：方式一） -->
+
+    <!--根据用户id查询用户所属组(全部)(多对多)-->
+    <select id="getUsersAndGroupByUserId" resultMap="usersAndGroup">
+    SELECT u.id,u.username,u.age,u.createtime,g.groupid,g.groupname FROM ugroup g, userentity u,usergroup ug
+    WHERE ug.userid=u.id AND g.groupid=ug.groupid AND u.id=#{userId}
+    </select>
+    <!--usersAndGroup: 用户对组(多对多)-->
+    <resultMap id="usersAndGroup" type="UserEntity" autoMapping="true">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="username" property="userName" jdbcType="VARCHAR"/>
+        <result column="age" property="age" jdbcType="VARCHAR"/>
+        <result column="createtime" property="createTime" jdbcType="DATE"/>
+        <!-- 映射 ： list-->
+        <collection property="groupEntityList" ofType="com.zja.entity.GroupEntity" fetchType="lazy">
+            <id column="groupid" property="groupId" jdbcType="INTEGER"/>
+            <result column="groupname" property="groupName" jdbcType="VARCHAR"/>
+        </collection>
+    </resultMap>
+
+    <!--根据用户组id查询组下的所有用户(多对多)-->
+    <select id="getGroupAndUsersByGroupId" resultMap="groupAndUsers">
+    SELECT g.groupid,g.groupname,u.id,u.username,u.age,u.createtime FROM ugroup g, userentity u,usergroup ug
+    WHERE g.groupid=ug.groupid AND ug.userid=u.id AND g.groupid=#{groupId}
+    </select>
+    <!--groupAndUsers:组对用户(多对多)-->
+    <resultMap id="groupAndUsers" type="GroupEntity" autoMapping="true">
+        <id column="groupid" property="groupId" jdbcType="INTEGER"/>
+        <result column="groupname" property="groupName" jdbcType="VARCHAR"/>
+        <!-- 映射 ： list-->
+        <collection property="userEntityList" ofType="com.zja.entity.UserEntity" fetchType="lazy">
+            <id column="id" property="id" jdbcType="INTEGER"/>
+            <result column="username" property="userName" jdbcType="VARCHAR"/>
+            <result column="age" property="age" jdbcType="VARCHAR"/>
+            <result column="createtime" property="createTime" jdbcType="DATE"/>
+        </collection>
+    </resultMap>
+
+
+    <!-- （多对多：方式二） -->
+
+    <!--根据用户组id 获取组下的全部用户(List<UserEntity>)-->
+    <select id="getUsersByGroupId" resultMap="UsersMap">
+    SELECT u.id,u.username,u.age,u.createtime FROM userentity u,usergroup ug
+    WHERE ug.userid=u.id AND ug.groupid=#{groupId}
+    </select>
+    <!--UsersMap-->
+    <resultMap id="UsersMap" type="UserEntity" autoMapping="true">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="username" property="userName" jdbcType="VARCHAR"/>
+        <result column="age" property="age" jdbcType="VARCHAR"/>
+        <result column="createtime" property="createTime" jdbcType="DATE"/>
+    </resultMap>
+
+    <!--根据用户id查询用户所属全部组(List<GroupEntity>)-->
+    <select id="getGroupByUsersId" resultMap="groupAndUsers">
+    SELECT g.* FROM ugroup g,usergroup ug
+    WHERE g.groupid=ug.groupid AND ug.userid=#{userId}
+    </select>
+    <!--GroupEntityMap-->
+    <resultMap id="GroupEntityMap" type="GroupEntity" autoMapping="true">
+        <id column="groupid" property="groupId" jdbcType="INTEGER"/>
+        <result column="groupname" property="groupName" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询用户信息(包含所属的全部组)-->
+    <select id="getUsers" resultMap="UsersListMap">
+        SELECT * FROM userentity u where u.id=#{userId}
+    </select>
+    <!--UsersMap:调用接口方法返回属性值-->
+    <resultMap id="UsersListMap" type="UserEntity" autoMapping="true">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="username" property="userName" jdbcType="VARCHAR"/>
+        <result column="age" property="age" jdbcType="VARCHAR"/>
+        <result column="createtime" property="createTime" jdbcType="DATE"/>
+        <collection property="groupEntityList" column="id" select="com.zja.dao.CascadeDao.getGroupByUsersId"/>
+    </resultMap>
+
+    <!--查询用户组信息(包含组下面的全部用户)-->
+    <select id="getGroup" resultMap="GroupListMap">
+        SELECT * FROM ugroup u where u.groupid=#{groupId}
+    </select>
+    <!--GroupEntityMap：调用接口方法返回属性值-->
+    <resultMap id="GroupListMap" type="GroupEntity" autoMapping="true">
+        <id column="groupid" property="groupId" jdbcType="INTEGER"/>
+        <result column="groupname" property="groupName" jdbcType="VARCHAR"/>
+        <collection property="userEntityList" column="groupid" select="com.zja.dao.CascadeDao.getUsersByGroupId"/>
+    </resultMap>
+
+</mapper>

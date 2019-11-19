@@ -545,7 +545,7 @@ resources/mappers文件夹下新建 UserEntity.xml，内容如下
             </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
-            SEQ_MY_HIBERNATE.NEXTVAL,
+            SEQ_MY_USER_HIBERNATE.NEXTVAL,
             <if test='userName != null and userName != "" '>
                 #{userName,jdbcType=VARCHAR},
             </if>

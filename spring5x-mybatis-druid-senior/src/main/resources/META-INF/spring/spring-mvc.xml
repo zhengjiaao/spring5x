@@ -30,18 +30,38 @@
                     </list>
                 </property>
                 <!-- 使用内置日期工具进行处理 -->
-                <property name="objectMapper">
+                <!--<property name="objectMapper">
                     <bean class="com.fasterxml.jackson.databind.ObjectMapper">
-                        <property name="dateFormat">
+                        &lt;!&ndash;驼峰命名法转换为小写加下划线&ndash;&gt;
+                        &lt;!&ndash;<property name="propertyNamingStrategy">
+                            <bean class="com.fasterxml.jackson.databind.PropertyNamingStrategy.LowerCaseWithUnderscoresStrategy" />
+                        </property>&ndash;&gt;
+                        &lt;!&ndash;为null字段时不输出&ndash;&gt;
+                        &lt;!&ndash;<property name="serializationInclusion">
+                            <value type="com.fasterxml.jackson.annotation.JsonInclude.Include">NON_NULL</value>
+                        </property>&ndash;&gt;
+                        &lt;!&ndash;禁用空对象转换json校验:解决mybatis使用懒加载返回json 报错:SerializationFeature.FAIL_ON_EMPTY_BEANS&ndash;&gt;
+                        &lt;!&ndash;<property name="configure">
+                            <value type="com.fasterxml.jackson.databind.SerializationFeature">FAIL_ON_EMPTY_BEANS</value>
+                        </property>&ndash;&gt;
+                        &lt;!&ndash;忽略未知的字段&ndash;&gt;
+                        &lt;!&ndash;<property name="configure">
+                            <value type="com.fasterxml.jackson.databind.DeserializationFeature">FAIL_ON_UNKNOWN_PROPERTIES</value>
+                        </property>&ndash;&gt;
+                        &lt;!&ndash;-返回时间统一格式化&ndash;&gt;
+                        &lt;!&ndash;<property name="dateFormat">
                             <bean class="java.text.SimpleDateFormat">
                                 <constructor-arg type="java.lang.String" value="yyyy-MM-dd"/>
                             </bean>
-                        </property>
+                        </property>&ndash;&gt;
                     </bean>
-                </property>
+                </property>-->
+                <property name="objectMapper" ref="myObjectMapper"/>
             </bean>
         </mvc:message-converters>
     </mvc:annotation-driven>
+    <!--解决mybatis使用懒加载返回json 报错:SerializationFeature.FAIL_ON_EMPTY_BEANS-->
+    <bean id="myObjectMapper" class="com.zja.util.MyObjectMapper"/>
 
     <!-- 增加application.properties文件 -->
     <context:property-placeholder
