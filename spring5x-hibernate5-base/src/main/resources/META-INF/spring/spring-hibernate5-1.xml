@@ -19,9 +19,6 @@
         <!--配置数据源-->
         <property name="dataSource" ref="dataSource"/>
 
-        <!--配置hibernate.cfg.xml-->
-        <property name="configLocation" value="classpath*:META-INF/spring/hibernate.cfg.xml"/>
-
         <!-- 自动扫描注解：实体类，使用注解@Entity，@Table，@Id等等，不需要hbm.xml -->
 <!--        <property name="packagesToScan">
             <list>
@@ -31,24 +28,37 @@
 
         <!--自动扫描配置：*.hbm.xml，可不使用packagesToScan-->
         <!--<property name="mappingLocations" value="classpath*:com/zja/entity/*.hbm.xml"/>-->
-        <!--自动扫描配置：*.hbm.xml-->
-        <!--<property name="mappingLocations">
-            <list>
-                <value>classpath*:/hbm/*.hbm.xml</value>
-            </list>
-        </property>-->
 
-        <!-- 配置 hibernate.cfg.xml 中的信息 -->
+        <!--自动扫描配置：*.hbm.xml,可不使用packagesToScan-->
+        <property name="mappingLocations">
+            <list>
+                <!--添加扫描*.hbm.xml文件的路径-->
+                <value>classpath*:/hbm/*.hbm.xml</value>
+                <!--<value>classpath*:com/zja/entity/*.hbm.xml</value>-->
+            </list>
+        </property>
+
+        <!-- 配置 hibernate-1.cfg.xml 中的信息 -->
         <property name="hibernateProperties">
             <props>
-                <!--数据库方言:Hibernate-5.2.10 后使用的方言需要升级-->
-                <!--<property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>-->
-                <prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
+                <!--数据库方言:Hibernate-5.2.10 之后使用的方言需要升级-->
+                <!--mysql新版本方言:创建表时,引擎engine=MyISAM，优点：查询很快，缺点：不支持事务处理和外键约束-->
+                <!--<prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>-->
+                <!--mysql新版本方言:创建表时,引擎engine=InnoDB，优点：支持事务处理和外键约束，缺点：查询很慢，(推荐使用)-->
+                <prop key="hibernate.dialect">org.hibernate.dialect.MySQL57Dialect</prop>
+
+                <!--oracle新版本方言: 支持版本10g和11g-->
+                <!--<prop key="hibernate.dialect">org.hibernate.dialect.Oracle10gDialect</prop>-->
+
+                <!--default_schema：oracle设置用户名:duke，mysql设置数据库名称:test-->
+                <!--<prop key="hibernate.default_schema">duke</prop>-->
+                <prop key="hibernate.default_schema">test</prop>
+
                 <!--create每次加载hibernate，重新创建数据库表结构，这就是导致数据库表数据丢失的原因
-                    create-drop加载hibernate时创建，退出时删除表结构
-                    update加载hibernate自动更新数据库结构
-                    validate加载hibernate时，验证创建数据库表结构
-                    none不是用此功能 -->
+                    create-drop加载hibernate时删除表再创建表，退出时删除表结构
+                    update加载hibernate自动更新数据库结构,建议禁用update，问题太多(比如第二次运行项目，bug会再次创建表，这时表已存在，报错)
+                    validate加载hibernate时，验证创建数据库表结构,只会和数据库中的表进行比较，不会创建新表，但是会插入新值
+                    none不是用此功能(推荐使用) -->
                 <prop key="hibernate.hbm2ddl.auto">update</prop>
                 <!--打印sql语句-->
                 <prop key="hibernate.show_sql">true</prop>

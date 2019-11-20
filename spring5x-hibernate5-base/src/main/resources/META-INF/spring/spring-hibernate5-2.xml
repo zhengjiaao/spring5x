@@ -10,21 +10,22 @@
     <!--c3p0.xml 配置-->
     <import resource="classpath:META-INF/spring/datasource/spring-c3p0.xml"/>
 
-
     <!-- Hibernate 配置  BEGIN -->
-
     <!-- **************配置SessionFactory工厂*************** -->
+    <!--方式一: 数据源连接池和cfg.xml 配置一起-->
+    <!--<bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+        <property name="configLocation" value="classpath*:META-INF/spring/hibernate-1.cfg.xml"/>
+    </bean>-->
 
+    <!--方式二：数据源连接池和cfg.xml配置分开-->
     <bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
         <!--配置数据源-->
         <property name="dataSource" ref="dataSource"/>
         <!-- 使用hibernate.cfg.xml配置文件 -->
         <property name="configLocations">
-            <value>classpath:META-INF/spring/hibernate-3.cfg.xml</value>
+            <value>classpath:META-INF/spring/hibernate-2.cfg.xml</value>
         </property>
-        <!--<property name="configLocation" value="classpath*:META-INF/spring/hibernate.cfg.xml"/>-->
     </bean>
-
 
     <!-- **************配置事务管理器*************** -->
 

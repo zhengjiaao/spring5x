@@ -8,8 +8,15 @@
     <session-factory>
 
         <!-- 配置 hibernate 的基本信息 -->
-        <!--所使用的数据库方言 MySQL5Dialect-->
-        <property name="dialect">org.hibernate.dialect.MySQL5Dialect</property>
+
+        <!--数据库方言:Hibernate-5.2.10 之后使用的方言需要升级-->
+        <!--mysql新版本方言:创建表时,引擎engine=MyISAM，优点：查询很快，缺点：不支持事务处理和外键约束-->
+        <!--<property name="dialect">org.hibernate.dialect.MySQL5Dialect</property>-->
+        <!--mysql新版本方言:创建表时,引擎engine=InnoDB，优点：支持事务处理和外键约束，缺点：查询很慢，(推荐使用)-->
+        <property name="dialect">org.hibernate.dialect.MySQL57Dialect</property>
+        <!--oracle新版本方言: 支持版本10g和11g-->
+        <!--<property name="dialect">org.hibernate.dialect.Oracle10gDialect</property>-->
+
         <!-- 执行操作时是否在控制台打印 SQL -->
         <property name="show_sql">true</property>
         <!-- 是否对 SQL 进行格式化,例如语句显示会换行 -->
@@ -20,10 +27,12 @@
                     update加载hibernate自动更新数据库结构
                     validate加载hibernate时，验证创建数据库表结构
                     none不用此功能 -->
-        <property name="hbm2ddl.auto">none</property>
+        <property name="hbm2ddl.auto">update</property>
 
         <!--设置*.hbm.xml-->
         <mapping resource="com/zja/entity/UserEntity.hbm.xml"/>
+        <!--<mapping class="com.zja.entity.UserEntity"/>
+        <mapping package="com.zja.entity"/>-->
 
     </session-factory>
 </hibernate-configuration>
