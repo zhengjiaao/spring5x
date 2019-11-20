@@ -2,5 +2,5 @@
 drop sequence SEQ_MY_HIBERNATE;
 
 -- 删表语句
-DROP TABLE USERENTITY;
+DROP TABLE userentity;
 COMMIT;

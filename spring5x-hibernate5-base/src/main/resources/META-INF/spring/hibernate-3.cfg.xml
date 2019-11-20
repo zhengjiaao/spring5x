@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+
+<!--hibernate配置-->
+<hibernate-configuration>
+    <session-factory>
+
+        <!-- 配置 hibernate 的基本信息 -->
+        <!--所使用的数据库方言 MySQL5Dialect-->
+        <property name="dialect">org.hibernate.dialect.MySQL5Dialect</property>
+        <!-- 执行操作时是否在控制台打印 SQL -->
+        <property name="show_sql">true</property>
+        <!-- 是否对 SQL 进行格式化,例如语句显示会换行 -->
+        <property name="format_sql">true</property>
+        <!-- 指定自动生成数据表的策略-->
+        <!--create每次加载hibernate，重新创建数据库表结构，这就是导致数据库表数据丢失的原因
+                    create-drop加载hibernate时创建，退出时删除表结构
+                    update加载hibernate自动更新数据库结构
+                    validate加载hibernate时，验证创建数据库表结构
+                    none不用此功能 -->
+        <property name="hbm2ddl.auto">none</property>
+
+        <!--设置*.hbm.xml-->
+        <mapping resource="com/zja/entity/UserEntity.hbm.xml"/>
+
+    </session-factory>
+</hibernate-configuration>

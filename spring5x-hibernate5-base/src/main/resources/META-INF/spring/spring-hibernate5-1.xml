@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- 数据源配置资源引入 -->
+    <!--druid.xml 配置-->
+    <import resource="classpath:META-INF/spring/datasource/spring-druid.xml"/>
+    <!--c3p0.xml 配置-->
+    <!--<import resource="classpath:META-INF/spring/datasource/spring-c3p0.xml"/>-->
+
+    <!-- Hibernate 配置  BEGIN -->
+
+    <!-- **************配置SessionFactory工厂*************** -->
+
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+        <!--配置数据源-->
+        <property name="dataSource" ref="dataSource"/>
+
+        <!--配置hibernate.cfg.xml-->
+        <property name="configLocation" value="classpath*:META-INF/spring/hibernate.cfg.xml"/>
+
+        <!-- 自动扫描注解：实体类，使用注解@Entity，@Table，@Id等等，不需要hbm.xml -->
+<!--        <property name="packagesToScan">
+            <list>
+                <value>com.zja.entity</value>
+            </list>
+        </property>-->
+
+        <!--自动扫描配置：*.hbm.xml，可不使用packagesToScan-->
+        <!--<property name="mappingLocations" value="classpath*:com/zja/entity/*.hbm.xml"/>-->
+        <!--自动扫描配置：*.hbm.xml-->
+        <!--<property name="mappingLocations">
+            <list>
+                <value>classpath*:/hbm/*.hbm.xml</value>
+            </list>
+        </property>-->
+
+        <!-- 配置 hibernate.cfg.xml 中的信息 -->
+        <property name="hibernateProperties">
+            <props>
+                <!--数据库方言:Hibernate-5.2.10 后使用的方言需要升级-->
+                <!--<property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>-->
+                <prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
+                <!--create每次加载hibernate，重新创建数据库表结构，这就是导致数据库表数据丢失的原因
+                    create-drop加载hibernate时创建，退出时删除表结构
+                    update加载hibernate自动更新数据库结构
+                    validate加载hibernate时，验证创建数据库表结构
+                    none不是用此功能 -->
+                <prop key="hibernate.hbm2ddl.auto">update</prop>
+                <!--打印sql语句-->
+                <prop key="hibernate.show_sql">true</prop>
+                <!--sql格式化-->
+                <prop key="hibernate.format_sql">true</prop>
+                <!--禁用 jdbc元数据默认值-->
+                <prop key="hibernate.temp.use_jdbc_metadata_defaults">false</prop>
+            </props>
+        </property>
+    </bean>
+
+
+    <!-- **************配置事务管理器*************** -->
+
+    <!-- 配置事务管理器 -->
+    <bean id="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+
+    <!-- 注解方式(配置事物)：通过@Transactional启用事物管理，xml方式的配置会覆盖注解配置 -->
+    <!--<tx:annotation-driven transaction-manager="transactionManager" />-->
+
+    <!-- XML方式(配置事物):配置事务特性，配置add，delete，update开始的方法，事务传播特性为required -->
+    <!-- 配置事务通知属性 -->
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+        <!-- 定义事务传播属性 -->
+        <tx:attributes>
+            <tx:method name="insert*" propagation="REQUIRED"/>
+            <tx:method name="update*" propagation="REQUIRED"/>
+            <tx:method name="edit*" propagation="REQUIRED"/>
+            <tx:method name="save*" propagation="REQUIRED"/>
+            <tx:method name="add*" propagation="REQUIRED"/>
+            <tx:method name="new*" propagation="REQUIRED"/>
+            <tx:method name="set*" propagation="REQUIRED"/>
+            <tx:method name="remove*" propagation="REQUIRED"/>
+            <tx:method name="delete*" propagation="REQUIRED"/>
+            <tx:method name="change*" propagation="REQUIRED"/>
+            <tx:method name="get*" propagation="REQUIRED" read-only="true"/>
+            <tx:method name="find*" propagation="REQUIRED" read-only="true"/>
+            <tx:method name="load*" propagation="REQUIRED" read-only="true"/>
+            <tx:method name="*" propagation="REQUIRED" read-only="true"/>
+        </tx:attributes>
+    </tx:advice>
+    <!-- 配置那些类的方法进行事务管理，当前com.sy.crm.service包中的子包，类中所有方法需要，还需要参考tx:advice的设置 -->
+    <aop:config>
+        <aop:pointcut id="allManagerMethod" expression="execution(* com.zja.service.*.*(..))"/>
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="allManagerMethod"/>
+    </aop:config>
+
+
+    <!-- **************配置hibernateTemplate 操作模板*************** -->
+
+    <!-- 配置hibernate模板操作类,Spring调用 Hibernate 的持久化操作  -->
+    <bean id="hibernateTemplate" class="org.springframework.orm.hibernate5.HibernateTemplate">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+    <!-- Hibernate 配置  END -->
+
+</beans>

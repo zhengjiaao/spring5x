@@ -216,37 +216,7 @@
             <version>1.18.2</version>
         </dependency>
 
-        <!--<dependency>
-            <groupId>com.dist</groupId>
-            <artifactId>dgp-ams-server-api</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
-        </dependency>-->
-
     </dependencies>
-
-    <!--项目中引入仓库地址-->
-    <!--<repositories>
-        <repository>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <id>distcentral</id>
-            <name>libs-release</name>
-            <url>http://elb-791125809.cn-northwest-1.elb.amazonaws.com.cn:5336/artifactory/libs-release</url>
-        </repository>
-        <repository>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </snapshots>
-            <id>distsnapshots</id>
-            <name>libs-snapshot</name>
-            <url>http://elb-791125809.cn-northwest-1.elb.amazonaws.com.cn:5336/artifactory/libs-snapshot</url>
-        </repository>
-    </repositories>-->
 
     <build>
         <finalName>spring5x-mybatis-druid-senior</finalName>

@@ -1,3 +1,3 @@
 -- 删表语句
-DROP TABLE USERENTITY;
+DROP TABLE userentity;
 COMMIT;

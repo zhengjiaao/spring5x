@@ -26,6 +26,9 @@
         <mavne.surefire.plugin.version>2.19.1</mavne.surefire.plugin.version>
         <maven-war-plugin.version>2.6</maven-war-plugin.version>
         <servlet.version>4.0.1</servlet.version>
+
+        <!--spring5.x集成swagger2-->
+        <springfox.version>2.9.2</springfox.version>
     </properties>
 
     <dependencies>
@@ -127,11 +130,56 @@
             <scope>test</scope>
         </dependency>
 
-        <!--日志，修复日志-->
+        <!--日志-->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-nop</artifactId>
             <version>1.7.28</version>
+        </dependency>
+
+        <!--swagger2 API 接口测试-->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>${springfox.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>jackson-annotations</artifactId>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>spring-context</artifactId>
+                    <groupId>org.springframework</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>spring-beans</artifactId>
+                    <groupId>org.springframework</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>spring-aop</artifactId>
+                    <groupId>org.springframework</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>slf4j-api</artifactId>
+                    <groupId>org.slf4j</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>byte-buddy</artifactId>
+                    <groupId>net.bytebuddy</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+            <version>${springfox.version}</version>
+        </dependency>
+
+        <!--@Data 是lombok 包下的注解，用来生成相应的 set、get,toString 方法，使得类的书写更为简洁 -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.2</version>
         </dependency>
 
         <!--mysql 连接驱动-->
@@ -141,46 +189,60 @@
             <version>8.0.13</version>
         </dependency>
         <!--oracle 连接驱动-->
-        <!--<dependency>
+        <dependency>
             <groupId>com.oracle</groupId>
             <artifactId>ojdbc6</artifactId>
             <version>11.2.0.3</version>
-        </dependency>-->
+        </dependency>
 
-        <!--druid 依赖-->
+        <!--druid 数据源连接池-->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>druid</artifactId>
             <version>1.1.20</version>
         </dependency>
+        <!--hibernate-c3p0 数据源连接池-->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-c3p0</artifactId>
+            <version>5.3.10.Final</version>
+        </dependency>
 
-        <!-- spring的整合hibernate所需的jar：orm -->
+        <!-- spring的整合hibernate所需的jar：orm,不然会找不到session工厂 -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-orm</artifactId>
             <version>${spring.version}</version>
         </dependency>
 
-        <!--hibernate-->
+        <!--apo 解决问题:Failed to introspect Class [org.springframework.aop.aspectj-->
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
+            <version>1.9.2</version>
+        </dependency>
+
+        <!--Hibernate-->
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
-            <version>5.3.6.Final</version>
+            <version>5.3.7.Final</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>classmate</artifactId>
+                    <groupId>com.fasterxml</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
-        <!--hibernate-c3p0 依赖-->
+
         <!--<dependency>
             <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-c3p0</artifactId>
-            <version>5.3.6.Final</version>
+            <artifactId>hibernate-ehcache</artifactId>
+            <version>5.4.4.Final</version>
         </dependency>-->
         <!--<dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-entitymanager</artifactId>
-            <version>5.3.6.Final</version>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-ehcache</artifactId>
             <version>5.3.6.Final</version>
         </dependency>
 
@@ -190,12 +252,25 @@
             <version>2.3.3</version>
         </dependency>-->
 
-
-
     </dependencies>
 
     <build>
         <finalName>spring5x-hibernate5-base</finalName>
+        <resources>
+            <!-- maven项目中src源代码下的xml等资源文件编译进classes文件夹，
+              注意：如果没有这个，它会自动搜索resources下是否有mapper.xml文件，
+              如果没有就会报org.apache.ibatis.binding.BindingException: Invalid bound statement (not found): com.pet.mapper.PetMapper.selectByPrimaryKey-->
+            <resource>
+                <directory>src/main/java</directory>
+                <includes>
+                    <include>**/*.xml</include>
+                </includes>
+            </resource>
+            <!--将resources目录下的配置文件编译进classes文件  -->
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
         <plugins>
             <!--maven的编译插件-->
             <plugin>

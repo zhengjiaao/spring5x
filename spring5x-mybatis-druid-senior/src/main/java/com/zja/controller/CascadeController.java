@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("rest/orders")
-@Api(tags = {"CascadeController"}, value = "关联查询:一对一、一对多、多对多")
+@Api(tags = {"CascadeController"}, description = "关联查询")
 public class CascadeController {
 
     @Autowired
