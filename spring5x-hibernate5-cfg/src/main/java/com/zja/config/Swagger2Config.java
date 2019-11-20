@@ -1,4 +1,4 @@
-ackage com.zja.config;
+package com.zja.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
