@@ -9,10 +9,10 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
     <groupId>com.zja</groupId>
-    <artifactId>spring5x-mybatis-druid-base</artifactId>
+    <artifactId>spring5x-mybatis-senior</artifactId>
     <packaging>war</packaging>
 
-    <name>spring5x-mybatis-druid-base</name>
+    <name>spring5x-mybatis-senior</name>
 
     <!--说明：spring5.x-base模块是spring5.x基础框架，其它模块都是以此模块为基础扩展的-->
     <properties>
@@ -184,11 +184,17 @@
             <version>11.2.0.3</version>
         </dependency>
 
-        <!--druid 依赖-->
+        <!--druid 数据源连接池-->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>druid</artifactId>
             <version>1.1.20</version>
+        </dependency>
+        <!--hibernate-c3p0 数据源连接池-->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-c3p0</artifactId>
+            <version>5.3.10.Final</version>
         </dependency>
 
         <!--mybatis 依赖包-->
@@ -209,10 +215,17 @@
             <version>5.1.2</version>
         </dependency>
 
+        <!--@Data 是lombok 包下的注解，用来生成相应的 set、get 方法，使得类的书写更为简洁 -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.2</version>
+        </dependency>
+
     </dependencies>
 
     <build>
-        <finalName>spring5x-mybatis-druid-base</finalName>
+        <finalName>spring5x-mybatis-senior</finalName>
         <plugins>
             <!--maven的编译插件-->
             <plugin>

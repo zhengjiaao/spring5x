@@ -23,8 +23,8 @@
         <module>spring5x-memcached</module>
         <module>spring5x-activemq</module>
         <module>spring5x-rabbitmq</module>
-        <module>spring5x-mybatis-druid-base</module>
-        <module>spring5x-mybatis-druid-senior</module>
+        <module>spring5x-mybatis-base</module>
+        <module>spring5x-mybatis-senior</module>
         <module>spring5x-hibernate5-base</module>
     </modules>
 

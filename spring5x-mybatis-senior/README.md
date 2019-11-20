@@ -1051,7 +1051,7 @@ spring-mvc.xml 完整配置
             location="classpath:properties/application.properties" ignore-unresolvable="true"/>
 
     <!--资源 druid.xml 配置-->
-    <import resource="classpath:META-INF/spring/spring-druid.xml"/>
+    <import resource="classpath:META-INF/spring/datasource/spring-druid.xml"/>
 
     <!--配置 mybatis 会话工厂 -->
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">

@@ -67,8 +67,11 @@
     <context:property-placeholder
             location="classpath:properties/application.properties" ignore-unresolvable="true"/>
 
-    <!--资源 druid.xml 配置-->
-    <import resource="classpath:META-INF/spring/spring-druid.xml"/>
+    <!-- 数据源配置资源引入 -->
+    <!--druid.xml 配置-->
+    <import resource="classpath:META-INF/spring/datasource/spring-druid.xml"/>
+    <!--c3p0.xml 配置-->
+    <!--<import resource="classpath:META-INF/spring/datasource/spring-c3p0.xml"/>-->
 
     <!--配置 mybatis 会话工厂 -->
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
