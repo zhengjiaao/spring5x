@@ -4,8 +4,9 @@
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
     <class name="com.zja.entity.UserEntity" table="userentity">
-        <id name="id">
-            <column name="id" sql-type="int"/>
+        <id name="id" column="id" type="int">
+            <!--<column name="id" sql-type="int"/>-->
+            <generator class="increment" />
         </id>
         <property name="userName">
             <!--不可为null-->

@@ -59,7 +59,7 @@
                     update加载hibernate自动更新数据库结构,建议禁用update，问题太多(比如第二次运行项目，bug会再次创建表，这时表已存在，报错)
                     validate加载hibernate时，验证创建数据库表结构,只会和数据库中的表进行比较，不会创建新表，但是会插入新值
                     none不是用此功能(推荐使用) -->
-                <prop key="hibernate.hbm2ddl.auto">none</prop>
+                <prop key="hibernate.hbm2ddl.auto">update</prop>
                 <!--打印sql语句-->
                 <prop key="hibernate.show_sql">true</prop>
                 <!--sql格式化-->

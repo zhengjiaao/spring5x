@@ -15,7 +15,7 @@ import java.util.Date;
 public class UserEntity implements Serializable {
 
     @ApiModelProperty(value = "默认:mysql自增,oracle序列")
-    private Integer id;
+    private int id;
     @ApiModelProperty("用户名")
     private String userName;
     @ApiModelProperty("年龄")
