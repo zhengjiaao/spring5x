@@ -59,7 +59,7 @@
                     update加载hibernate自动更新数据库结构,建议禁用update，问题太多(比如第二次运行项目，bug会再次创建表，这时表已存在，报错)
                     validate加载hibernate时，验证创建数据库表结构,只会和数据库中的表进行比较，不会创建新表，但是会插入新值
                     none不是用此功能(推荐使用) -->
-                <prop key="hibernate.hbm2ddl.auto">update</prop>
+                <prop key="hibernate.hbm2ddl.auto">none</prop>
                 <!--打印sql语句-->
                 <prop key="hibernate.show_sql">true</prop>
                 <!--sql格式化-->
@@ -86,15 +86,17 @@
     <tx:advice id="txAdvice" transaction-manager="transactionManager">
         <!-- 定义事务传播属性 -->
         <tx:attributes>
+            <tx:method name="save*" propagation="REQUIRED"/>
+            <tx:method name="merge*" propagation="REQUIRED"/>
             <tx:method name="insert*" propagation="REQUIRED"/>
+            <tx:method name="add*" propagation="REQUIRED"/>
+            <tx:method name="set*" propagation="REQUIRED"/>
+            <tx:method name="new*" propagation="REQUIRED"/>
             <tx:method name="update*" propagation="REQUIRED"/>
             <tx:method name="edit*" propagation="REQUIRED"/>
-            <tx:method name="save*" propagation="REQUIRED"/>
-            <tx:method name="add*" propagation="REQUIRED"/>
-            <tx:method name="new*" propagation="REQUIRED"/>
-            <tx:method name="set*" propagation="REQUIRED"/>
             <tx:method name="remove*" propagation="REQUIRED"/>
             <tx:method name="delete*" propagation="REQUIRED"/>
+            <tx:method name="execute*" propagation="REQUIRED"/>
             <tx:method name="change*" propagation="REQUIRED"/>
             <tx:method name="get*" propagation="REQUIRED" read-only="true"/>
             <tx:method name="find*" propagation="REQUIRED" read-only="true"/>
@@ -103,6 +105,9 @@
         </tx:attributes>
     </tx:advice>
     <!-- 配置那些类的方法进行事务管理，当前com.sy.crm.service包中的子包，类中所有方法需要，还需要参考tx:advice的设置 -->
+    <!--dao是原子的数据库操作
+        service层可以把多个原子的数据库操作组合
+        为了让一个事务里面可以进行多个数据库操作，因此把事务放在service层-->
     <aop:config>
         <aop:pointcut id="allManagerMethod" expression="execution(* com.zja.service.*.*(..))"/>
         <aop:advisor advice-ref="txAdvice" pointcut-ref="allManagerMethod"/>
@@ -111,9 +116,12 @@
 
     <!-- **************配置hibernateTemplate 操作模板*************** -->
 
-    <!-- 配置hibernate模板操作类,Spring调用 Hibernate 的持久化操作  -->
+    <!-- 配置HibernateTemplate模板操作类,Spring调用 Hibernate 的持久化操作,HibernateTemplate是线程安全的  -->
     <bean id="hibernateTemplate" class="org.springframework.orm.hibernate5.HibernateTemplate">
         <property name="sessionFactory" ref="sessionFactory"/>
+        <!-- spring与hibernate整合后默认必须在事务下对数据库执行写操作，如果将checkWriteOperations设置为false则没有事务也可写数据库，这样是为了单独测试dao方便 -->
+        <!--上面已经配置了事务，注释掉下方代码-->
+        <!--<property name="checkWriteOperations" value="false"/>-->
     </bean>
     <!-- Hibernate 配置  END -->
 
