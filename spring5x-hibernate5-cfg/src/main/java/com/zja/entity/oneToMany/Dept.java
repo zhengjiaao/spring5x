@@ -1,0 +1,26 @@
+package com.zja.entity.oneToMany;
+
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.Set;
+
+/**
+ * Company: 上海数慧系统技术有限公司
+ * Department: 数据中心
+ * Date: 2019-11-27 14:19
+ * Author: zhengja
+ * Email: zhengja@dist.com.cn
+ * Desc：关键点是通过部门实体类维护到员工的实体类
+ */
+@Getter
+@Setter
+public class Dept {
+    private int deptId;// 部门编号
+    private String deptName;// 部门名称
+
+    //@JSONField(serialize=false)  //被注解的字段不会被序列化
+    //@JsonIgnore  //被注解的字段不会被序列化
+    //@JsonBackReference //在序列化时，@JsonBackReference的作用相当于@JsonIgnore
+    private Set<Employee> emps;// 部门对应多个员工，即一对多的关系
+}

@@ -19,6 +19,7 @@ public class MyObjectMapper extends ObjectMapper {
         this.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         // 禁用 忽略未知的字段
         //this.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        //设置返回给前端的时间格式化
         this.setDateFormat(new SimpleDateFormat("yyyy-MM-dd"));
     }
 }

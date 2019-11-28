@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="com.zja.entity.oneToMany">
+    <class name="Dept" table="t_dept">
+        <!-- 第一写主键映射 -->
+        <id name="deptId" column="deptId">
+            <!--在内存中生成主键，不依赖于底层的数据库，因此可以跨数据库,首次从数据库取主键最大的值-->
+            <generator class="increment" />
+        </id>
+        <!-- 第二写其他字段映射 -->
+        <property name="deptName" column="deptName"
+                  length="20"	type="string" />
+        <!--
+            第三写其他映射，比如这里的set集合映射，set集合映射主要有以下几点：
+                1 实体类申明的集合属性属性（name）
+                2 集合属性对应的表（table）
+                3 指定集合表的外键字段名称（key中的column）
+                4 集合对象对应的实体类（noe-to-many中的class）
+        -->
+        <!--一对多(一个部门对应多个员工)-->
+        <set name="emps" table="t_employee">
+            <!--column指定了员工表的外键字段名称 -->
+            <key column="deptId"/>
+            <!-- class由于上面已经写了包名，这里直接使用即可 -->
+            <one-to-many class="Employee" />
+        </set>
+    </class>
+</hibernate-mapping>

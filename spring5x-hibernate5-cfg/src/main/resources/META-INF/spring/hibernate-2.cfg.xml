@@ -27,12 +27,43 @@
                     update加载hibernate自动更新数据库结构
                     validate加载hibernate时，验证创建数据库表结构
                     none不用此功能 -->
-        <property name="hbm2ddl.auto">none</property>
+        <property name="hbm2ddl.auto">update</property>
 
         <!--设置*.hbm.xml-->
+        <!--测试-->
         <mapping resource="com/zja/entity/UserEntity.hbm.xml"/>
         <!--<mapping class="com.zja.entity.UserEntity"/>
         <mapping package="com.zja.entity"/>-->
+
+        <!--自关联映射：一对多、多对一-->
+        <mapping resource="com/zja/entity/sinceMapping/Menu.hbm.xml"/>
+
+        <!-- 多对多 -->
+        <mapping resource="com/zja/entity/manytoMany/Student.hbm.xml"/>
+        <mapping resource="com/zja/entity/manytoMany/Teacher.hbm.xml"/>
+
+        <!-- 一对多，多对一 -->
+        <mapping resource="com/zja/entity/oneToMany/Dept.hbm.xml"/>
+        <mapping resource="com/zja/entity/oneToMany/Employee.hbm.xml"/>
+
+        <!-- 基于外键的一对一 -->
+        <!--<mapping resource="com/zja/entity/oneToOne/UserOne.hbm.xml"/>
+        <mapping resource="com/zja/entity/oneToOne/Resume.hbm.xml"/>-->
+
+        <!-- 基于主键的一对一 -->
+        <!--<mapping resource="com/zja/entity/oneToOnePk/UserPk.hbm.xml"/>
+        <mapping resource="com/zja/entity/oneToOnePk/ResumePk.hbm.xml"/>-->
+
+        <!-- 注册实体类(注解方式配置映射关系) -->
+        <!--<mapping class="com.yh.anotation.EmpAnotation"/>-->
+
+        <!-- 注解 一多对 多对一 -->
+        <!--<mapping class="com.yh.anotation.onetoMany.DeptAno"/>
+        <mapping class="com.yh.anotation.onetoMany.EmpAno"/>-->
+
+        <!-- 注解 多对多 -->
+        <!--<mapping class="com.yh.anotation.manytomany.CourseAno"/>
+        <mapping class="com.yh.anotation.manytomany.StudentAno"/>-->
 
     </session-factory>
 </hibernate-configuration>

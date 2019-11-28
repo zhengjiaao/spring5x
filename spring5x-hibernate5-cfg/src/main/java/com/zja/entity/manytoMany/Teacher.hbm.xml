@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!-- Generated 2017-3-14 9:12:22 by Hibernate Tools 3.4.0.CR1 -->
+<hibernate-mapping>
+    <class name="com.zja.entity.manytoMany.Teacher" table="t_teacher">
+        <id name="teaId" type="int">
+            <column name="teaId" />
+            <generator class="increment" />
+        </id>
+        <property name="teaName" type="java.lang.String">
+            <column name="teaName" />
+        </property>
+        <!-- 这里的table是指连接表(中间表)的名称 -->
+        <!--lazy:proxy(使用代理并延迟加载),no-proxy(不适用代理并延迟加载),false(立即加载)-->
+        <!--inverse:true属性说明Teacher实体类是被控方，不负责维护关系表。只有一方维护关系，否则会造成重复更新-->
+        <set name="students" table="t_stu_tea" cascade="save-update,delete" inverse="true" lazy="true">
+            <!-- 这个是关联表的字段名，同时是Teacher的外键 -->
+            <key column="teaId" />
+            <many-to-many class="com.zja.entity.manytoMany.Student" column="stuId"/>
+        </set>
+    </class>
+</hibernate-mapping>

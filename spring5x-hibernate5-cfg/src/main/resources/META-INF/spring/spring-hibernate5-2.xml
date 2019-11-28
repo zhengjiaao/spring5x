@@ -6,9 +6,9 @@
 
     <!-- 数据源配置资源引入 -->
     <!--druid.xml 配置-->
-    <!--<import resource="classpath:META-INF/spring/datasource/spring-druid.xml"/>-->
+    <import resource="classpath:META-INF/spring/datasource/spring-druid.xml"/>
     <!--c3p0.xml 配置-->
-    <import resource="classpath:META-INF/spring/datasource/spring-c3p0.xml"/>
+    <!--<import resource="classpath:META-INF/spring/datasource/spring-c3p0.xml"/>-->
 
     <!-- Hibernate 配置  BEGIN -->
     <!-- **************配置SessionFactory工厂*************** -->
@@ -34,19 +34,21 @@
     <!-- 注解方式(配置事物)：通过@Transactional启用事物管理，xml方式的配置会覆盖注解配置 -->
     <!--<tx:annotation-driven transaction-manager="transactionManager" />-->
     <!-- XML方式(配置事物):配置事务特性，配置add，delete，update开始的方法，事务传播特性为required -->
-    <!-- 配置事务通知属性 -->
+    <!-- 手动配置事务通知属性 -->
     <tx:advice id="txAdvice" transaction-manager="transactionManager">
         <!-- 定义事务传播属性 -->
         <tx:attributes>
+            <tx:method name="save*" propagation="REQUIRED"/>
+            <tx:method name="merge*" propagation="REQUIRED"/>
             <tx:method name="insert*" propagation="REQUIRED"/>
+            <tx:method name="add*" propagation="REQUIRED"/>
+            <tx:method name="set*" propagation="REQUIRED"/>
+            <tx:method name="new*" propagation="REQUIRED"/>
             <tx:method name="update*" propagation="REQUIRED"/>
             <tx:method name="edit*" propagation="REQUIRED"/>
-            <tx:method name="save*" propagation="REQUIRED"/>
-            <tx:method name="add*" propagation="REQUIRED"/>
-            <tx:method name="new*" propagation="REQUIRED"/>
-            <tx:method name="set*" propagation="REQUIRED"/>
             <tx:method name="remove*" propagation="REQUIRED"/>
             <tx:method name="delete*" propagation="REQUIRED"/>
+            <tx:method name="execute*" propagation="REQUIRED"/>
             <tx:method name="change*" propagation="REQUIRED"/>
             <tx:method name="get*" propagation="REQUIRED" read-only="true"/>
             <tx:method name="find*" propagation="REQUIRED" read-only="true"/>

@@ -4,7 +4,37 @@
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
          version="4.0">
 
-    <!--配置spring前端控制器-->
+    <!--下面代码中<listener> 就是初始化的作用-->
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+    <!--
+    初始化文件的位置 具体怎么加载的spring已经为我们写好了  我们所可以改的就是
+    <param-value>classpath:Resource/SpringConf.xml</param-value>
+    还句话说 配置此处的目的就是告诉spring要加载的配置文件的路径
+    -->
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>classpath:META-INF/spring/spring.xml</param-value>
+    </context-param>
+
+    <!--hibernate延迟加载,配置在所有filter之前(springmvc过滤器前) 解决无限循环和no Session问题，在get方法上使用@JsonBackReference-->
+    <filter>
+        <filter-name>hibernateFilter</filter-name>
+        <filter-class>org.springframework.orm.hibernate5.support.OpenSessionInViewFilter</filter-class>
+        <init-param>
+            <param-name>sessionFactoryBeanName</param-name>
+            <param-value>sessionFactory</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>hibernateFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+    </filter-mapping>
+
+    <!--配置spring mvc前端控制器-->
     <servlet>
         <servlet-name>springMvc</servlet-name>
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>

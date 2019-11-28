@@ -8,6 +8,10 @@
     <!-- 开启注解包扫描-->
     <context:component-scan base-package="com.zja.*"/>
 
+    <!-- 增加application.properties文件 -->
+    <context:property-placeholder
+            location="classpath:application.properties" />
+
     <!--使用默认的 Servlet 来响应静态文件 -->
     <mvc:default-servlet-handler/>
 
@@ -42,10 +46,6 @@
             </bean>
         </mvc:message-converters>
     </mvc:annotation-driven>
-
-    <!-- 增加application.properties文件 -->
-    <context:property-placeholder
-            location="classpath:application.properties" />
 
     <!-- 配置视图解析器 -->
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"

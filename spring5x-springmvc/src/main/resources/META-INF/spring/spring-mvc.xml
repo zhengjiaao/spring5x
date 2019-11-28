@@ -50,6 +50,9 @@
     <!--aop xml配置-->
     <import resource="classpath:aop.xml"/>
 
+    <!--对象映射工具dozer-->
+    <import resource="classpath:dozer/spring-dozer.xml"></import>
+
 
     <!-- 配置视图解析器 -->
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"

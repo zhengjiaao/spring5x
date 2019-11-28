@@ -1,6 +1,6 @@
 package com.zja.service;
 
-import com.zja.entity.UserEntity;
+import java.util.List;
 
 /**
  * @author ZhengJa
@@ -9,7 +9,46 @@ import com.zja.entity.UserEntity;
  */
 public interface UserService {
 
-    Object getuser(Integer id);
+    Object saveEntity(UserEntity userEntity);
 
-    Object saveUser(UserEntity userEntity);
+    Object saveEntity2(UserEntity userEntity);
+
+    UserEntity mergeEntity(UserEntity userEntity);
+
+    UserEntity mergeEntity2(UserEntity userEntity);
+
+    Object getEntity(Integer id);
+
+    Object loadEntity(Integer id);
+
+    Object getListEntity();
+
+    UserEntity getEntityName(Integer id);
+
+    List<UserEntity> getPageByConditions();
+
+    void updateEntity(UserEntity userEntity);
+
+    void saveOrUpdate(UserEntity userEntity);
+
+    void deleteByEntity(Integer id);
+
+    void deleteAll();
+
+    Object execute();
+
+    Object executeSaveUserEntity(UserEntity userEntity);
+
+    List<UserEntity> findByExample();
+
+    List<UserEntity> findByExample(int firstResult, int maxResults);
+
+    List<UserEntity> findByCriteria();
+
+    List<UserEntity> findPageByCriteria(int firstResult, int maxResults);
+
+    List<UserEntity> findByCriteria(String propertyName, Object value, int firstResult, int maxResults);
+
+    List<UserEntity> findByCriteria(int low, int high);
+
 }

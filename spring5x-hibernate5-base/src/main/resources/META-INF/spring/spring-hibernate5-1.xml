@@ -45,21 +45,21 @@
                 <!--mysql新版本方言:创建表时,引擎engine=MyISAM，优点：查询很快，缺点：不支持事务处理和外键约束-->
                 <!--<prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>-->
                 <!--mysql新版本方言:创建表时,引擎engine=InnoDB，优点：支持事务处理和外键约束，缺点：查询很慢，(推荐使用)-->
-                <prop key="hibernate.dialect">org.hibernate.dialect.MySQL57Dialect</prop>
+                <!--<prop key="hibernate.dialect">org.hibernate.dialect.MySQL57Dialect</prop>-->
 
                 <!--oracle新版本方言: 支持版本10g和11g-->
-                <!--<prop key="hibernate.dialect">org.hibernate.dialect.Oracle10gDialect</prop>-->
+                <prop key="hibernate.dialect">org.hibernate.dialect.Oracle10gDialect</prop>
 
-                <!--default_schema：oracle设置用户名:duke，mysql设置数据库名称:test-->
+                <!--default_schema：oracle设置用户名:duke，mysql设置数据库名称:test。不推荐使用：默认自动识别-->
                 <!--<prop key="hibernate.default_schema">duke</prop>-->
-                <prop key="hibernate.default_schema">test</prop>
+                <!--<prop key="hibernate.default_schema">test</prop>-->
 
                 <!--create每次加载hibernate，重新创建数据库表结构，这就是导致数据库表数据丢失的原因
                     create-drop加载hibernate时删除表再创建表，退出时删除表结构
                     update加载hibernate自动更新数据库结构,建议禁用update，问题太多(比如第二次运行项目，bug会再次创建表，这时表已存在，报错)
                     validate加载hibernate时，验证创建数据库表结构,只会和数据库中的表进行比较，不会创建新表，但是会插入新值
                     none不是用此功能(推荐使用) -->
-                <prop key="hibernate.hbm2ddl.auto">update</prop>
+                <prop key="hibernate.hbm2ddl.auto">none</prop>
                 <!--打印sql语句-->
                 <prop key="hibernate.show_sql">true</prop>
                 <!--sql格式化-->

@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -17,7 +16,7 @@ import java.util.Date;
 @Entity
 @Table(name = "userentity")
 @ApiModel("用户信息实体类")
-public class UserEntity implements Serializable {
+public class UserEntity{
 
     @ApiModelProperty(value = "默认:mysql自增,oracle序列")
     @Id

@@ -54,7 +54,7 @@
     <!--方式一: 不使用hibernate.cfg.xml配置 -->
     <import resource="classpath:META-INF/spring/spring-hibernate5-1.xml"/>
     <!--方式二: 使用hibernate.cfg.xml配置-->
-    <!--<import resource="classpath:META-INF/spring/spring-hibernate5-2.xml"/>-->
+    <import resource="classpath:META-INF/spring/spring-hibernate5-2.xml"/>
 
     <!-- 配置视图解析器 -->
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"

@@ -6,7 +6,17 @@
     <class name="com.zja.entity.UserEntity" table="userentity">
         <id name="id" column="id" type="int">
             <!--<column name="id" sql-type="int"/>-->
-            <generator class="increment" />
+            <!--在内存中生成主键，不依赖于底层的数据库，因此可以跨数据库,首次从数据库取主键最大的值-->
+            <!--<generator class="increment" />-->
+            <!--根据数据库自动选择identity、hilo、sequence其中一种，例如MySQL使用identity，Oracle使用sequence(默认序列查找hibernate_sequence序列)，使用自定义序列时需加入参数sequence_name-->
+            <!--<generator class="native">
+                <param name="sequence_name">SEQ_MY_HIBERNATE</param>
+            </generator>-->
+            <!--需要数据库支持sequence,例如oralce、PostgerSQL等，不支持 mysql(可以使用identity)-->
+            <generator class="sequence">
+                <!--SEQ_MY_HIBERNATE 是自定义创建的序列，指定sequence的名称-->
+                <param name="sequence_name">SEQ_MY_HIBERNATE</param>
+            </generator>
         </id>
         <property name="userName">
             <!--不可为null-->

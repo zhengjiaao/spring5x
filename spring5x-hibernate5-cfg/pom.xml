@@ -252,6 +252,12 @@
             <version>2.3.3</version>
         </dependency>-->
 
+        <!--解决hibernate 关联关系死循环问题-->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>1.2.59</version>
+        </dependency>
     </dependencies>
 
     <build>
