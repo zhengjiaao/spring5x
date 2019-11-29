@@ -1,5 +1,6 @@
 package com.zja.controller;
 
+import com.zja.entity.UserEntity;
 import com.zja.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

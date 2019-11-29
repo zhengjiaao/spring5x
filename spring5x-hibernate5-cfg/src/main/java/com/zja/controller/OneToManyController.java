@@ -3,12 +3,11 @@ package com.zja.controller;
 import com.zja.service.OneToManyService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * Company: 上海数慧系统技术有限公司
- * Department: 数据中心
  * Date: 2019-11-26 13:40
  * Author: zhengja
  * Email: zhengja@dist.com.cn
@@ -30,7 +29,7 @@ public class OneToManyController {
 
     @GetMapping("getDept")
     @ApiOperation(value = "2、根据deptId获取部门信息", notes = "HibernateTemplate", httpMethod = "GET")
-    public Object getDept(@RequestParam int deptId) {
+    public Object getDept(@ApiParam(defaultValue = "1") @RequestParam int deptId) {
         return this.oneToManyService.getDept(deptId);
     }
 
@@ -42,7 +41,7 @@ public class OneToManyController {
 
     @GetMapping("getEmployee")
     @ApiOperation(value = "4、根据empId获取员工信息", notes = "HibernateTemplate", httpMethod = "GET")
-    public Object getEmployee(@RequestParam int empId) {
+    public Object getEmployee(@ApiParam(defaultValue = "1") @RequestParam int empId) {
         return this.oneToManyService.getEmployee(empId);
     }
 

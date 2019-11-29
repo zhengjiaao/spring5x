@@ -1,5 +1,6 @@
 package com.zja.service.Impl;
 
+import com.zja.entity.UserEntity;
 import com.zja.service.UserService;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;

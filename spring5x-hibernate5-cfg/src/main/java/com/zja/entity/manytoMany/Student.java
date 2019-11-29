@@ -33,6 +33,7 @@ public class Student {
 		this.stuName = stuName;
 	}
 
+	//不序列化
 	@JsonBackReference
 	public Set<Teacher> getTeachers() {
 		return teachers;

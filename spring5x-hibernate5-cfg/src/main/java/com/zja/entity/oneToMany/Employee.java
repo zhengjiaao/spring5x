@@ -1,11 +1,10 @@
 package com.zja.entity.oneToMany;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.Setter;
 
 /**
- * Company: 上海数慧系统技术有限公司
- * Department: 数据中心
  * Date: 2019-11-27 14:20
  * Author: zhengja
  * Email: zhengja@dist.com.cn
@@ -20,6 +19,6 @@ public class Employee {
 
     //@JSONField(serialize=false)  //被注解的字段不会被序列化
     //@JsonIgnore //被注解的字段不会被序列化
-    //@JsonBackReference //尽量放到get方法上，在序列化时，@JsonBackReference的作用相当于@JsonIgnore
+    @JsonBackReference //尽量放到get方法上，在序列化时，@JsonBackReference的作用相当于@JsonIgnore
     private Dept dept;// 员工和部门的关系
 }

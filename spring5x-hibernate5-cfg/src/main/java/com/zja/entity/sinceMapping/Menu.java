@@ -8,8 +8,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Company: 上海数慧系统技术有限公司
- * Department: 数据中心
  * Date: 2019-11-25 13:24
  * Author: zhengja
  * Email: zhengja@dist.com.cn

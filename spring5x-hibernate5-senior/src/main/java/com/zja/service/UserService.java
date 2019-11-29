@@ -1,5 +1,7 @@
 package com.zja.service;
 
+import com.zja.entity.UserEntity;
+
 import java.util.List;
 
 /**

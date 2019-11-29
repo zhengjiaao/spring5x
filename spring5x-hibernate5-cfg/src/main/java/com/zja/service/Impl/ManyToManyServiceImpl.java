@@ -1,5 +1,7 @@
 package com.zja.service.Impl;
 
+import com.zja.dto.manytoMany.StudentDTO;
+import com.zja.dto.manytoMany.TeacherDTO;
 import com.zja.entity.manytoMany.Student;
 import com.zja.entity.manytoMany.Teacher;
 import com.zja.service.ManyToManyService;
@@ -12,8 +14,6 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * Company: 上海数慧系统技术有限公司
- * Department: 数据中心
  * Date: 2019-11-26 14:35
  * Author: zhengja
  * Email: zhengja@dist.com.cn
@@ -56,16 +56,32 @@ public class ManyToManyServiceImpl implements ManyToManyService {
         Teacher teacher = this.hibernateTemplate.get(Teacher.class, teaId);
         System.out.println("TeaName: "+teacher.getTeaName());
 
+        TeacherDTO teacherDTO =new TeacherDTO();
+        teacherDTO.setTeaId(teacher.getTeaId());
+        teacherDTO.setTeaName(teacher.getTeaName());
+
         //延迟加载：当获取老师有哪些学生时会二次sql查询学生信息
         Set<Student> students = teacher.getStudents();
+        Set<StudentDTO> studentDTOS = new HashSet<>();
         if (students !=null ){
             Iterator<Student> iterator = students.iterator();
             while (iterator.hasNext()){
                 Student student = iterator.next();
                 System.out.println("老师【 "+teacher.getTeaName()+"】的学生有: "+student.getStuName());
+
+                StudentDTO studentDTO = new StudentDTO();
+                studentDTO.setStuId(student.getStuId());
+                studentDTO.setStuName(student.getStuName());
+
+                studentDTOS.add(studentDTO);
             }
         }
-        return teacher;
+        teacherDTO.setStudents(studentDTOS);
+
+        //使用DTO解决嵌套死循环问题
+        return teacherDTO;
+        //使用@JsonBackReference 在集合的get方法上，解决死循环问题，但不是完美解决
+        //return teacher;
     }
 
     @Override
@@ -78,14 +94,29 @@ public class ManyToManyServiceImpl implements ManyToManyService {
         Student student = this.hibernateTemplate.get(Student.class, stuId);
         System.out.println("StuName: "+student.getStuName());
 
+        StudentDTO studentDTO = new StudentDTO();
+        studentDTO.setStuId(student.getStuId());
+        studentDTO.setStuName(student.getStuName());
         //延迟加载：当获取学生属于哪个老师时会二次sql查询老师信息
         Set<Teacher> teachers = student.getTeachers();
         Iterator<Teacher> iterator = teachers.iterator();
+        Set<TeacherDTO> teacherDTOS = new HashSet<>();
         while (iterator.hasNext()){
             Teacher teacher = iterator.next();
             System.out.println("学生【 "+student.getStuName()+" 】的老师: "+teacher.getTeaName());
+
+            TeacherDTO teacherDTO = new TeacherDTO();
+            teacherDTO.setTeaId(teacher.getTeaId());
+            teacherDTO.setTeaName(teacher.getTeaName());
+            teacherDTOS.add(teacherDTO);
+
         }
-        return student;
+        studentDTO.setTeachers(teacherDTOS);
+
+        //使用DTO解决嵌套死循环问题
+        return studentDTO;
+        //使用@JsonBackReference 在集合的get方法上，解决死循环问题，但不是完美解决
+        //return student;
     }
 
     @Override
