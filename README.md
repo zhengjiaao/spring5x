@@ -15,15 +15,15 @@ Spring5x项目整合了Spring常用的一些关键性技术，使用组件化的
 源码为初始源代码，部分组件提供了易用性整合，提高了可读性和易用性，部分仍需继续改造。
 
 项目包含：
-	- **spring5x-base, Spring基本功能，下面的所有项目都是基于此模块进行扩展的**。
-	- Spring5x-springmvc, Spring系列视图控制层
-	- spring5x-Mail, 邮件服务，组件进行了易用性整合，统一了邮件内文本、图片、附件等的发送方式，简单易用。
-	- spring5x-WebSocket, HTML5定义了WebSocket协议, 这里做了服务端简单的IM聊天功能。
-	- spring5x-redis, jedis和redisson 连接redis简单实现
-	- spring5x-swagger2 API, 主要是多环境swagger2的启动和关闭
-	- spring5x-mybatis-druid-base, mybatis、druid(mysql/oracle) 基础搭建，此后的mybatis扩展都是以此模块
-	- sprng5x-mongdb 简单连接及使用
-	- spring5x-task 定时任务
+- **spring5x-base：SpringMvc基本功能，下面的所有项目都是基于此模块进行扩展的**。
+- Spring5x-springmvc, Spring系列视图控制层
+- spring5x-Mail, 邮件服务，组件进行了易用性整合，统一了邮件内文本、图片、附件等的发送方式，简单易用。
+- spring5x-WebSocket, HTML5定义了WebSocket协议, 这里做了服务端简单的IM聊天功能。
+- spring5x-redis, jedis和redisson 连接redis简单实现
+- spring5x-swagger2 API, 主要是多环境swagger2的启动和关闭
+- spring5x-mybatis-druid-base, mybatis、druid(mysql/oracle) 基础搭建，此后的mybatis扩展都是以此模块
+- sprng5x-mongdb 简单连接及使用
+- spring5x-task 定时任务
 
 
 
