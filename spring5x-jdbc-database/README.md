@@ -188,7 +188,7 @@ Spring5x-base的作用：
 
     <!-- 增加application.properties文件，这个文件里没有内容 -->
     <context:property-placeholder
-            location="classpath*:application.properties" />
+            location="classpath*:properties/application.properties" />
 
     <!-- 配置视图解析器 -->
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"

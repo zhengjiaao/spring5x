@@ -3,6 +3,7 @@ package com.zja.service.Impl;
 import com.zja.entity.UserEntity;
 import com.zja.rowmapper.UserEntityRowMapper;
 import com.zja.service.UserService;
+import com.zja.util.MyId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -11,18 +12,19 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
- * Company: 上海数慧系统技术有限公司
- * Department: 数据中心
  * Date: 2019-11-28 15:59
  * Author: zhengja
  * Email: zhengja@dist.com.cn
- * Desc：
+ * Desc：用户操作：jdbc模板增删改查
  */
 @Service
 public class UserServiceImpl implements UserService {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private MyId myId;
 
     /**
      * 增加用户(将用户保存到数据库)
@@ -32,9 +34,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public Object saveUser(String username, int age) {
         UserEntity userByName = (UserEntity) this.findUserByName(username);
+
         if (userByName == null) {
-            String sql = "insert into userentity (username,age) values(?,?)";
-            Object[] args = {username, age};
+            String sql = "insert into userentity (id,username,age) values(?,?,?)";
+            Object[] args = {myId.generateId(),username, age};
             int insert = this.jdbcTemplate.update(sql, args);
             if (insert > 0) {
                 return "新增用户成功!!!";
@@ -89,7 +92,7 @@ public class UserServiceImpl implements UserService {
         if (query.isEmpty()) {
             return null;
         }else {
-            return query.get(0);
+            return query;
         }
     }
 
@@ -119,7 +122,7 @@ public class UserServiceImpl implements UserService {
         if (query.isEmpty()) {
             return null;
         }else {
-            return query.get(0);
+            return query;
         }
     }
 

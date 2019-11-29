@@ -5,5 +5,8 @@
 </head>
 <body>
 <h2>Hello World!</h2>
+
+<a href="http://localhost:8080/spring5x-jdbc-database/swagger-ui.html">点击-->进入swagger页面测试</a>
+
 </body>
 </html>

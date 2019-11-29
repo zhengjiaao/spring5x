@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!--jdbc据库连接资源-->
+    <context:property-placeholder location="classpath:properties/jdbc.properties" ignore-unresolvable="true"/>
+
+    <!--可选 Mysql/Oracle 数据源-->
+
+    <!--Mysql 数据源-->
+    <bean id="dataSource"
+          class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName"
+                  value="${mysql.jdbc.driverClassName}">
+        </property>
+        <property name="url"
+                  value="${mysql.jdbc.url}">
+        </property>
+        <property name="username" value="${mysql.jdbc.username}"></property>
+        <property name="password" value="${mysql.jdbc.password}"></property>
+    </bean>
+
+    <!--Oracle 数据源-->
+    <!--<bean id="dataSource"
+          class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName"
+                  value="${oracle.jdbc.driverClassName}">
+        </property>
+        <property name="url"
+                  value="${oracle.jdbc.url}">
+        </property>
+        <property name="username" value="${oracle.jdbc.username}"></property>
+        <property name="password" value="${oracle.jdbc.password}"></property>
+    </bean>-->
+
+    <!--jdbc操作数据库模板-->
+    <bean id="jdbcTemplate"
+          class="org.springframework.jdbc.core.JdbcTemplate" abstract="false"
+          lazy-init="false">
+        <property name="dataSource">
+            <ref bean="dataSource"/>
+        </property>
+    </bean>
+</beans>

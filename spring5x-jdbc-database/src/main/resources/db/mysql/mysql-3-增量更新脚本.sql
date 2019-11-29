@@ -1,11 +1,9 @@
 -- 增量更新数据
 
 -- 增加用户表数据
-insert into userentity(username,age)
-values ('王五',16);
-insert into userentity(username,age)
-values ('李四',18);
-insert into userentity(username,age)
-values ('阿里',19);
+insert into userentity(id,username,age)
+values (397739285358587996,'小明',22);
+insert into userentity(id,username,age)
+values (397739285358587997,'小王',23);
 
 COMMIT;

@@ -10,7 +10,7 @@
 
     <!-- 增加application.properties文件 -->
     <context:property-placeholder
-            location="classpath:application.properties" />
+            location="classpath:properties/application.properties" ignore-unresolvable="true"/>
 
     <!--使用默认的 Servlet 来响应静态文件 -->
     <mvc:default-servlet-handler/>
@@ -47,8 +47,8 @@
         </mvc:message-converters>
     </mvc:annotation-driven>
 
-    <!--引入数据源-->
-    <import resource="classpath:META-INF/spring/springjdbc-mysql.xml"/>
+    <!--引入数据源(支持mysql/Oracle)-->
+    <import resource="classpath*:META-INF/spring/spring-jdbc.xml"/>
 
     <!-- 配置视图解析器 -->
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"

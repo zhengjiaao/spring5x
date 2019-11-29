@@ -13,7 +13,7 @@ public class UserEntityRowMapper implements RowMapper<UserEntity> {
     @Override
     public UserEntity mapRow(ResultSet resultSet, int i) throws SQLException {
         UserEntity userEntity = new UserEntity();
-        userEntity.setId(resultSet.getInt("id"));
+        userEntity.setId(resultSet.getLong("id"));
         userEntity.setUserName(resultSet.getString("username"));
         userEntity.setAge(resultSet.getInt("age"));
         return userEntity;
