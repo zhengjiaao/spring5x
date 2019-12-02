@@ -228,7 +228,8 @@ public class UserServiceImpl implements UserService {
 
 
 
-    /*********** hql 面向对象查询数据 *************/
+    //1. HQL查询
+    /*********** HQL查询 面向对象查询数据 *************/
 
     /**
      * 通过Hql执行获取所有用户
@@ -286,7 +287,8 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    /*********** sql 查询数据 *************/
+    //2.原生SQL查询
+    /*********** 原生SQL查询数据 *************/
 
     /**
      * 通过Sql执行获取所有用户
@@ -308,8 +310,6 @@ public class UserServiceImpl implements UserService {
         });
         return o;
     }
-
-
 
 
     /*********** findByExample查询数据 *************/
@@ -340,6 +340,7 @@ public class UserServiceImpl implements UserService {
         return hibernateTemplate.findByExample(userEntity, firstResult, maxResults);
     }
 
+    //3.QBC（Query By Criteria）命名查询 面向对象查询
     /*********** findByExample查询数据 *************/
 
     /**
@@ -347,7 +348,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public List<UserEntity> findByCriteria() {
-        //DetachedCriteria：离线条件查询对象，该对象的创建不需要session对象
+        //DetachedCriteria：离线条件查询对象，该对象的创建不需要session对象，替代了Criteria查询
         DetachedCriteria criteria = DetachedCriteria.forClass(UserEntity.class);
         return (List<UserEntity>) hibernateTemplate.findByCriteria(criteria);
     }
