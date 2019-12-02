@@ -47,12 +47,12 @@
         <mapping resource="com/zja/entity/oneToMany/Employee.hbm.xml"/>
 
         <!-- 基于外键的一对一 -->
-        <!--<mapping resource="com/zja/entity/oneToOne/UserOne.hbm.xml"/>
-        <mapping resource="com/zja/entity/oneToOne/Resume.hbm.xml"/>-->
+        <mapping resource="com/zja/entity/oneToOne/UserOne.hbm.xml"/>
+        <mapping resource="com/zja/entity/oneToOne/Resume.hbm.xml"/>
 
         <!-- 基于主键的一对一 -->
-        <!--<mapping resource="com/zja/entity/oneToOnePk/UserPk.hbm.xml"/>
-        <mapping resource="com/zja/entity/oneToOnePk/ResumePk.hbm.xml"/>-->
+        <mapping resource="com/zja/entity/oneToOnePk/UserPk.hbm.xml"/>
+        <mapping resource="com/zja/entity/oneToOnePk/ResumePk.hbm.xml"/>
 
         <!-- 注册实体类(注解方式配置映射关系) -->
         <!--<mapping class="com.yh.anotation.EmpAnotation"/>-->

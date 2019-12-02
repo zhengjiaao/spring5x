@@ -116,6 +116,30 @@ public class HibernateController {
         return this.userService.executeSaveUserEntity(userEntity);
     }
 
+    @GetMapping("getAllUserEntityByHql")
+    @ApiOperation(value = "通过hql查询所有用户", notes = "HibernateTemplate", httpMethod = "GET")
+    public Object getAllUserEntityByHql() {
+        return this.userService.getAllUserEntityByHql();
+    }
+
+    @GetMapping("getUserEntityByHql")
+    @ApiOperation(value = "通过hql根据id查询一条用户", notes = "HibernateTemplate", httpMethod = "GET")
+    public Object getUserEntityByHql(@RequestParam Integer id) {
+        return this.userService.getUserEntityByHql(id);
+    }
+
+    @GetMapping("getNameByHQL")
+    @ApiOperation(value = "通过hql查询用户名集合", notes = "HibernateTemplate", httpMethod = "GET")
+    public Object getNameByHQL() {
+        return this.userService.getNameByHQL();
+    }
+
+    @GetMapping("executeGetUserEntityBySql")
+    @ApiOperation(value = "通过Sql执行获取所有用户", notes = "HibernateTemplate", httpMethod = "GET")
+    public Object executeGetUserEntityBySql() {
+        return this.userService.executeGetUserEntityBySql();
+    }
+
     @GetMapping("findByExample")
     @ApiOperation(value = "Example查询所有数据", notes = "HibernateTemplate", httpMethod = "GET")
     public Object findByExample() {

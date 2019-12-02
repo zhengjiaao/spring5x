@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!--基于主键的一对一-->
+<hibernate-mapping>
+    <class name="com.zja.entity.oneToOnePk.UserPk" table="pk_user">
+        <id name="userId" column="USERID" type="int">
+            <!--在内存中生成主键，不依赖于底层的数据库，因此可以跨数据库,首次从数据库取主键最大的值-->
+            <generator class="increment"/>
+        </id>
+        <property name="userName" column="USERNAME" type="java.lang.String"/>
+
+        <one-to-one name="resume" class="com.zja.entity.oneToOnePk.ResumePk" cascade="all"/>
+    </class>
+</hibernate-mapping>

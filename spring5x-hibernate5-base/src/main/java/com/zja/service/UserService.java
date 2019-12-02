@@ -41,6 +41,14 @@ public interface UserService {
 
     Object executeSaveUserEntity(UserEntity userEntity);
 
+    Object getAllUserEntityByHql();
+
+    Object getUserEntityByHql(Integer id);
+
+    Object getNameByHQL();
+
+    Object executeGetUserEntityBySql();
+
     List<UserEntity> findByExample();
 
     List<UserEntity> findByExample(int firstResult, int maxResults);

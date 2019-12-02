@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!--基于主键的一对一-->
+<hibernate-mapping>
+    <class name="com.zja.entity.oneToOnePk.ResumePk" table="pk_resume">
+        <id name="resId" column="RESID" type="int">
+            <!-- 档案表是外键 generator -->
+            <generator class="foreign">
+            <!-- 引用one-to-one 关联属性名称 -->
+            <!-- 重点在这里，因为主键跟外键是同一个，直接在此申明该主键就是外键 -->
+            <param name="property">user</param>
+            </generator>
+        </id>
+        <property name="resName" column="RESNAME" type="java.lang.String"/>
+
+        <!--
+        1、constrained只能在one-to-one的映射中使用，（一般在主表的映射中，有外键的那个表）。
+        如果constrained=true， 则表明存在外键与关联表对应，并且关联表中肯定存在对应的键与其对应，
+        另外该选项最关键的是影响save和delete的先后顺序。例如增加的时候，如果constainted=true,则会先增加关联表，然后增加本表。删除的时候反之。
+        2、one-to- one的双向关联中，必须设置constrained=true，要不然会有重复数据读。
+        3、one-to-one的单向关联中，如果constrained=false，则会在查询时就全部取出来，用left outer join的方式。
+        如果constrained=true，hibernate即会延迟加载sql，只把主表的查出来，等有用到关联表的再发sql取。-->
+        <one-to-one name="user" class="com.zja.entity.oneToOnePk.UserPk" constrained="true"/>
+    </class>
+</hibernate-mapping>

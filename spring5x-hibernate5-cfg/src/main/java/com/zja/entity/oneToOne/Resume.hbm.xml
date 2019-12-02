@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!-- 基于外键的一对一 ，和主键关联的区别是：主键策略正常配置，one-to-one改为many-to-one,
+     注意保存顺序，先保存主的一方（用户），可以减少update-->
+<hibernate-mapping>
+    <class name="com.zja.entity.oneToOne.Resume" table="RESUME">
+        <id name="resId" column="RESID" type="int">
+            <!--在内存中生成主键，不依赖于底层的数据库，因此可以跨数据库,首次从数据库取主键最大的值-->
+            <generator class="increment"/>
+        </id>
+        <property name="resName" column="RESNAME" type="java.lang.String"/>
+
+        <!--多对一：档案对用户
+        	一对一配置，name是实体类UserOne的属性
+        	column是数据库外键字段名
+        	由于是多对一的特例，所以需要加unique属性
+        -->
+        <many-to-one name="user" class="com.zja.entity.oneToOne.UserOne" cascade="all">
+        <!-- 指定列不能重复 -->
+        <column name="user_id" unique="true"/>
+        </many-to-one>
+
+    </class>
+</hibernate-mapping>

@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!-- 基于外键的一对一 ，和主键关联的区别是：新增property-ref属性，
+     如果没有指定此属性会使用对方关联类的主键来跟本类的主键比较，这里要注意不是关联表中的外键字段名，是对象属性-->
+<hibernate-mapping>
+    <class name="com.zja.entity.oneToOne.UserOne" table="USERONE">
+        <id name="userId" column="USERID" type="int">
+            <!--在内存中生成主键，不依赖于底层的数据库，因此可以跨数据库,首次从数据库取主键最大的值-->
+            <generator class="increment"/>
+        </id>
+        <property name="userName" column="USERNAME" type="java.lang.String"/>
+
+        <!--
+           name:是实体类中引入的属性名
+           property-ref:指定关联类的属性名(档案所属的学生)，
+           这个属性将会和本类的主键相对应
+       -->
+        <one-to-one name="resume" class="com.zja.entity.oneToOne.Resume" property-ref="user"/>
+
+    </class>
+</hibernate-mapping>

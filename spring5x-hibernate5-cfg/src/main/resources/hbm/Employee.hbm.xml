@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="com.zja.entity.oneToMany">
+    <class name="Employee" table="employee">
+        <!-- 主键映射 -->
+        <id name="empId" column="empId">
+            <!--在内存中生成主键，不依赖于底层的数据库，因此可以跨数据库,首次从数据库取主键最大的值-->
+            <generator class="increment" />
+        </id>
+        <!-- 其他字段映射 -->
+        <property name="empName" column="empName" length="20" type="string"/>
+        <property name="salary" column="salary" type="double"/>
+        <!--
+            多对一的映射配置：多个员工对应一个部门
+            name是实体类中申明的属性；
+            column外键字段名称，对应多的一方的数据库表中的外键字段名；
+            class对应的部门实体类；
+        -->
+        <many-to-one name="dept" column="deptId" class="Dept"/>
+    </class>
+
+</hibernate-mapping>

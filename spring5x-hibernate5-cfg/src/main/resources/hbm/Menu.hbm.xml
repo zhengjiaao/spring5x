@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated 2018-7-31 16:16:18 by Hibernate Tools 3.5.0.Final -->
+<!--package解决每个实体类都要写全路径-->
+<hibernate-mapping>
+    <class name="com.zja.entity.sinceMapping.Menu" table="t_menu">
+        <id name="menuId" column="menuId" type="int">
+            <!--在内存中生成主键，不依赖于底层的数据库，因此可以跨数据库,首次从数据库取主键最大的值-->
+            <generator class="increment" />
+        </id>
+        <property name="menuName" type="java.lang.String">
+            <column name="menuName" />
+        </property>
+
+        <!--###注意：自关联查询，不能同时开启一对多和多对一，会发生死循环###-->
+
+        <!--多对一-->
+        <!--表中会生成parentId字段;lazy:proxy(使用代理并延迟加载),no-proxy(不适用代理并延迟加载),false(立即加载)-->
+        <many-to-one name="parentMenu" class="com.zja.entity.sinceMapping.Menu" column="parentId" lazy="false"/>
+        <!--一对多-->
+        <!--<set name="childMenus" cascade="all" lazy="false">
+            <key column="parentId" />
+            <one-to-many class="com.zja.entity.sinceMapping.Menu"/>
+        </set>-->
+
+    </class>
+</hibernate-mapping>

@@ -7,6 +7,8 @@ import org.hibernate.Session;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.query.NativeQuery;
+import org.hibernate.query.Query;
 import org.springframework.orm.hibernate5.HibernateCallback;
 import org.springframework.orm.hibernate5.HibernateTemplate;
 import org.springframework.stereotype.Service;
@@ -216,7 +218,6 @@ public class UserServiceImpl implements UserService {
         Object o = this.hibernateTemplate.execute(new HibernateCallback<Object>() {
             @Override
             public Object doInHibernate(Session session) throws HibernateException {
-                //创建空表mysql_ok
                 Serializable save = session.save(userEntity);
                 System.out.println("id=" + save);
                 return save;
@@ -224,6 +225,92 @@ public class UserServiceImpl implements UserService {
         });
         return o;
     }
+
+
+
+    /*********** hql 面向对象查询数据 *************/
+
+    /**
+     * 通过Hql执行获取所有用户
+     */
+    @Override
+    public Object getAllUserEntityByHql() {
+        Object o = this.hibernateTemplate.execute(new HibernateCallback<Object>() {
+            @Override
+            public Object doInHibernate(Session session) throws HibernateException {
+                // 这里UserEntity是对象名，不是数据库表名
+                String hql ="from UserEntity";
+                Query<UserEntity> query = session.createQuery(hql);
+                List<UserEntity> userEntityList = query.list();
+                return userEntityList;
+            }
+        });
+        return o;
+    }
+
+    /**
+     * 通过Hql执行获取唯一的用户
+     */
+    @Override
+    public Object getUserEntityByHql(Integer id) {
+        Object o = this.hibernateTemplate.execute(new HibernateCallback<Object>() {
+            @Override
+            public Object doInHibernate(Session session) throws HibernateException {
+                // 这里UserEntity是对象名，不是数据库表名,id也不是数据库字段名称
+                String hql ="from UserEntity where id ="+id;
+                //推荐使用，易读
+                Query<UserEntity> query = session.createQuery(hql);
+                // 知道返回结果是唯一的，使用uniqueResult
+                UserEntity userEntity = query.uniqueResult();
+                return userEntity;
+            }
+        });
+        return o;
+    }
+
+    @Override
+    public Object getNameByHQL() {
+        Object o = this.hibernateTemplate.execute(new HibernateCallback<Object>() {
+            @Override
+            public Object doInHibernate(Session session) throws HibernateException {
+                // 这里UserEntity是对象名，不是数据库表名,username也不是数据库字段名称
+                String hql ="select userName from UserEntity";
+                Query<UserEntity> query = session.createQuery(hql);
+                //集合中直接存放着name属性，不是对象
+                List<UserEntity> userEntityList = query.list();
+                //结果： ["小明","小刘","小王","明月","秦时","阿里"]
+                return userEntityList;
+            }
+        });
+        return o;
+    }
+
+
+    /*********** sql 查询数据 *************/
+
+    /**
+     * 通过Sql执行获取所有用户
+     */
+    @Override
+    public Object executeGetUserEntityBySql() {
+        Object o = this.hibernateTemplate.execute(new HibernateCallback<Object>() {
+            @Override
+            public Object doInHibernate(Session session) throws HibernateException {
+                // 这里UserEntity是对象名，不是数据库表名
+                String sql ="select * from userentity";
+                // 创建一个接收结果集的SQLQuery对象
+                NativeQuery sqlQuery = session.createSQLQuery(sql);
+                // 通过addEntity,来绑定到实体
+                List<UserEntity> userEntityList = sqlQuery.addEntity(UserEntity.class).list();
+
+                return userEntityList;
+            }
+        });
+        return o;
+    }
+
+
+
 
     /*********** findByExample查询数据 *************/
 
@@ -311,5 +398,6 @@ public class UserServiceImpl implements UserService {
         criteria.addOrder(Order.desc("age"));
         return (List<UserEntity>) hibernateTemplate.findByCriteria(criteria);
     }
+
 
 }
