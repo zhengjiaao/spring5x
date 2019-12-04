@@ -1,5 +1,6 @@
 package com.zja.dao;
 
+import com.baomidou.mybatisplus.core.mapper.Mapper;
 import com.zja.entity.UserEntity;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -11,7 +12,7 @@ import java.util.List;
  * @description UserDao 接口
  * @data 2019/10/29
  */
-public interface UserDao {
+public interface UserMapper extends Mapper<UserEntity> {
 
     //静态插入数据:通用方法
     int insertUser(UserEntity userEntity);
@@ -27,7 +28,7 @@ public interface UserDao {
     int oracleBatchSaveUser(@Param("userEntityList") List<UserEntity> userEntities);
 
     //按id查询用户
-    UserEntity queryUserById(Integer id);
+    UserEntity queryUserById(Long id);
     //查询所有用户
     List<UserEntity> queryAllUser();
     //按用户查询用户信息

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <!-- ************配置整合mybatis-plus过程************** -->
+
+    <!--1、配置数据库连接池(druid/c3p0),mybatis-plus不推荐使用druid，有些类型不支持转换-->
+    <!--<import resource="classpath:META-INF/spring/datasource/spring-druid.xml"/>-->
+    <import resource="classpath:META-INF/spring/datasource/spring-c3p0.xml"/>
+
+    <!-- 2、mybatis的sqlSessionFactory: org.mybatis.spring.SqlSessionFactoryBean-->
+    <!-- 2、配置mybatis-plus的sqlSessionFactory:com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean-->
+    <bean id="sqlSessionFactory" class="com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <!-- 自动扫描mapping.xml文件 (可无) -->
+        <property name="mapperLocations" value="classpath*:/mappers/**/*.xml"/>
+        <!-- 配置 Mybatis 配置文件（可无） -->
+        <property name="configLocation" value="classpath:META-INF/spring/mybatis/mybatis-config.xml"/>
+        <!--别名和分页插件可在mybatis-config.xml中配置-->
+        <!-- 别名处理 -->
+        <property name="typeAliasesPackage" value="com.zja.entity"/>
+        <!-- MP 3.x配置插件 -->
+        <property name="plugins">
+            <array>
+                <!-- 分页插件配置 -->
+                <bean id="paginationInterceptor"
+                      class="com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor"/>
+                <!-- 乐观锁插件 -->
+                <!--<bean id="optimisticLockerInterceptor"
+                      class="com.baomidou.mybatisplus.extension.plugins.OptimisticLockerInterceptor">
+                </bean>-->
+                <!-- 性能拦截器，兼打印sql，不建议生产环境配置 SqlExplainInterceptor-->
+                <!--<bean id="performanceInterceptor"
+                      class="com.baomidou.mybatisplus.extension.plugins.SqlExplainInterceptor"/>-->
+            </array>
+        </property>
+
+        <!--定义 MP3.x全局策略配置-->
+        <!--<property name="globalConfig" ref="globalConfig"/>-->
+
+        <!-- 枚举属性配置扫描，支持通配符 * 或者 ; 分割 (可无) -->
+        <!-- <property name="typeEnumsPackage" value="com.wlqq.insurance.conf.*.enums"/> -->
+    </bean>
+
+    <!-- 3、DAO接口所在包名，Spring会自动查找其下的类 -->
+    <!--作用:从接口的基础包开始递归搜索，并将它们注册为 MapperFactoryBean(只有至少一种方法的接口才会被注册;, 具体类将被忽略)-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!--指定会话工厂 -->
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+        <!-- 指定 mybatis 接口所在的包 -->
+        <property name="basePackage" value="com.zja.dao"/>
+    </bean>
+
+    <!-- 4、定义 MP3.x 全局策略配置 -->
+    <bean id="globalConfig" class="com.baomidou.mybatisplus.core.config.GlobalConfig">
+        <property name="dbConfig">
+            <bean class="com.baomidou.mybatisplus.core.config.GlobalConfig.DbConfig">
+                <!-- 主键策略配置:value=0 1 2 3 -->
+                <!-- 可选参数
+                    AUTO->`0`("数据库ID自增")
+                    INPUT->`1`(用户输入ID")
+                    ID_WORKER->`2`("全局唯一ID")
+                    UUID->`3`("全局唯一ID")
+                -->
+                <property name="idType" value="AUTO"/>
+                <!-- 数据库类型配置 -->
+                <!--<property name="dbType" value="MYSQL"/>-->
+                <!-- Oracle需要添加该项 -->
+                <!--<property name="dbType" value="oracle" />-->
+                <!-- 全局表为下划线命名设置true,MP2.3版本后，驼峰命名默认值就是true，可不配置-->
+                <property name="tableUnderline" value="true"/>
+                <!-- 全局表前缀配置 -->
+                <property name="tablePrefix" value="tb_"/>
+            </bean>
+        </property>
+    </bean>
+
+    <!--5、义事务管理器-->
+    <bean id="transactionManager"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <!-- 开启事务注解@Transactional 支持 -->
+    <tx:annotation-driven/>
+
+</beans>

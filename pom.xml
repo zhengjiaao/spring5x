@@ -25,6 +25,7 @@
         <module>spring5x-rabbitmq</module>
         <module>spring5x-jdbc-database</module>
         <module>spring5x-mybatis-base</module>
+        <module>spring5x-mybatis-plus</module>
         <module>spring5x-mybatis-senior</module>
         <module>spring5x-hibernate5-base</module>
         <module>spring5x-hibernate5-cfg</module>
@@ -44,6 +45,15 @@
 
         <servlet.version>4.0.1</servlet.version>
     </properties>
+
+    <!--阿里镜像库-->
+    <repositories>
+        <repository>
+            <id>alimaven</id>
+            <name>aliyun maven</name>
+            <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
+        </repository>
+    </repositories>
 
     <!--定义编译时的配置项-->
     <build>

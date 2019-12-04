@@ -29,6 +29,8 @@ public interface UserService {
     UserEntity queryUserById(Integer id);
     //查询所有用户
     List<UserEntity> queryAllUser();
+    //按用户查询用户信息
+    List<UserEntity> queryByUserName(String userName);
 
     //获取分页结果
     List<UserEntity> getPagingResults(int pageNum, int pageSize);

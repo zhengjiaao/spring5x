@@ -2,7 +2,7 @@ package com.zja.service.Impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.zja.dao.UserDao;
+import com.zja.dao.UserMapper;
 import com.zja.entity.UserEntity;
 import com.zja.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,7 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
 
     @Autowired
-    private UserDao userDao;
+    private UserMapper userDao;
 
     //静态插入数据:通用方法
     @Override
@@ -59,7 +59,7 @@ public class UserServiceImpl implements UserService {
 
     //按id查询用户
     @Override
-    public UserEntity queryUserById(Integer id) {
+    public UserEntity queryUserById(Long id) {
         return this.userDao.queryUserById(id);
     }
 
