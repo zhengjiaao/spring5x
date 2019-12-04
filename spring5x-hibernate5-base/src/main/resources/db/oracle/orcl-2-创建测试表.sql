@@ -8,6 +8,6 @@ CREATE TABLE userentity(
    createtime DATE,
    updatetime TIMESTAMP(6),
    PRIMARY KEY ( id )
-);
+) $$
 
-COMMIT;
+COMMIT $$

@@ -27,7 +27,7 @@ public interface UserDao {
     int oracleBatchSaveUser(@Param("userEntityList") List<UserEntity> userEntities);
 
     //按id查询用户
-    UserEntity queryUserById(Integer id);
+    UserEntity queryUserById(Long id);
     //查询所有用户
     List<UserEntity> queryAllUser();
     //按用户查询用户信息
@@ -38,6 +38,6 @@ public interface UserDao {
     int updateUser(UserEntity userEntity);
 
     //删除数据
-    int delUser(Integer id);
+    int delUser(Long id);
 
 }

@@ -64,7 +64,7 @@
 
         <!-- 配置监控统计拦截的 filters Druid 连接池的监控信息主要是通过 StatFilter 采集的，
         采集的信息非常全面，包括 SQL 执行、并发、慢查、执行时间区间分布等-->
-        <!--value="stat,wall" ,wall防止sql注入-->
+        <!--wall防止sql注入-->
         <!--<property name="filters" value="stat,wall"/>-->
         <property name="filters" value="stat"/>
         <!--配置 Druid过滤器,与filters是组合关系，并非替换关系-->

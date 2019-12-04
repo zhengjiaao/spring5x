@@ -9,7 +9,7 @@
         type:返回结果集对应java实体类型
         autoMapping:默认完成映射，如果已经开启驼峰匹配，可以解决驼峰匹配-->
     <resultMap id="BaseResultMap" type="com.zja.entity.UserEntity" autoMapping="true">
-        <id column="id" property="id" jdbcType="INTEGER"/>
+        <id column="id" property="id" jdbcType="BIGINT"/>
         <result column="username" property="userName" jdbcType="VARCHAR"/>
         <result column="age" property="age" jdbcType="VARCHAR"/>
         <result column="createtime" property="createTime" jdbcType="DATE"/>

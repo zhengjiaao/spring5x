@@ -75,7 +75,7 @@ public class MybatisController {
         for (int i=0;i<count;i++){
             UserEntity userEntity = new UserEntity();
             //批量插入没有提交，无法获取递增的序列值，所以，oracle注意，id不能使用序列，会报异常 “违反唯一约束条件”
-            userEntity.setId(100+i);
+            userEntity.setId(100L+i);
             userEntity.setUserName("Zhengja_"+i);
             userEntity.setAge(20+i);
             userEntity.setCreateTime(new Date());
@@ -86,7 +86,7 @@ public class MybatisController {
 
     @GetMapping("queryUserById")
     @ApiOperation(value = "按id查询用户", notes = "按id查询数据", httpMethod = "GET")
-    public UserEntity queryUserById(@RequestParam Integer id) {
+    public UserEntity queryUserById(@RequestParam Long id) {
         return this.userService.queryUserById(id);
     }
 
@@ -122,7 +122,7 @@ public class MybatisController {
 
     @DeleteMapping("delUser")
     @ApiOperation(value = "删除数据", notes = "删除数据", httpMethod = "DELETE")
-    public int delUser(@RequestParam Integer id) {
+    public int delUser(@RequestParam Long id) {
         return this.userService.delUser(id);
     }
 

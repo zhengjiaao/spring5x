@@ -2,12 +2,12 @@
 
 [TOC]
 
-Spring5x-mybatis-druid-base此模块是从spring5x-base 基础模块扩展过来的
+Spring5x-mybatis-base此模块是从spring5x-base 基础模块扩展过来的
 spring5x-base模块是一个非常干净的spring5.x+springMVC架构
 
 如果没有搭建spring5x-base模块，请先参考：  [spring5x-base模块搭建](https://www.jianshu.com/p/8612404cf1d6)
 
-**Spring5x-mybatis-druid-base 是一个mybatis基础模块，今后的spring+mybatis 的xml配置方式，在此模块上扩展。**
+**Spring5x-mybatis-base 是一个mybatis基础模块，今后的spring+mybatis 的xml配置方式，在此模块上扩展。**
 
 
 

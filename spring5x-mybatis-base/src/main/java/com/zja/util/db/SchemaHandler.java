@@ -2,7 +2,6 @@ package com.zja.util.db;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.EncodedResource;
@@ -22,7 +21,6 @@ import java.sql.SQLException;
  * Email: zhengja@dist.com.cn
  * Desc：Schema处理器
  */
-@Slf4j
 @Component
 public class SchemaHandler {
 
@@ -86,7 +84,7 @@ public class SchemaHandler {
 
         File file =  ResourceUtils.getFile("classpath:db"+File.separator+dbname);
         if (!file.exists()){
-            log.info("不存在【 "+"classpath:db"+File.separator+dbname+"】文件");
+            System.out.println("不存在【 "+"classpath:db"+File.separator+dbname+"】文件");
             return;
         }
         File[] files = file.listFiles();

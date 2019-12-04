@@ -59,7 +59,7 @@ public class UserServiceImpl implements UserService {
 
     //按id查询用户
     @Override
-    public UserEntity queryUserById(Integer id) {
+    public UserEntity queryUserById(Long id) {
         return this.userDao.queryUserById(id);
     }
 
@@ -126,7 +126,7 @@ public class UserServiceImpl implements UserService {
 
     //删除数据
     @Override
-    public int delUser(Integer id) {
+    public int delUser(Long id) {
         return this.userDao.delUser(id);
     }
 
