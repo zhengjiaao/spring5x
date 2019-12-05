@@ -1,11 +1,11 @@
-# Spring5x-mybatis-druid-base
+# spring5x-mybatis-senior
 
 [TOC]
 
-Spring5x-mybatis-base此模块是从spring5x-base 基础模块扩展过来的
-spring5x-base模块是一个非常干净的spring5.x+springMVC架构
+spring5x-mybatis-senior此模块是从spring5x-mybatis-base 基础模块扩展过来的
+spring5x-mybatis-base模块是一个mybatis架构
 
-如果没有搭建spring5x-base模块，请先参考：  [spring5x-base模块搭建](https://www.jianshu.com/p/8612404cf1d6)
+如果没有搭建spring5x-mybatis-base模块，请先参考：  [spring5x-mybatis-base模块搭建]()
 
 **Spring5x-mybatis-base 是一个mybatis基础模块，今后的spring+mybatis 的xml配置方式，在此模块上扩展。**
 
@@ -15,7 +15,7 @@ spring5x-base模块是一个非常干净的spring5.x+springMVC架构
 
 **基于spring5x-base 基础模块 新增功能：**
 
-* 1、集成 druid + mysql(oracle)
+* 1、集成 druid/c3p0 + mysql/oracle
 * 2、集成 mybatis 配置
 * 3、mapper 配置：
   - mybatis 增删改查操作
@@ -23,14 +23,15 @@ spring5x-base模块是一个非常干净的spring5.x+springMVC架构
   - mybatis+mysql 批量插入数据
   - mybatis+oracle 批量插入数据
 * 4、Mybatis-PageHelper 分页插件
+* 5、项目启动自动执行sql文件
 
 
 
-### 1、集成 druid + mysql(oracle)
+### 1、集成 druid/c3p0 + mysql/oracle
 
 ****
 
-pom.xml 引入依赖 ，使用的是mysql
+pom.xml 主要依赖
 
 ```xml
 <properties>
@@ -39,11 +40,11 @@ pom.xml 引入依赖 ，使用的是mysql
 </properties>
 
         <!--jdbc 相关依赖包 上面已经引入了-->
-        <!--<dependency>
+        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-jdbc</artifactId>
             <version>${spring.version}</version>
-        </dependency>-->
+        </dependency>
 
         <!--mysql 连接驱动-->
         <dependency>
@@ -58,11 +59,35 @@ pom.xml 引入依赖 ，使用的是mysql
             <version>11.2.0.3</version>
         </dependency>
 
-        <!--druid 依赖-->
+        <!--druid 数据源连接池-->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>druid</artifactId>
             <version>1.1.20</version>
+        </dependency>
+        <!--hibernate-c3p0 数据源连接池-->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-c3p0</artifactId>
+            <version>5.3.10.Final</version>
+        </dependency>
+
+        <!--mybatis 依赖包-->
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis-spring</artifactId>
+            <version>2.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis</artifactId>
+            <version>3.5.2</version>
+        </dependency>
+        <!--Mybatis-PageHelper分页插件:目前支持Oracle,Mysql,MariaDB,SQLite,Hsqldb,PostgreSQL等等常用数据库分页-->
+        <dependency>
+            <groupId>com.github.pagehelper</groupId>
+            <artifactId>pagehelper</artifactId>
+            <version>5.1.2</version>
         </dependency>
 
 ```
@@ -114,6 +139,10 @@ pom.xml 引入依赖 ，使用的是mysql
 **jdbc.properties**
 
 ```properties
+# 项目启动是否启动执行sql文件 true/false
+jdbc.isStartSql=true
+
+
 # mysql 数据库配置:
 mysql.jdbc.driverClassName=com.mysql.jdbc.Driver
 mysql.jdbc.url=jdbc:mysql://127.0.0.1:3306/test?characterEncoding=UTF-8&serverTimezone=UTC&useSSL=false
@@ -132,7 +161,8 @@ oracle.jdbc.validationQuery=select 'x' from dual
 ```
 
 **spring-druid.xml **
-
+> 注：MySQL和Oracle 数据库更换方式：
+> 只需要将spring-druid.xml 中 "配置mysql" 和 "配置oracle" 注释其中一个。
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
@@ -207,20 +237,56 @@ oracle.jdbc.validationQuery=select 'x' from dual
 
 ```
 
-> 注：MySQL和Oracle 数据库更换方式：
-> 只需要将spring-druid.xml 中 "配置mysql" 和 "配置oracle" 注释其中一个。
+spring-c3p0.xml
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
+    <!--指定配置文件的位置-->
+    <context:property-placeholder location="classpath:properties/jdbc.properties" ignore-unresolvable="true"/>
 
+    <!-- 配置 C3P0 数据源 -->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+
+        <!--配置mysql -->
+        <property name="driverClass" value="${mysql.jdbc.driverClassName}" />
+        <property name="jdbcUrl" value="${mysql.jdbc.url}" />
+        <property name="user" value="${mysql.jdbc.username}" />
+        <property name="password" value="${mysql.jdbc.password}" />
+
+        <!--配置oracle -->
+        <!--<property name="driverClass" value="${oracle.jdbc.driverClassName}" />
+        <property name="jdbcUrl" value="${oracle.jdbc.url}" />
+        <property name="user" value="${oracle.jdbc.username}" />
+        <property name="password" value="${oracle.jdbc.password}" />-->
+
+        <!--c3p0公共属性配置-->
+        <!-- 数据库连接池中的最大的数据库连接数,建议在开发环境中设置小一点,够用即可 -->
+        <property name="maxPoolSize" value="25"/>
+        <!-- 数据库连接池中的最小的数据库连接数 -->
+        <property name="minPoolSize" value="5"/>
+        <!-- 如果池中数据连接不够时一次增长多少个 -->
+        <property name="acquireIncrement" value="5"/>
+        <!-- 初始化数据库连接池时连接的数量 -->
+        <property name="initialPoolSize" value="20"/>
+
+    </bean>
+
+</beans>
+
+```
 
 **spring-mvc.xml**
 
 ```xml
-	<!--资源 druid.xml 配置-->
-    <import resource="classpath:META-INF/spring/spring-druid.xml"/>
+    <!--资源 druid.xml 配置-->
+    <!--<import resource="classpath:META-INF/spring/datasource/spring-druid.xml"/>-->
+    <import resource="classpath:META-INF/spring/datasource/spring-c3p0.xml"/>
 
 ```
-
-
 
 
 
@@ -545,7 +611,7 @@ resources/mappers文件夹下新建 UserEntity.xml，内容如下
             </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
-            SEQ_MY_HIBERNATE.NEXTVAL,
+            SEQ_MY_USER_HIBERNATE.NEXTVAL,
             <if test='userName != null and userName != "" '>
                 #{userName,jdbcType=VARCHAR},
             </if>
@@ -735,6 +801,231 @@ public class MybatisController {
 }
 
 ```
+
+### 5、项目启动自动执行sql文件
+resources/db/mysql/mysql-0-准备测试数据.sql
+```sql
+-- 删表语句
+drop table if exists userentity;
+
+-- 创建表
+-- 用户表，如果表不存在，则创建，id自增且是主键，username不能null
+CREATE TABLE IF NOT EXISTS userentity(
+   id bigint not null,
+   username VARCHAR(50) not null,
+   age int,
+   createtime DATE,
+   PRIMARY KEY (id)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+COMMIT;
+
+-- 插入数据语句
+-- 增加USERENTITY表数据
+insert into USERENTITY(id,username,age) values (1,'小明',18);
+insert into USERENTITY(id,username,age) values (2,'小刘',20);
+insert into USERENTITY(id,username,age) values (3,'小王',20);
+
+COMMIT;
+
+```
+resources/db/oracle/orcl-0-准备测试数据.sql
+```sql
+-- 删除测试的表和数据
+declare
+    countCol number;
+    countTab number;
+    countSeq number;
+begin
+--===============20191203==================start
+    -- 删除无用表  upper：小写字符转化成大写的函数
+    select count(*) into countTab from user_tables where table_name = upper('userentity');
+    if countTab = 1 then
+        execute immediate 'drop table userentity';
+    end if;
+    -- 删除无用序列 名称区分大小写
+    select count(*) into countSeq from user_sequences where sequence_name = 'SEQ_MY_USER';
+    if countSeq = 1 then
+        execute immediate 'DROP SEQUENCE SEQ_MY_USER';
+    end if;
+--===============20191203==================end
+end;$$
+
+-- oracle创建序列语句
+-- SEQ_MY_USER-->userentity
+create sequence SEQ_MY_USER
+minvalue 1
+maxvalue 9999999999999999999999999999
+start with 1
+increment by 1
+cache 20 $$
+
+-- oracle建表语句
+-- 用户表
+create table userentity
+(
+	id NUMBER(19) not null
+		primary key,
+	username VARCHAR2(255 char),
+	createtime TIMESTAMP(6),
+	age NUMBER(19)
+) $$
+
+COMMIT $$
+
+--插入数据语句
+-- userentity用户表数据准备
+insert into USERENTITY(id,username,age) values (SEQ_MY_USER.NEXTVAL,'小明',21) $$
+insert into USERENTITY(id,username,age) values (SEQ_MY_USER.NEXTVAL,'小刘',22) $$
+insert into USERENTITY(id,username,age) values (SEQ_MY_USER.NEXTVAL,'小王',20) $$
+
+COMMIT $$
+
+```
+代码执行sql文件
+```java
+/**
+ * Date: 2019-12-03 14:19
+ * Author: zhengja
+ * Email: zhengja@dist.com.cn
+ * Desc：ApplicationContext 应用上下文对象
+ */
+@Component
+public class SpringContextGetter implements ApplicationContextAware {
+
+    private ApplicationContext applicationContext;
+
+    public ApplicationContext getApplicationContext() {
+        return applicationContext;
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
+}
+
+
+/**
+ * Date: 2019-12-03 14:17
+ * Author: zhengja
+ * Email: zhengja@dist.com.cn
+ * Desc：Schema处理器
+ */
+@Component
+public class SchemaHandler {
+
+    //private final String SCHEMA_SQL = "classpath:schema.sql";
+
+    @Autowired
+    private DataSource datasource;
+
+    @Autowired
+    private SpringContextGetter springContextGetter;
+
+    /**
+     * 执行判断数据源连接池
+     */
+    public void execute() throws Exception {
+        //druid 判断数据库是mysql/oracle
+        /*DruidDataSource druidDataSource = (DruidDataSource) this.datasource;
+        Driver driver = druidDataSource.getDriver();
+        if (driver instanceof com.mysql.jdbc.Driver) {
+            executeSqlFile("mysql");
+        }
+        if (driver instanceof com.mysql.cj.jdbc.Driver) {
+            executeSqlFile("mysql");
+        }
+        if (driver instanceof oracle.jdbc.OracleDriver){
+            executeSqlFile("oracle");
+        }
+        if (driver instanceof oracle.jdbc.driver.OracleDriver){
+            executeSqlFile("oracle");
+        }*/
+
+        //判断是c3p0/druid 连接池
+        if (datasource instanceof DruidDataSource){
+            DruidDataSource druidDataSource = (DruidDataSource) this.datasource;
+            judgeDriver(druidDataSource.getDriverClassName());
+        }
+        if (datasource instanceof ComboPooledDataSource){
+            ComboPooledDataSource comboPooledDataSource = (ComboPooledDataSource) this.datasource;
+            judgeDriver(comboPooledDataSource.getDriverClass());
+        }
+    }
+
+    /**
+     * 根据驱动判断是mysql/oracle的.sql文件
+     * @param driverClassName 驱动名称
+     */
+    private void judgeDriver(String driverClassName) throws SQLException, IOException {
+        if (driverClassName.equals("com.mysql.jdbc.Driver") || driverClassName.equals("com.mysql.cj.jdbc.Driver")){
+            executeSqlFile("mysql");
+        }
+        if (driverClassName.equals("oracle.jdbc.OracleDriver") || driverClassName.equals("oracle.jdbc.driver.OracleDriver")){
+            executeSqlFile("oracle");
+        }
+    }
+
+    /**
+     * 执行sql文件
+     * @param dbname mysql/oracle
+     */
+    private void executeSqlFile(String dbname) throws SQLException, IOException {
+
+        File file =  ResourceUtils.getFile("classpath:db"+File.separator+dbname);
+        if (!file.exists()){
+            System.out.println("不存在【 "+"classpath:db"+File.separator+dbname+"】文件");
+            return;
+        }
+        File[] files = file.listFiles();
+        if (dbname.equals("oracle")){
+            for (File f : files){
+                String sqlRelativePath = "classpath:db"+File.separator+dbname+File.separator+f.getName();
+                Resource resource = springContextGetter.getApplicationContext().getResource(sqlRelativePath);
+                //一条sql语句以"$$"结尾区分.执行oralce的存储过程 将'declare countCol number;'当初一条sql执行爆错,因默认以";"结尾是一条sql语句,更改成以"$$"分割作为一条sql语句
+                ScriptUtils.executeSqlScript(this.datasource.getConnection(), new EncodedResource(resource,"UTF-8"), false, false, "--", "$$", "/*", "*/");
+                System.out.println("执行: "+dbname+"/"+f.getName());
+            }
+        }
+        if (dbname.equals("mysql")){
+            for (File f : files){
+                String sqlRelativePath = "classpath:db"+File.separator+dbname+File.separator+f.getName();
+                Resource resource = springContextGetter.getApplicationContext().getResource(sqlRelativePath);
+                //一条sql语句,默认以";"结尾区分
+                ScriptUtils.executeSqlScript(this.datasource.getConnection(), new EncodedResource(resource,"UTF-8"));
+                System.out.println("执行: "+dbname+"/"+f.getName());
+            }
+        }
+    }
+}
+
+
+/**
+ * Date: 2019-12-04 13:18
+ * Author: zhengja
+ * Email: zhengja@dist.com.cn
+ * Desc：在初始化Bean时,操作数据库执行sql文件
+ */
+@Component
+public class InitSql implements InitializingBean {
+
+    @Value("${jdbc.isStartSql}")
+    private boolean isStartSql;
+
+    @Autowired
+    private SchemaHandler schemaHandler;
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        if (isStartSql){
+            this.schemaHandler.execute();
+        }
+    }
+}
+
+```
+
 
 
 

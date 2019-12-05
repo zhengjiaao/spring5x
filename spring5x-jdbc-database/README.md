@@ -1,86 +1,30 @@
-![spring5x-base-目录.png](https://upload-images.jianshu.io/upload_images/15645795-1842ee12621631a6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+# spring5x-jdbc-database
+
+[toc]
+
+spring5x-jdbc-database 此模块是从spring5x-base 基础模块扩展过来的
+spring5x-base模块是一个非常干净的spring5.x+springMVC架构
+如果没有搭建spring5x-base模块，请参考 [spring5x-base模块搭建](https://www.jianshu.com/p/8612404cf1d6)
 
 
-**此模块是基础模块，其它模块都是以此模块扩展**
+## 搭建项目
 
-Spring5x-base:是一个非常干净的spring5.x+springMVC架构
+**基于spring5x-base 基础模块 新增功能：**
 
-Spring5x-base的作用：
+- 1、jdbc主要依赖和配置
+- 2、雪花算生成法递增趋势id
+- 3、JdbcTemplate操作数据库
 
-* 可以直接拷贝这个模块，改名成其它模块名称
 
-推荐-接口调试：
+### 1、jdbc主要依赖和配置
 
-* 浏览器调用调试接口
-* Postman 工具调用接口调试(极力建议)
-* swagger Api 调试接口(推荐)
+****
 
-## Spring5x-base 搭建过程：
-
-功能：
-
-- 单纯的 spring+springmvc 框架
-- 版本spring 5.x 
-
-项目结构：特别简单的基础框架，往后的spring xml配置方式都是以此框架的为基础。
-![base_1.png](https://upload-images.jianshu.io/upload_images/15645795-82a3753e3edabe31.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
-
-#### 1、pom.xml 引入依赖
+pom.xml 依赖
 
 ```xml
-<?xml version="1.0" encoding="UTF-8"?>
-
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <!--可以集成到父项目中，需要在夫项目中添加这个模块->
-   <!-- <parent>
-        <groupId>com.zja</groupId>
-        <artifactId>spring5.x</artifactId>
-        <version>1.0-SNAPSHOT</version>
-    </parent> -->
-    <groupId>com.zja</groupId>
-    <artifactId>spring5x-base</artifactId>
-    <packaging>war</packaging>
-
-    <name>spring5x-base</name>
-
-    <!--说明：spring5.x-base模块是spring5.x基础框架，其它模块都是以此模块为基础扩展的-->
-    <properties>
-        <!--spring5.x 至少需要jdk1.8及以上版本-->
-        <spring.version>5.0.9.RELEASE</spring.version>
-        <!--jdk必须 >=1.8-->
-        <jdk.version>1.8</jdk.version>
-        <!--maven 版本-->
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.plugin.version>3.6.0</maven.compiler.plugin.version>
-        <mavne.surefire.plugin.version>2.19.1</mavne.surefire.plugin.version>
-        <maven-war-plugin.version>2.6</maven-war-plugin.version>
-        <servlet.version>4.0.1</servlet.version>
-    </properties>
-
-    <dependencies>
-        <!--spring核心包——Start-->
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-core</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-web</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-oxm</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
+        <!-- spring的jdbc开发所需jar包：tx，jdbc -->
+        <!-- spring的事务管理所需的jar：tx -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-tx</artifactId>
@@ -91,112 +35,83 @@ Spring5x-base的作用：
             <artifactId>spring-jdbc</artifactId>
             <version>${spring.version}</version>
         </dependency>
+        <!--mysql 连接驱动-->
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-webmvc</artifactId>
-            <version>${spring.version}</version>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.13</version>
         </dependency>
+        <!--oracle 连接驱动-->
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-aop</artifactId>
-            <version>${spring.version}</version>
+            <groupId>com.oracle</groupId>
+            <artifactId>ojdbc6</artifactId>
+            <version>11.2.0.3</version>
         </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context-support</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-beans</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-test</artifactId>
-            <version>${spring.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <!--spring核心包——End-->
-
-        <!--servlet-api  web层-->
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>${servlet.version}</version>
-            <scope>provided</scope>
-        </dependency>
-    </dependencies>
-
-    <build>
-        <finalName>spring5x-base</finalName>
-        <plugins>
-            <!--maven的编译插件-->
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven.compiler.plugin.version}</version>
-                <configuration>
-                    <!--开发版本-->
-                    <source>${jdk.version}</source>
-                    <!--.class文件版本-->
-                    <target>${jdk.version}</target>
-                    <!--打包后的编码-->
-                    <encoding>${project.build.sourceEncoding}</encoding>
-                </configuration>
-            </plugin>
-            <!--打包跳过测试-->
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>${mavne.surefire.plugin.version}</version>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-</project>
 
 ```
+jdbc.properties
+```properties
+# mysql 数据库配置:需要修改用户/密码
+mysql.jdbc.driverClassName=com.mysql.cj.jdbc.Driver
+mysql.jdbc.url=jdbc:mysql://127.0.0.1:3306/test?characterEncoding=UTF-8&serverTimezone=UTC&useSSL=false
+mysql.jdbc.username=root
+mysql.jdbc.password=123456
+mysql.jdbc.validationQuery=select 'x'
 
+# oracle 数据库配置:需要修改用户/密码
+oracle.jdbc.driverClassName=oracle.jdbc.driver.OracleDriver
+oracle.jdbc.url=jdbc:oracle:thin:@127.0.0.1/orcl
+oracle.jdbc.username=duke
+oracle.jdbc.password=duke
+oracle.jdbc.validationQuery=select 'x' from dual
 
-
-#### 2、spring-mvc.xml 配置
-
+```
+spring-jdbc.xml
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:mvc="http://www.springframework.org/schema/mvc"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
-    <!-- 开启注解包扫描-->
-    <context:component-scan base-package="com.zja.*"/>
+    <!--jdbc据库连接资源-->
+    <context:property-placeholder location="classpath:properties/jdbc.properties" ignore-unresolvable="true"/>
 
-    <!--使用默认的 Servlet 来响应静态文件 -->
-    <mvc:default-servlet-handler/>
+    <!--可选 Mysql/Oracle 数据源-->
 
-    <!-- 开启springMVC 注解驱动 -->
-    <mvc:annotation-driven>
-        <mvc:message-converters register-defaults="false">
-        <!-- 将StringHttpMessageConverter的默认编码设为UTF-8 ，解决返回给前端中文乱码-->
-        <bean class="org.springframework.http.converter.StringHttpMessageConverter">
-            <constructor-arg value="UTF-8"/>
-        </bean>
-        </mvc:message-converters>
-    </mvc:annotation-driven>
+    <!--Mysql 数据源-->
+    <bean id="dataSource"
+          class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName"
+                  value="${mysql.jdbc.driverClassName}">
+        </property>
+        <property name="url"
+                  value="${mysql.jdbc.url}">
+        </property>
+        <property name="username" value="${mysql.jdbc.username}"></property>
+        <property name="password" value="${mysql.jdbc.password}"></property>
+    </bean>
 
-    <!-- 增加application.properties文件，这个文件里没有内容 -->
-    <context:property-placeholder
-            location="classpath*:properties/application.properties" />
+    <!--Oracle 数据源-->
+    <!--<bean id="dataSource"
+          class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName"
+                  value="${oracle.jdbc.driverClassName}">
+        </property>
+        <property name="url"
+                  value="${oracle.jdbc.url}">
+        </property>
+        <property name="username" value="${oracle.jdbc.username}"></property>
+        <property name="password" value="${oracle.jdbc.password}"></property>
+    </bean>-->
 
-    <!-- 配置视图解析器 -->
-    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"
-          id="internalResourceViewResolver">
-        <!-- 前缀 ：/WEB-INF/jsp/和/WEB-INF/html/-->
-        <property name="prefix" value="/WEB-INF/jsp/"/>
-        <!-- 后缀 ：.jsp和.html-->
-        <property name="suffix" value=".jsp"/>
+    <!--jdbc操作数据库模板-->
+    <bean id="jdbcTemplate"
+          class="org.springframework.jdbc.core.JdbcTemplate" abstract="false"
+          lazy-init="false">
+        <property name="dataSource">
+            <ref bean="dataSource"/>
+        </property>
     </bean>
 </beans>
 
@@ -204,65 +119,288 @@ Spring5x-base的作用：
 
 
 
-#### 3、web.xml 配置
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
-         version="4.0">
-
-    <!--配置spring前端控制器-->
-    <servlet>
-        <servlet-name>springMvc</servlet-name>
-        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-        <init-param>
-            <param-name>contextConfigLocation</param-name>
-            <param-value>classpath:META-INF/spring/spring-mvc.xml</param-value>
-        </init-param>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>springMvc</servlet-name>
-        <url-pattern>/</url-pattern>
-    </servlet-mapping>
-
-</web-app>
-
-```
-
-
-
-#### 4、HelloController 接口测试
-
-```
-package com.zja.controller;
-
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+### 2、雪花算生成法递增趋势id
+SnowFlake.java
+```java
+package com.zja.util;
 
 /**
- * @author ZhengJa
- * @description HelloController
- * @data 2019/10/24
+ * Desc：雪花算法：分布式自增ID(是递增趋势，非递增)雪花算法snowflake (Java版)
  */
-@Controller
-public class HelloController {
+public class SnowFlake {
+    /**
+     * 起始的时间戳
+     */
+    private final static long START_STMP = 1480166465631L;
 
-    @GetMapping("/hello")
-    public String hello(){
-        //返回hello页面
-       return  "hello";
+    /**
+     * 每一部分占用的位数
+     */
+    private final static long SEQUENCE_BIT = 12; //序列号占用的位数
+    private final static long MACHINE_BIT = 5;   //机器标识占用的位数
+    private final static long DATACENTER_BIT = 5;//数据中心占用的位数
+
+    /**
+     * 每一部分的最大值
+     */
+    private final static long MAX_DATACENTER_NUM = -1L ^ (-1L << DATACENTER_BIT);
+    private final static long MAX_MACHINE_NUM = -1L ^ (-1L << MACHINE_BIT);
+    private final static long MAX_SEQUENCE = -1L ^ (-1L << SEQUENCE_BIT);
+
+    /**
+     * 每一部分向左的位移
+     */
+    private final static long MACHINE_LEFT = SEQUENCE_BIT;
+    private final static long DATACENTER_LEFT = SEQUENCE_BIT + MACHINE_BIT;
+    private final static long TIMESTMP_LEFT = DATACENTER_LEFT + DATACENTER_BIT;
+
+    private long datacenterId;  //数据中心
+    private long machineId;     //机器标识
+    private long sequence = 0L; //序列号
+    private long lastStmp = -1L;//上一次时间戳
+
+    public SnowFlake(long datacenterId, long machineId) {
+        if (datacenterId > MAX_DATACENTER_NUM || datacenterId < 0) {
+            throw new IllegalArgumentException("datacenterId can't be greater than MAX_DATACENTER_NUM or less than 0");
+        }
+        if (machineId > MAX_MACHINE_NUM || machineId < 0) {
+            throw new IllegalArgumentException("machineId can't be greater than MAX_MACHINE_NUM or less than 0");
+        }
+        this.datacenterId = datacenterId;
+        this.machineId = machineId;
     }
 
-    @GetMapping("/hello2")
-    @ResponseBody
-    public String hello2(){
-        //返回字符串
-        return  "hello2 字符串";
+    /**
+     * 产生下一个ID
+     *
+     * @return
+     */
+    public synchronized long nextId() {
+        long currStmp = getNewstmp();
+        if (currStmp < lastStmp) {
+            throw new RuntimeException("Clock moved backwards.  Refusing to generate id");
+        }
+
+        if (currStmp == lastStmp) {
+            //相同毫秒内，序列号自增
+            sequence = (sequence + 1) & MAX_SEQUENCE;
+            //同一毫秒的序列数已经达到最大
+            if (sequence == 0L) {
+                currStmp = getNextMill();
+            }
+        } else {
+            //不同毫秒内，序列号置为0
+            sequence = 0L;
+        }
+
+        lastStmp = currStmp;
+
+        return (currStmp - START_STMP) << TIMESTMP_LEFT //时间戳部分
+                | datacenterId << DATACENTER_LEFT       //数据中心部分
+                | machineId << MACHINE_LEFT             //机器标识部分
+                | sequence;                             //序列号部分
+    }
+
+    private long getNextMill() {
+        long mill = getNewstmp();
+        while (mill <= lastStmp) {
+            mill = getNewstmp();
+        }
+        return mill;
+    }
+
+    private long getNewstmp() {
+        return System.currentTimeMillis();
+    }
+
+    public static void main(String[] args) {
+        SnowFlake snowFlake = new SnowFlake(2, 3);
+
+        long start = System.currentTimeMillis();
+        for (int i = 0; i < 1000000; i++) {
+            System.out.println(snowFlake.nextId());
+        }
+
+        //100万个id大概5~12秒
+        System.out.println(System.currentTimeMillis() - start);
+
+
+    }
+}
+
+```
+
+自定义生成递增趋势id，目的支持跨数据库
+```java
+/**
+ * Desc：自定义生成递增趋势id，目的支持跨数据库
+ */
+@Component
+public class MyId {
+
+    public long generateId() {
+        SnowFlake snowFlake = new SnowFlake(2, 3);
+
+        System.out.println(snowFlake.nextId());
+        return snowFlake.nextId();
+    }
+}
+
+```
+
+### 3、JdbcTemplate操作数据库
+```java
+package com.zja.service.Impl;
+
+import com.zja.entity.UserEntity;
+import com.zja.rowmapper.UserEntityRowMapper;
+import com.zja.service.UserService;
+import com.zja.util.MyId;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+/**
+ * Date: 2019-11-28 15:59
+ * Author: zhengja
+ * Email: zhengja@dist.com.cn
+ * Desc：用户操作：jdbc模板增删改查
+ */
+@Service
+public class UserServiceImpl implements UserService {
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private MyId myId;
+
+    /**
+     * 增加用户(将用户保存到数据库)
+     *
+     * @param
+     */
+    @Override
+    public Object saveUser(String username, int age) {
+        UserEntity userByName = (UserEntity) this.findUserByName(username);
+
+        if (userByName == null) {
+            String sql = "insert into userentity (id,username,age) values(?,?,?)";
+            Object[] args = {myId.generateId(),username, age};
+            int insert = this.jdbcTemplate.update(sql, args);
+            if (insert > 0) {
+                return "新增用户成功!!!";
+            }
+        }
+        return "用户已存在,请改用其它用户名称!";
+    }
+
+    /**
+     * 根据用户名称修改用户年龄(修改库中用户信息)
+     *
+     * @param
+     */
+    @Override
+    public Object updateUser(String username, int age) {
+        UserEntity userByName = (UserEntity) this.findUserByName(username);
+        if (userByName != null) {
+            //sql语句
+            String sql = "update userentity  SET age = ? WHERE username = ?";
+            Object[] args = {age, username};
+            int update = jdbcTemplate.update(sql, args);
+            if (update > 0) {
+                return "修改用户年龄成功!!!";
+            }
+        }
+        return "用户名称不存在,修改年龄失败!";
+    }
+
+    /**
+     * 根据用户名查询用户信息(从数据库中获取用户信息)
+     *
+     * @param username 用户名称
+     */
+    @Override
+    public Object findUserByName(String username) {
+        List<UserEntity> query = jdbcTemplate.query("select * from userentity where username=?", new BeanPropertyRowMapper<UserEntity>(UserEntity.class), username);
+        if (query.isEmpty()) {
+            return null;
+        } else if (query.size() > 1) {
+            throw new RuntimeException("结果集不唯一");
+        } else {
+            return query.get(0);
+        }
+    }
+
+    /**
+     * 查询所有用户信息
+     */
+    @Override
+    public Object getAllUser() {
+        List<UserEntity> query = jdbcTemplate.query("select * from userentity", new BeanPropertyRowMapper<UserEntity>(UserEntity.class));
+        if (query.isEmpty()) {
+            return null;
+        }else {
+            return query;
+        }
+    }
+
+    /**
+     * 根据用户名查询用户信息(从数据库中获取用户信息)
+     *
+     * @param username 用户名称
+     */
+    @Override
+    public Object findUserByName2(String username) {
+        List<UserEntity> query = jdbcTemplate.query("select * from userentity where username=?", new UserEntityRowMapper(), username);
+        if (query.isEmpty()) {
+            return null;
+        } else if (query.size() > 1) {
+            throw new RuntimeException("结果集不唯一");
+        } else {
+            return query.get(0);
+        }
+    }
+
+    /**
+     * 查询所有用户信息
+     */
+    @Override
+    public Object getAllUser2() {
+        List<UserEntity> query = jdbcTemplate.query("select * from userentity", new UserEntityRowMapper());
+        if (query.isEmpty()) {
+            return null;
+        }else {
+            return query;
+        }
+    }
+
+    /**
+     * 根据用户名称删除用户(删除数据库中用户)
+     *
+     * @param username 用户名称
+     */
+    @Override
+    public Object deleteUserByName(String username) {
+        String sql = "delete from userentity where username = ?";
+        int update = this.jdbcTemplate.update(sql, username);
+        if (update > 0) {
+            return "删除成功!!!";
+        }
+        return "删除失败!!!";
+    }
+
+    @Override
+    public Object deleteAllUser() {
+        String sql = "delete from userentity";
+        int update = this.jdbcTemplate.update(sql);
+        if (update > 0) {
+            return "删除所有用户成功!!!";
+        }
+        return "删除所有用户成功!!!";
     }
 }
 
@@ -270,26 +408,14 @@ public class HelloController {
 
 
 
-#### 5、测试-页面访问
-
-* 访问：http://localhost:8080/项目名称/hello
-* 效果：hello.jsp 页面 或 hello.html 页面 
-
-数据访问
-
-* 访问：http://localhost:8080/项目名称/hello2
-* 效果：hello2 字符串
-
-
-
-**基础搭建已经可以结束！！！**
-
-
-
 ## github 地址：
-* [https://github.com/zhengjiaao/spring5x](https://github.com/zhengjiaao/spring5x)
+
+- [https://github.com/zhengjiaao/spring5x](https://links.jianshu.com/go?to=https%3A%2F%2Fgithub.com%2Fzhengjiaao%2Fspring5x)
+
 
 
 ## 博客地址
-* 简书：https://www.jianshu.com/u/70d69269bd09
-* 掘金： https://juejin.im/user/5d82daeef265da03ad14881b/posts
+
+- 简书：https://www.jianshu.com/u/70d69269bd09
+- 掘金： https://juejin.im/user/5d82daeef265da03ad14881b/posts
+
