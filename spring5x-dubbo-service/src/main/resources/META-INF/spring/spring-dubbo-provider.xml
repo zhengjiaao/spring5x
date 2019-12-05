@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://dubbo.apache.org/schema/dubbo"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://dubbo.apache.org/schema/dubbo http://dubbo.apache.org/schema/dubbo/dubbo.xsd">
+
+    <!--定义当前应用名称，主要用于注册中心的信息保存，这个名称可以任意填写-->
+    <dubbo:application name="${dubbo.application.name}"/>
+    <!--定义dubbo注册中心的地址-->
+    <dubbo:registry protocol="zookeeper" address="${dubbo.registry.address}"/>
+    <!--定义dubbo所在服务执行时暴露给客户端的端口-->
+    <dubbo:protocol name="dubbo" port="${dubbo.protocol.port}"/>
+    <!--定义远程服务提供者操作的超时时间-->
+    <dubbo:provider timeout="${dubbo.provider.timeout}"/>
+
+    <!--定义dubbo远程服务的接口,声明需要暴露的服务接口
+        interface 定义的接口
+        ref Service 中对应实现类首字母小写
+        version是需要考虑到版本一致问题-->
+    <dubbo:service interface="com.zja.service.CascadeService" ref="cascadeServiceImpl" version="${dubbo.interface.version}"/>
+    <dubbo:service interface="com.zja.service.UserService" ref="userServiceImpl" version="${dubbo.interface.version}"/>
+
+    <!-- 和本地 bean 一样实现服务 -->
+    <bean id="cascadeService" class="com.zja.service.CascadeService" abstract="true"/>
+    <bean id="userService" class="com.zja.service.UserService" abstract="true"/>
+
+</beans>

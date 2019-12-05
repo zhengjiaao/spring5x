@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <!--使用默认的 Servlet 来响应静态文件 -->
+    <mvc:default-servlet-handler/>
+
+    <!-- 开启springMVC 注解驱动 -->
+    <mvc:annotation-driven>
+        <mvc:message-converters register-defaults="false">
+            <!-- 将StringHttpMessageConverter的默认编码设为UTF-8 ，解决返回给前端中文乱码-->
+            <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+                <constructor-arg value="UTF-8"/>
+            </bean>
+            <!-- 将Jackson2HttpMessageConverter的默认格式化输出设为true -->
+            <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+                <property name="prettyPrint" value="true"/>
+                <property name="supportedMediaTypes">
+                    <list>
+                        <!-- 优先使用该媒体类型,为了解决IE浏览器下,返回JSON数据的下载问题 -->
+                        <value>application/json;charset=UTF-8</value>
+                        <value>text/html;charset=UTF-8</value>
+                        <value>text/json;charset=UTF-8</value>
+                    </list>
+                </property>
+                <!-- 使用内置日期工具进行处理 -->
+                <!--<property name="objectMapper">
+                    <bean class="com.fasterxml.jackson.databind.ObjectMapper">
+                        &lt;!&ndash;驼峰命名法转换为小写加下划线&ndash;&gt;
+                        &lt;!&ndash;<property name="propertyNamingStrategy">
+                            <bean class="com.fasterxml.jackson.databind.PropertyNamingStrategy.LowerCaseWithUnderscoresStrategy" />
+                        </property>&ndash;&gt;
+                        &lt;!&ndash;为null字段时不输出&ndash;&gt;
+                        &lt;!&ndash;<property name="serializationInclusion">
+                            <value type="com.fasterxml.jackson.annotation.JsonInclude.Include">NON_NULL</value>
+                        </property>&ndash;&gt;
+                        &lt;!&ndash;禁用空对象转换json校验:解决mybatis使用懒加载返回json 报错:SerializationFeature.FAIL_ON_EMPTY_BEANS&ndash;&gt;
+                        &lt;!&ndash;<property name="configure">
+                            <value type="com.fasterxml.jackson.databind.SerializationFeature">FAIL_ON_EMPTY_BEANS</value>
+                        </property>&ndash;&gt;
+                        &lt;!&ndash;忽略未知的字段&ndash;&gt;
+                        &lt;!&ndash;<property name="configure">
+                            <value type="com.fasterxml.jackson.databind.DeserializationFeature">FAIL_ON_UNKNOWN_PROPERTIES</value>
+                        </property>&ndash;&gt;
+                        &lt;!&ndash;-返回时间统一格式化&ndash;&gt;
+                        &lt;!&ndash;<property name="dateFormat">
+                            <bean class="java.text.SimpleDateFormat">
+                                <constructor-arg type="java.lang.String" value="yyyy-MM-dd"/>
+                            </bean>
+                        </property>&ndash;&gt;
+                    </bean>
+                </property>-->
+                <property name="objectMapper" ref="myObjectMapper"/>
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+    <!--解决mybatis使用懒加载返回json 报错:SerializationFeature.FAIL_ON_EMPTY_BEANS-->
+    <bean id="myObjectMapper" class="com.zja.util.MyObjectMapper"/>
+
+    <!-- 配置视图解析器 -->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"
+          id="internalResourceViewResolver">
+        <!-- 前缀 ：/WEB-INF/jsp/和/WEB-INF/html/-->
+        <property name="prefix" value="/WEB-INF/jsp/"/>
+        <!-- 后缀 ：.jsp和.html-->
+        <property name="suffix" value=".jsp"/>
+    </bean>
+
+</beans>

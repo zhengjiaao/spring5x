@@ -218,7 +218,7 @@
             <version>1.7.2</version>
         </dependency>
 
-        <!-- POJO之间映射工具类dozer ############################# -->
+        <!-- POJO之间映射工具类dozer -->
         <dependency>
             <groupId>net.sf.dozer</groupId>
             <artifactId>dozer-spring</artifactId>

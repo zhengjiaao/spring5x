@@ -51,7 +51,7 @@
     <import resource="classpath:aop.xml"/>
 
     <!--对象映射工具dozer-->
-    <import resource="classpath:dozer/spring-dozer.xml"></import>
+    <import resource="classpath:dozer/spring-dozer.xml"/>
 
 
     <!-- 配置视图解析器 -->

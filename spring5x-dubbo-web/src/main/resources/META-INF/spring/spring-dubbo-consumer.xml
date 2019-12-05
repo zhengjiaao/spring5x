@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://dubbo.apache.org/schema/dubbo"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://dubbo.apache.org/schema/dubbo http://dubbo.apache.org/schema/dubbo/dubbo.xsd">
+
+    <!-- 消费方应用名，用于计算依赖关系，不是匹配条件，不要与提供方一样 -->
+    <dubbo:application name="${dubbo.application.name}"/>
+
+    <!--Dubbo 缺省会在启动时检查依赖的服务是否可用，不可用时会抛出异常，阻止 Spring 初始化完成，以便上线时，能及早发现问题，默认 check="true"。-->
+    <!--可以关闭所有服务的启动时检查 -->
+    <dubbo:consumer check="false" />
+
+    <!--定义dubbo调用本地注册中心zk服务地址-->
+    <dubbo:registry id="local" protocol="zookeeper" address="${dubbo.local.registry.address}"/>
+    <!--定义dubbo调用远程注册中心zk服务地址-->
+    <!--<dubbo:registry id="remote" protocol="zookeeper" address="${dubbo.remote.registry.address}"/>-->
+
+    <!--定义dubbo所在服务执行时暴露给客户端的端口-->
+    <dubbo:protocol name="dubbo" port="${dubbo.protocol.port}"/>
+
+
+    <!-- 生成远程服务代理，可以和本地 bean 一样使用 Service-->
+    <!--本地(local)-->
+    <dubbo:reference registry="local" id="cascadeService" interface="com.zja.service.CascadeService" version="${dubbo.interface.version}"/>
+    <dubbo:reference registry="local" id="userService" interface="com.zja.service.UserService" version="${dubbo.interface.version}"/>
+
+    <!--本地(local)-->
+    <!--<dubbo:reference registry="local" interface="com.zja.service.CascadeService" id="bannerService"
+                     version="${dubbo.interface.version}" check="false"/>-->
+    <!--远程(remote)-->
+    <!--<dubbo:reference registry="remote" id="permissionSupplier" interface="com.dist.dcc.security.auth.api.PermissionSupplier"
+                     check="false" version="${dubbo.remote.interface.version}" />-->
+</beans>

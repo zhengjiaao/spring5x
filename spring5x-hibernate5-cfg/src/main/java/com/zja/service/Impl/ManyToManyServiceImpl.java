@@ -1,7 +1,7 @@
 package com.zja.service.Impl;
 
-import com.zja.dto.manytoMany.StudentDTO;
-import com.zja.dto.manytoMany.TeacherDTO;
+import com.zja.model.dto.manytoMany.StudentDTO;
+import com.zja.model.dto.manytoMany.TeacherDTO;
 import com.zja.entity.manytoMany.Student;
 import com.zja.entity.manytoMany.Teacher;
 import com.zja.service.ManyToManyService;

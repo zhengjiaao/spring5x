@@ -1,7 +1,7 @@
 package com.zja.service.Impl;
 
-import com.zja.dto.oneToMany.DeptDTO;
-import com.zja.dto.oneToMany.EmployeeDTO;
+import com.zja.model.dto.oneToMany.DeptDTO;
+import com.zja.model.dto.oneToMany.EmployeeDTO;
 import com.zja.entity.oneToMany.Dept;
 import com.zja.entity.oneToMany.Employee;
 import com.zja.service.OneToManyService;
