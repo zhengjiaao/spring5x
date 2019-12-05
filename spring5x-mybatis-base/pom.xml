@@ -190,12 +190,18 @@
             <artifactId>druid</artifactId>
             <version>1.1.20</version>
         </dependency>
-        <!--hibernate-c3p0 数据源连接池-->
+        <!--c3p0 数据源连接池-->
         <dependency>
+            <groupId>com.mchange</groupId>
+            <artifactId>c3p0</artifactId>
+            <version>0.9.5.2</version>
+        </dependency>
+        <!--hibernate-c3p0 数据源连接池-->
+        <!--<dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-c3p0</artifactId>
             <version>5.3.10.Final</version>
-        </dependency>
+        </dependency>-->
 
         <!--mybatis 依赖包-->
         <dependency>
