@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!--RocketMQ 消费者配置-->
+
+    <bean id="consumerListenerImpl" class="com.zja.rocketmq.consumer.ConsumerListenerImpl" />
+
+    <bean id="rocketmqConsumer" class="org.apache.rocketmq.client.consumer.DefaultMQPushConsumer" init-method="start" destroy-method="shutdown">
+        <property name="consumerGroup" value="concurrent_consumer"/>
+        <property name="namesrvAddr" value="127.0.0.1:9876"/>
+        <property name="messageListener" ref="consumerListenerImpl"/>
+        <property name="subscription">
+            <map>
+                <entry key="TopicTest">
+                    <value>*</value>
+                </entry>
+            </map>
+        </property>
+    </bean>
+
+</beans>

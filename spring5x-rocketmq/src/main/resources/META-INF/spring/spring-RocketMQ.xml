@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!--RocketMQ 总配置-->
+
+    <bean id="consumer"
+          class="com.alibaba.rocketmq.client.consumer.DefaultMQPushConsumer">
+        <constructor-arg name="consumerGroup" value="mySpring" />
+        <property name="namesrvAddr" value="127.0.0.1:9876" />
+    </bean>
+
+    <!--监听消息-->
+    <bean id="messageListener" class="com.lujing.util.MessageListener">
+    </bean>
+
+    <!--生产消息-->
+    <bean id="rocketMqProducer" class="com.lujing.util.RocketMqProducer"
+          init-method="init" lazy-init="false" />
+
+    <!-- 订阅topic是ROCKETMQ_TOPIC的消息  -->
+    <bean id="rocketmqConsumer" class="org.apache.rocketmq.client.consumer.DefaultMQPushConsumer" init-method="start" destroy-method="shutdown">
+        <property name="consumerGroup" value="mySpring"/>
+        <property name="namesrvAddr" value="127.0.0.1:9876"/>
+        <property name="messageListener" ref="messageListener"/>
+        <property name="subscription">
+            <map>
+                <!--<entry key="${rocketmq.topic}" value="${rocketmq.tags}" />-->
+                <entry key="ROCKETMQ_TOPIC" value="ROCKETMQ_START_TAG" />
+            </map>
+        </property>
+    </bean>
+
+
+</beans>

@@ -23,6 +23,7 @@
         <module>spring5x-memcached</module>
         <module>spring5x-activemq</module>
         <module>spring5x-rabbitmq</module>
+        <module>spring5x-rocketmq</module>
         <module>spring5x-jdbc-database</module>
         <module>spring5x-mybatis-base</module>
         <module>spring5x-mybatis-plus</module>
