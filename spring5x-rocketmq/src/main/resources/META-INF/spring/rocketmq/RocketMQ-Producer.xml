@@ -5,9 +5,29 @@
 
     <!---RocketMQ 生产者配置-->
 
-    <bean id="rocketmqProduct" class="org.apache.rocketmq.client.producer.DefaultMQProducer" init-method="start" destroy-method="shutdown">
-        <property name="producerGroup" value="producer1"/>
+    <bean id="producer" class="org.apache.rocketmq.client.producer.DefaultMQProducer" init-method="start" destroy-method="shutdown">
+        <property name="producerGroup" value="producer_group_1"/>
         <property name="namesrvAddr" value="127.0.0.1:9876"/>
+        <!--回调执行-->
+        <!--<property name="callbackExecutor" ref=""/>-->
+         <!--发送失败时重试次数-->
+        <!--<property name="retryTimesWhenSendFailed" value=""/>-->
+        <!--发送异步失败时重试次数-->
+        <!--<property name="retryTimesWhenSendAsyncFailed" value=""/>-->
     </bean>
+
+<!--    <bean id="transactionMQProducer" class="org.apache.rocketmq.client.producer.TransactionMQProducer" init-method="start" destroy-method="shutdown">-->
+<!--        <property name="producerGroup" value="producer_group_2"/>-->
+<!--        <property name="namesrvAddr" value="127.0.0.1:9876"/>-->
+<!--        &lt;!&ndash;回调执行&ndash;&gt;-->
+<!--        &lt;!&ndash;<property name="callbackExecutor" ref=""/>&ndash;&gt;-->
+<!--        &lt;!&ndash;发送失败时重试次数&ndash;&gt;-->
+<!--        &lt;!&ndash;<property name="retryTimesWhenSendFailed" value=""/>&ndash;&gt;-->
+<!--        &lt;!&ndash;发送异步失败时重试次数&ndash;&gt;-->
+<!--        &lt;!&ndash;<property name="retryTimesWhenSendAsyncFailed" value=""/>&ndash;&gt;-->
+
+<!--        &lt;!&ndash;事务检查侦听器&ndash;&gt;-->
+<!--        &lt;!&ndash;<property name="transactionCheckListener" ref=""/>&ndash;&gt;-->
+<!--    </bean>-->
 
 </beans>

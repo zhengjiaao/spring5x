@@ -5,19 +5,90 @@
 
     <!--RocketMQ 消费者配置-->
 
-    <bean id="consumerListenerImpl" class="com.zja.rocketmq.consumer.ConsumerListenerImpl" />
+    <!--pushConsumer消费者监听器-->
+    <bean id="pushConsumerListener" class="com.zja.rocketmq.consumer.ConcurrentlyConsumerListenerImpl"/>
+    <bean id="pushOrderlyConsumerListener" class="com.zja.rocketmq.consumer.OrderlyConsumerListenerImpl"/>
 
-    <bean id="rocketmqConsumer" class="org.apache.rocketmq.client.consumer.DefaultMQPushConsumer" init-method="start" destroy-method="shutdown">
+
+    <!--DefaultMQPushConsumer需要设置三 个 参数 : 1.这个Consumer的GroupName，2.NameServer的地址和端口号，3.是 Topic 的名称 -->
+    <bean id="pushConsumer" class="org.apache.rocketmq.client.consumer.DefaultMQPushConsumer" init-method="start"
+          destroy-method="shutdown">
+        <!--GroupName：用于把多个 Consumer组织到一起,提高并发处理能力,与消息模式 (MessageModel)配合使用-->
+        <!--Consumer 组名，参数默认值是：DEFAULT_CONSUMER，多个 Consumer如果属于一个应用，订阅同样的消息，且消费逻辑一致，则应该将它们归为同一组-->
         <property name="consumerGroup" value="concurrent_consumer"/>
+        <!--NameServer的地址和端口号,可以填写多个 ，用";"分号隔开，达到消除单点故障的目的-->
         <property name="namesrvAddr" value="127.0.0.1:9876"/>
-        <property name="messageListener" ref="consumerListenerImpl"/>
+        <!--Topic名称用来标识消息类型， 需要提前创建-->
+        <!--如果不需要消费某 个 Topic 下的所有消息，可以通过指定消息的 Tag 进行消息过滤，比如: Consumer.subscribe (”TopicTest”，’tag1 || tag2 || tag3”)，
+            表示这个 Consumer要 消费“ TopicTest”下带有 tag1 或 tag2 或 tag3 的消息。在填写 Tag 参数的位置，用 null 或者“ *“ 表示要消费这个 Topic 的所有消息-->
         <property name="subscription">
             <map>
+                <!--Topic的名称-->
                 <entry key="TopicTest">
-                    <value>*</value>
+                    <!--tag 方式过滤-->
+                    <!--<value>*</value>-->
+                    <value>TagA</value>
+                    <!--<value>TagB</value>-->
+                    <!--<value>TagA || TagC || TagD</value>-->
                 </entry>
             </map>
         </property>
+
+        <!--设置消费线程数大小取值范围都是 [1, 1000]。
+            4.2版本中的默认配置为：
+                consumeThreadMin 默认是20
+                consumeThreadMax 默认是64-->
+        <!--<property name="consumeThreadMin" value="20"/>-->
+        <!--<property name="consumeThreadMax" value="64"/>-->
+
+        <!--定义消费Client从那个位置消费消息
+                CONSUME_FROM_LAST_OFFSET 默认策略：从该队列最尾开始消费，即跳过历史消息
+                CONSUME_FROM_FIRST_OFFSET 从队列最开始开始消费，即历史消息（还储存在broker的）全部消费一遍
+                CONSUME_FROM_TIMESTAMP 从某个时间点开始消费，和setConsumeTimestamp()配合使用，默认是半个小时以前
+        -->
+        <!--<property name="consumeFromWhere" value="CONSUME_FROM_LAST_OFFSET"/>-->
+
+        <!--RocketMQ支持两种消费模式: Clustering(集群)和Broadcasting(广播)-->
+        <!-- Clustering(集群)模式: 同一个 ConsumerGroup(GroupName相同) 里的每 个 Consumer 只消费所订阅消 息的一部分 内容，
+         同一个 ConsumerGroup 里所有的 Consumer消费的内容合起来才是所订阅 Topic 内容的整体， 从而达到负载均衡的目的-->
+        <!-- Broadcasting(广播)模式: 同一个 ConsumerGroup里的每个 Consumer都 能消费到所订阅 Topic 的全部消息，
+        也就是一个消息会被多次分发，被 多个 Consumer消费-->
+        <!--<property name="messageModel" value="BROADCASTING"/>-->
+
+        <!--分配消息队列策略，默认平均分配：AllocateMessageQueueAveragely-->
+        <!--<property name="allocateMessageQueueStrategy" ref=""/>-->
+
+        <!--批量消费最大消息条数，取值范围: [1, 1024]。默认是1-->
+        <!--<property name="consumeMessageBatchMaxSize" value="1"/>-->
+
+        <!--消费者去broker拉取消息时，一次拉取多少条。取值范围: [1, 1024].默认是32,可选配置-->
+        <!--<property name="pullBatchSize" value="32"/>-->
+
+        <!--检查拉取消息的间隔时间，由于是长轮询，所以为 0，但是如果应用为了流控，也可以设置大于 0 的值，单位毫秒，取值范围: [0, 65535]-->
+        <!--<property name="pullInterval" value="0"/>-->
+
+        <!--单队列并行消费允许的最大跨度取值范围都是 [1, 65535]，默认是2000,这个参数只在并行消费的时候才起作用-->
+        <!--<property name="consumeConcurrentlyMaxSpan" value="2000"/>-->
+
+        <!--消费者监听器配置-->
+        <!--无序消息监听器-监听主题下所有队列消息-->
+        <property name="messageListener" ref="pushConsumerListener"/>
+        <!--顺序消息监听器-订阅有序消息-->
+        <!--<property name="messageListener" ref="pushOrderlyConsumerListener"/>
+        <property name="consumeFromWhere" value="CONSUME_FROM_FIRST_OFFSET"/>-->
     </bean>
+
+    <!--DefaultMQPullConsumer:调用pull方法主动去拉取消息-->
+    <bean id="pullConsumer" class="org.apache.rocketmq.client.consumer.DefaultMQPullConsumer" init-method="start"
+          destroy-method="shutdown">
+        <property name="consumerGroup" value="concurrent_pull_consumer_group_1"/>
+        <property name="namesrvAddr" value="127.0.0.1:9876"/>
+
+        <!--消息队列监听器-->
+        <!--<property name="messageQueueListener" ref="pullConsumerListener"/>-->
+    </bean>
+
+    <!--pullConsumer消费者监听器-->
+    <bean id="pullConsumerListener" class="com.zja.rocketmq.consumer.PullConsumerListenerImpl"/>
 
 </beans>
