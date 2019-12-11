@@ -34,7 +34,6 @@
         <module>spring5x-dubbo-api</module>
         <module>spring5x-dubbo-service</module>
         <module>spring5x-dubbo-web</module>
-        <module>spring5x-netty-base</module>
     </modules>
 
     <properties>
