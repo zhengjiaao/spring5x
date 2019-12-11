@@ -8,7 +8,7 @@
     <!-- 1、配置Job类 ：也可通过注解bean配置-->
     <bean id="quartzTask" class="com.zja.quartz.QuartzTask"/>
 
-    <!--2、控制台打印 任务JobDetail-->
+    <!--2、任务JobDetail-->
     <bean id="consolePrintJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
         <property name="targetObject" ref="quartzTask" />          <!--执行类的实例-->
         <property name="targetMethod" value="execute" />                   <!--执行方法-->
@@ -27,7 +27,7 @@
         <property name="repeatInterval" value="20000"/>  <!-- 每20秒执行一次 -->
     </bean>
 
-    <!--3、控制台打印 触发器CronTrigger：支持到指定时间运行一次，如每天12:00运行一次等，比较强大-->
+    <!--3、触发器CronTrigger：支持到指定时间运行一次，如每天12:00运行一次等，比较强大-->
     <bean id="consolePrintCronTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="consolePrintJob" />
         <!--cron表达式在线生成地址：http://cron.qqe2.com/ -->
