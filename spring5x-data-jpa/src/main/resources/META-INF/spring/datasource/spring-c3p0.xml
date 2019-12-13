@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!--指定配置文件的位置-->
+    <!--<context:property-placeholder location="classpath:properties/jdbc.properties" ignore-unresolvable="true"/>-->
+
+    <!-- 配置 C3P0 数据源 -->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+
+        <!--配置mysql -->
+        <property name="driverClass" value="${mysql.jdbc.driverClassName}" />
+        <property name="jdbcUrl" value="${mysql.jdbc.url}" />
+        <property name="user" value="${mysql.jdbc.username}" />
+        <property name="password" value="${mysql.jdbc.password}" />
+
+        <!--配置oracle -->
+        <!--<property name="driverClass" value="${oracle.jdbc.driverClassName}" />
+        <property name="jdbcUrl" value="${oracle.jdbc.url}" />
+        <property name="user" value="${oracle.jdbc.username}" />
+        <property name="password" value="${oracle.jdbc.password}" />-->
+
+        <!--c3p0公共属性配置-->
+        <!-- 数据库连接池中的最大的数据库连接数,建议在开发环境中设置小一点,够用即可 -->
+        <property name="maxPoolSize" value="25"/>
+        <!-- 数据库连接池中的最小的数据库连接数 -->
+        <property name="minPoolSize" value="5"/>
+        <!-- 如果池中数据连接不够时一次增长多少个 -->
+        <property name="acquireIncrement" value="5"/>
+        <!-- 初始化数据库连接池时连接的数量 -->
+        <property name="initialPoolSize" value="20"/>
+
+    </bean>
+
+    <!-- jdbcTemplate -->
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+
+</beans>

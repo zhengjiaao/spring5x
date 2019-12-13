@@ -34,6 +34,7 @@
         <module>spring5x-dubbo-api</module>
         <module>spring5x-dubbo-service</module>
         <module>spring5x-dubbo-web</module>
+        <module>spring5x-data-jpa</module>
     </modules>
 
     <properties>
