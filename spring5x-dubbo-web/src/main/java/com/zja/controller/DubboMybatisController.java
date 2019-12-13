@@ -19,9 +19,9 @@ import java.util.List;
  * @data 2019/10/29
  */
 @RestController
-@RequestMapping("rest/mybatis")
-@Api(tags = {"MybatisController"}, description = "mybatis简单测试")
-public class MybatisController {
+@RequestMapping("rest/dubbo")
+@Api(tags = {"DubboMybatisController"}, description = "dubbo简单测试")
+public class DubboMybatisController {
 
     @Autowired
     private UserService userService;

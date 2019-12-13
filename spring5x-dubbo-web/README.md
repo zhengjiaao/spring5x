@@ -1,295 +1,432 @@
-![spring5x-base-目录.png](https://upload-images.jianshu.io/upload_images/15645795-1842ee12621631a6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+# spring5x-dubbo-web
+[toc]
+
+spring5x-dubbo-web此模块是从spring5x-base 基础模块扩展过来的
+spring5x-base模块是一个非常干净的spring5.x+springMVC架构
+如果没有搭建spring5x-base模块，请参考 [spring5x-base模块搭建](https://www.jianshu.com/p/8612404cf1d6)
 
 
-**此模块是基础模块，其它模块都是以此模块扩展**
+## 搭建项目
 
-Spring5x-base:是一个非常干净的spring5.x+springMVC架构
+**基于spring5x-base 基础模块 新增功能：**
 
-Spring5x-base的作用：
+- 1、spring集成 dubbo依赖和xml配置
+- 2、实体类和接口层
+- 3、web层调用
+- 4、项目的github和博客地址
 
-* 可以直接拷贝这个模块，改名成其它模块名称
+**项目架构：spring5.x+dubbo**
 
-推荐-接口调试：
+以下只贴dubbo有关配置和代码，本篇仅将dubbo使用。
 
-* 浏览器调用调试接口
-* Postman 工具调用接口调试(极力建议)
-* swagger Api 调试接口(推荐)
-
-## Spring5x-base 搭建过程：
-
-功能：
-
-- 单纯的 spring+springmvc 框架
-- 版本spring 5.x 
-
-项目结构：特别简单的基础框架，往后的spring xml配置方式都是以此框架的为基础。
-![base_1.png](https://upload-images.jianshu.io/upload_images/15645795-82a3753e3edabe31.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
-
-#### 1、pom.xml 引入依赖
-
+### 1、spring集成 dubbo依赖和xml配置
+dubboy依赖
 ```xml
-<?xml version="1.0" encoding="UTF-8"?>
-
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <!--可以集成到父项目中，需要在夫项目中添加这个模块->
-   <!-- <parent>
-        <groupId>com.zja</groupId>
-        <artifactId>spring5.x</artifactId>
-        <version>1.0-SNAPSHOT</version>
-    </parent> -->
-    <groupId>com.zja</groupId>
-    <artifactId>spring5x-base</artifactId>
-    <packaging>war</packaging>
-
-    <name>spring5x-base</name>
-
-    <!--说明：spring5.x-base模块是spring5.x基础框架，其它模块都是以此模块为基础扩展的-->
-    <properties>
-        <!--spring5.x 至少需要jdk1.8及以上版本-->
-        <spring.version>5.0.9.RELEASE</spring.version>
-        <!--jdk必须 >=1.8-->
-        <jdk.version>1.8</jdk.version>
-        <!--maven 版本-->
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.plugin.version>3.6.0</maven.compiler.plugin.version>
-        <mavne.surefire.plugin.version>2.19.1</mavne.surefire.plugin.version>
-        <maven-war-plugin.version>2.6</maven-war-plugin.version>
-        <servlet.version>4.0.1</servlet.version>
-    </properties>
-
-    <dependencies>
-        <!--spring核心包——Start-->
+        <!--dubbo 依赖-->
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-core</artifactId>
-            <version>${spring.version}</version>
+            <groupId>com.alibaba</groupId>
+            <artifactId>dubbo</artifactId>
+            <version>2.6.2</version>
         </dependency>
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-            <version>${spring.version}</version>
+            <groupId>org.apache.curator</groupId>
+            <artifactId>curator-framework</artifactId>
+            <version>4.0.0</version>
         </dependency>
+        <!--默认是最新的3.5.x版本，而我版本安装zk是3.4.9，所以要用3.4.x版本，不然报异常-->
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-web</artifactId>
-            <version>${spring.version}</version>
+            <groupId>org.apache.zookeeper</groupId>
+            <artifactId>zookeeper</artifactId>
+            <version>3.4.13</version>
         </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-oxm</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-tx</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-jdbc</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-webmvc</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-aop</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context-support</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-beans</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-test</artifactId>
-            <version>${spring.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <!--spring核心包——End-->
-
-        <!--servlet-api  web层-->
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>${servlet.version}</version>
-            <scope>provided</scope>
-        </dependency>
-    </dependencies>
-
-    <build>
-        <finalName>spring5x-base</finalName>
-        <plugins>
-            <!--maven的编译插件-->
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven.compiler.plugin.version}</version>
-                <configuration>
-                    <!--开发版本-->
-                    <source>${jdk.version}</source>
-                    <!--.class文件版本-->
-                    <target>${jdk.version}</target>
-                    <!--打包后的编码-->
-                    <encoding>${project.build.sourceEncoding}</encoding>
-                </configuration>
-            </plugin>
-            <!--打包跳过测试-->
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>${mavne.surefire.plugin.version}</version>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-</project>
 
 ```
 
-
-
-#### 2、spring-mvc.xml 配置
-
+spring-dubbo-consumer.xml
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:mvc="http://www.springframework.org/schema/mvc"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://dubbo.apache.org/schema/dubbo"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://dubbo.apache.org/schema/dubbo http://dubbo.apache.org/schema/dubbo/dubbo.xsd">
 
-    <!-- 开启注解包扫描-->
-    <context:component-scan base-package="com.zja.*"/>
+    <!-- 消费方应用名，用于计算依赖关系，不是匹配条件，不要与提供方一样 -->
+    <dubbo:application name="${dubbo.application.name}"/>
 
-    <!--使用默认的 Servlet 来响应静态文件 -->
-    <mvc:default-servlet-handler/>
+    <!--Dubbo 缺省会在启动时检查依赖的服务是否可用，不可用时会抛出异常，阻止 Spring 初始化完成，以便上线时，能及早发现问题，默认 check="true"。-->
+    <!--可以关闭所有服务的启动时检查 -->
+    <dubbo:consumer check="false" />
 
-    <!-- 开启springMVC 注解驱动 -->
-    <mvc:annotation-driven>
-        <mvc:message-converters register-defaults="false">
-        <!-- 将StringHttpMessageConverter的默认编码设为UTF-8 ，解决返回给前端中文乱码-->
-        <bean class="org.springframework.http.converter.StringHttpMessageConverter">
-            <constructor-arg value="UTF-8"/>
-        </bean>
-        </mvc:message-converters>
-    </mvc:annotation-driven>
+    <!--定义dubbo调用本地注册中心zk服务地址-->
+    <dubbo:registry id="local" protocol="zookeeper" address="${dubbo.local.registry.address}"/>
+    <!--定义dubbo调用远程注册中心zk服务地址-->
+    <!--<dubbo:registry id="remote" protocol="zookeeper" address="${dubbo.remote.registry.address}"/>-->
 
-    <!-- 增加application.properties文件，这个文件里没有内容 -->
-    <context:property-placeholder
-            location="classpath*:properties/application.properties" />
+    <!--定义dubbo所在服务执行时暴露给客户端的端口-->
+    <dubbo:protocol name="dubbo" port="${dubbo.protocol.port}"/>
 
-    <!-- 配置视图解析器 -->
-    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"
-          id="internalResourceViewResolver">
-        <!-- 前缀 ：/WEB-INF/jsp/和/WEB-INF/html/-->
-        <property name="prefix" value="/WEB-INF/jsp/"/>
-        <!-- 后缀 ：.jsp和.html-->
-        <property name="suffix" value=".jsp"/>
-    </bean>
+
+    <!-- 生成远程服务代理，可以和本地 bean 一样使用 Service-->
+    <!--本地(local)-->
+    <dubbo:reference registry="local" id="cascadeService" interface="com.zja.service.CascadeService" version="${dubbo.interface.version}"/>
+    <dubbo:reference registry="local" id="userService" interface="com.zja.service.UserService" version="${dubbo.interface.version}"/>
+
+    <!--本地(local)-->
+    <!--<dubbo:reference registry="local" interface="com.zja.service.CascadeService" id="bannerService"
+                     version="${dubbo.interface.version}" check="false"/>-->
+    <!--远程(remote)-->
+    <!--<dubbo:reference registry="remote" id="permissionSupplier" interface="com.dist.dcc.security.auth.api.PermissionSupplier"
+                     check="false" version="${dubbo.remote.interface.version}" />-->
 </beans>
 
 ```
 
+### 2、实体类和接口层
+实体类：存在spring5x-dubbo-api模块中
+```java
+/**
+ * @author ZhengJa
+ * @description User 实体类
+ * @data 2019/10/29
+ */
+@Data
+@ApiModel("用户信息实体类")
+public class UserEntity implements Serializable {
 
+    @ApiModelProperty(value = "默认:mysql自增,oracle序列")
+    private Integer id;
+    @ApiModelProperty("用户名")
+    private String userName;
+    @ApiModelProperty("年龄")
+    private Integer age;
+    @ApiModelProperty("不传值,后台创建时间")
+    private Date createTime;
 
-#### 3、web.xml 配置
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
-         version="4.0">
-
-    <!--配置spring前端控制器-->
-    <servlet>
-        <servlet-name>springMvc</servlet-name>
-        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-        <init-param>
-            <param-name>contextConfigLocation</param-name>
-            <param-value>classpath:META-INF/spring/spring-mvc.xml</param-value>
-        </init-param>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>springMvc</servlet-name>
-        <url-pattern>/</url-pattern>
-    </servlet-mapping>
-
-</web-app>
+    @ApiModelProperty("订单信息")
+    private List<OrdersEntity> ordersEntityList;
+    @ApiModelProperty("所属组信息")
+    private List<GroupEntity> groupEntityList;
+}
 
 ```
+serviceImpl层：存在spring5x-dubbo-service模块中
+```java
+package com.zja.serviceImpl;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.zja.dao.UserDao;
+import com.zja.model.dto.UserEntityDTO;
+import com.zja.model.entity.UserEntity;
+import com.zja.service.UserService;
+import org.dozer.Mapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-
-#### 4、HelloController 接口测试
-
-```
-package com.zja.controller;
-
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import java.util.Date;
+import java.util.List;
 
 /**
  * @author ZhengJa
- * @description HelloController
- * @data 2019/10/24
+ * @description
+ * @data 2019/11/14
  */
-@Controller
-public class HelloController {
+@Service
+public class UserServiceImpl implements UserService {
 
-    @GetMapping("/hello")
-    public String hello(){
-        //返回hello页面
-       return  "hello";
+    @Autowired
+    private UserDao userDao;
+
+    @Autowired
+    private Mapper mapper;
+
+    //静态插入数据:通用方法
+    @Override
+    public int insertUser(UserEntity userEntity) {
+        UserEntity userById = this.userDao.queryUserById(userEntity.getId());
+        if (userById !=null){
+            throw new RuntimeException("id自增，默认可不传id，是唯一主键，已经存在："+userEntity.getId());
+        }
+        userEntity.setCreateTime(new Date());
+        return this.userDao.insertUser(userEntity);
     }
 
-    @GetMapping("/hello2")
-    @ResponseBody
-    public String hello2(){
-        //返回字符串
-        return  "hello2 字符串";
+    //动态插入数据: mysql用法，id自增
+    @Override
+    public int insertUserMysql(UserEntity userEntity) {
+        return this.userDao.insertUserMysql(userEntity);
     }
+
+    //动态插入数据:oracle用法，id使用序列
+    @Override
+    public int insertUserOracle(UserEntity userEntity) {
+        return this.userDao.insertUserOracle(userEntity);
+    }
+
+    //mybatis批量插入数据:mysql用法，id自增
+    @Override
+    public int mysqlBatchSaveUser(List<UserEntity> userEntities) {
+        return this.userDao.mysqlBatchSaveUser(userEntities);
+    }
+
+    //mybatis批量插入数据:oracle用法，id使用序列
+    @Override
+    public int oracleBatchSaveUser(List<UserEntity> userEntities) {
+        return this.userDao.oracleBatchSaveUser(userEntities);
+    }
+
+    //按id查询用户
+    @Override
+    public UserEntityDTO queryUserById(Integer id) {
+        UserEntity userEntity = this.userDao.queryUserById(id);
+        return mapper.map(userEntity, UserEntityDTO.class);
+    }
+
+    //查询所有用户
+    @Override
+    public List<UserEntity> queryAllUser() {
+        return this.userDao.queryAllUser();
+    }
+
+    /**
+     * 获取分页结果
+     * @param pageNum 页码值
+     * @param pageSize 每页显示条数
+     */
+    @Override
+    public List<UserEntity> getPagingResults(int pageNum, int pageSize) {
+        //第一个参数是页码值，第二个参数是每页显示条数，第三个参数默认查询总数count
+        //获取第pageNum页，每页pageSize条内容，默认查询总数count
+        PageHelper.startPage(pageNum, pageSize);
+        //紧跟着的第一个select方法会被分页
+        return this.userDao.queryAllUser();
+    }
+
+    /**
+     * 获取分页结果及分页信息
+     * @param pageNum 页码值
+     * @param pageSize 每页显示条数
+     */
+    @Override
+    public PageInfo<UserEntity> queryPageInfo(int pageNum, int pageSize) {
+        //第一个参数是页码值，第二个参数是每页显示条数，第三个参数默认查询总数count
+        //获取第pageNum页，每页pageSize条内容，默认查询总数count
+        PageHelper.startPage(pageNum, pageSize,true);
+        //紧跟着的第一个select方法会被分页
+        List<UserEntity> userEntities = this.userDao.queryAllUser();
+
+        //分页信息
+        PageInfo<UserEntity> pageInfo = new PageInfo<UserEntity>(userEntities);
+
+        //打印分页信息
+        System.out.println("数据总数：" + pageInfo.getTotal());
+        System.out.println("数据总页数：" + pageInfo.getPages());
+        System.out.println("进入第一页：" + pageInfo.getNavigateFirstPage());
+        System.out.println("进入最后一页：" + pageInfo.getNavigateLastPage());
+
+        for (UserEntity user : pageInfo.getList()) {
+            System.out.println(user);
+        }
+        return pageInfo;
+    }
+
+    //更新数据-改数据
+    @Override
+    public int updateUser(UserEntity userEntity) {
+        userEntity.setCreateTime(new Date());
+        return this.userDao.updateUser(userEntity);
+    }
+
+    //删除数据
+    @Override
+    public int delUser(Integer id) {
+        return this.userDao.delUser(id);
+    }
+
+}
+
+```
+接口层：spring5x-dubbo-api模块中
+```java
+package com.zja.service;
+
+
+import com.github.pagehelper.PageInfo;
+import com.zja.model.dto.UserEntityDTO;
+import com.zja.model.entity.UserEntity;
+
+import java.util.List;
+
+/**
+ * @author ZhengJa
+ * @description
+ * @data 2019/11/14
+ */
+public interface UserService {
+
+    //静态插入数据:通用方法
+    int insertUser(UserEntity userEntity);
+
+    //动态插入数据: mysql用法，id自增
+    int insertUserMysql(UserEntity userEntity);
+    //动态插入数据:oracle用法，id使用序列
+    int insertUserOracle(UserEntity userEntity);
+
+    //mybatis批量插入数据:mysql用法，id自增
+    int mysqlBatchSaveUser(List<UserEntity> userEntities);
+    //mybatis批量插入数据:oracle用法，id使用序列
+    int oracleBatchSaveUser(List<UserEntity> userEntities);
+
+    //按id查询用户
+    UserEntityDTO queryUserById(Integer id);
+    //查询所有用户
+    List<UserEntity> queryAllUser();
+
+    //获取分页结果
+    List<UserEntity> getPagingResults(int pageNum, int pageSize);
+    //获取分页结果及分页信息
+    PageInfo<UserEntity> queryPageInfo(int pageNum, int pageSize);
+
+    //更新数据-改数据
+    int updateUser(UserEntity userEntity);
+
+    //删除数据
+    int delUser(Integer id);
 }
 
 ```
 
+### 3、web层调用
+```java
+package com.zja.controller;
 
+import com.github.pagehelper.PageInfo;
+import com.zja.model.entity.UserEntity;
+import com.zja.service.UserService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
-#### 5、测试-页面访问
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
-* 访问：http://localhost:8080/spring5x-base/hello
-* 效果：hello.jsp 页面 或 hello.html 页面 
+/**
+ * @author ZhengJa
+ * @description MybatisController 测试类
+ * @data 2019/10/29
+ */
+@RestController
+@RequestMapping("rest/dubbo")
+@Api(tags = {"DubboMybatisController"}, description = "dubbo简单测试")
+public class DubboMybatisController {
 
-数据访问
+    @Autowired
+    private UserService userService;
 
-* 访问：http://localhost:8080/spring5x-base/hello2
-* 效果：hello2 字符串
+    @PostMapping("insertUser")
+    @ApiOperation(value = "静态插入数据:通用方法,必须传id值且id>0", notes = "插入数据(id不自增或不使用序列，必须传id值且id>0)", httpMethod = "POST")
+    public int insertUser(@RequestBody UserEntity userEntity) {
+        return this.userService.insertUser(userEntity);
+    }
 
+    @PostMapping("insertUserMysql")
+    @ApiOperation(value = "动态插入数据: mysql用法 id自增,不传id值", notes = "插入数据(id自增，不传id值)", httpMethod = "POST")
+    public int insertUserMysql(@RequestParam String userName,@RequestParam Integer age) {
+        UserEntity userEntity = new UserEntity();
+        userEntity.setUserName(userName);
+        userEntity.setAge(age);
+        userEntity.setCreateTime(new Date());
+        return this.userService.insertUserMysql(userEntity);
+    }
 
+    @PostMapping("insertUserOracle")
+    @ApiOperation(value = "动态插入数据:oracle用法 id使用序列,不传id值", notes = "插入数据(id使用序列，不传id值)", httpMethod = "POST")
+    public int insertUserOracle(@RequestParam String userName,@RequestParam Integer age) {
+        UserEntity userEntity = new UserEntity();
+        userEntity.setUserName(userName);
+        userEntity.setAge(age);
+        userEntity.setCreateTime(new Date());
+        return this.userService.insertUserOracle(userEntity);
+    }
 
-**基础搭建已经可以结束！！！**
+    @PostMapping("mysqlBatchSaveUser")
+    @ApiOperation(value = "mybatis+mysql批量插入数据: mysql用法 id自增", notes = "插入数据(id自增)", httpMethod = "POST")
+    public int mysqlBatchSaveUser(@ApiParam(value = "count 批量插入几条",defaultValue = "5") @RequestParam Integer count) {
 
+        List<UserEntity> entityList = new ArrayList<>();
+        for (int i=0;i<count;i++){
+            UserEntity userEntity = new UserEntity();
+            userEntity.setUserName("Zhengja_"+i);
+            userEntity.setAge(20+i);
+            userEntity.setCreateTime(new Date());
+            entityList.add(userEntity);
+        }
+        return this.userService.mysqlBatchSaveUser(entityList);
+    }
 
+    @PostMapping("oracleBatchSaveUser")
+    @ApiOperation(value = "mybatis+oracle批量插入数据: oracle用法 id不使用序列", notes = "插入数据(id不能使用序列)", httpMethod = "POST")
+    public int oracleBatchSaveUser(@ApiParam(value = "count 批量插入几条",defaultValue = "5") @RequestParam Integer count) {
 
-## github 地址：
-* [https://github.com/zhengjiaao/spring5x](https://github.com/zhengjiaao/spring5x)
+        List<UserEntity> entityList = new ArrayList<>();
+        for (int i=0;i<count;i++){
+            UserEntity userEntity = new UserEntity();
+            //批量插入没有提交，无法获取递增的序列值，所以，oracle注意，id不能使用序列，会报异常 “违反唯一约束条件”
+            userEntity.setId(100+i);
+            userEntity.setUserName("Zhengja_"+i);
+            userEntity.setAge(20+i);
+            userEntity.setCreateTime(new Date());
+            entityList.add(userEntity);
+        }
+        return this.userService.oracleBatchSaveUser(entityList);
+    }
 
+    @GetMapping("queryUserById")
+    @ApiOperation(value = "按id查询用户", notes = "按id查询数据", httpMethod = "GET")
+    public Object queryUserById(@RequestParam Integer id) {
+        return this.userService.queryUserById(id);
+    }
 
-## 博客地址
-* 简书：https://www.jianshu.com/u/70d69269bd09
-* 掘金： https://juejin.im/user/5d82daeef265da03ad14881b/posts
+    @GetMapping("queryAllUser")
+    @ApiOperation(value = "查询所有用户", notes = "查询所有数据", httpMethod = "GET")
+    public List<UserEntity> queryAllUser() {
+        return this.userService.queryAllUser();
+    }
+
+    @GetMapping("getpage")
+    @ApiOperation(value = "获取分页结果", notes = "分页查询", httpMethod = "GET")
+    public List<UserEntity> getPagingResults(@ApiParam("页码值") @RequestParam int pageNum, @ApiParam("每页显示条数") @RequestParam int pageSize) {
+        return this.userService.getPagingResults(pageNum, pageSize);
+    }
+
+    @GetMapping("getpageinfo")
+    @ApiOperation(value = "获取分页结果及分页信息", notes = "分页查询", httpMethod = "GET")
+    public PageInfo<UserEntity> queryPageInfo(@ApiParam("页码值") @RequestParam int pageNum, @ApiParam("每页显示条数") @RequestParam int pageSize) {
+        return this.userService.queryPageInfo(pageNum, pageSize);
+    }
+
+    @PutMapping("updateUser")
+    @ApiOperation(value = "更新用户信息", notes = "更新数据-改数据", httpMethod = "PUT")
+    public int updateUser(@RequestBody UserEntity userEntity) {
+        return this.userService.updateUser(userEntity);
+    }
+
+    @DeleteMapping("delUser")
+    @ApiOperation(value = "删除数据", notes = "删除数据", httpMethod = "DELETE")
+    public int delUser(@RequestParam Integer id) {
+        return this.userService.delUser(id);
+    }
+
+}
+
+```
+
+### 4、项目的github和简书博客地址
+**github:**
+- [https://github.com/zhengjiaao/spring5x](https://links.jianshu.com/go?to=https%3A%2F%2Fgithub.com%2Fzhengjiaao%2Fspring5x)
+
+**博客:**
+- 简书：https://www.jianshu.com/u/70d69269bd09
+- 掘金： https://juejin.im/user/5d82daeef265da03ad14881b/posts
