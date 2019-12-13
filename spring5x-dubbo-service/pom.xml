@@ -37,7 +37,7 @@
     </properties>
 
     <dependencies>
-        <!--引入api接口service、DTO、VO、Entity-->
+        <!--引入api接口service、DTO、Entity-->
         <dependency>
             <groupId>com.zja</groupId>
             <artifactId>spring5x-dubbo-api</artifactId>
