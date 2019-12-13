@@ -19,7 +19,7 @@ import javax.annotation.Resource;
  * Date: 2019-12-06 15:41
  * Author: zhengja
  * Email: zhengja@dist.com.cn
- * Desc：
+ * Desc：生产者：发送消息
  */
 @RunWith(JUnitPlatform.class)  // org.junit.platform.runner.JUnitPlatform
 @ExtendWith(SpringExtension.class)  // org.springframework.test.context.junit.jupiter.SpringExtension

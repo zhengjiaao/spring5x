@@ -21,8 +21,10 @@ public class UserEntity implements Serializable {
 
     @ApiModelProperty(value = "默认:mysql自增,oracle序列")
     @Id
-    //@GeneratedValue //序列，默认 HIBERNATE_SEQUENCE
     @Column(name = "id", nullable = false)
+    //oracle序列，默认 HIBERNATE_SEQUENCE
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     private Long id;
     @ApiModelProperty("用户名")
     @Basic(fetch = FetchType.EAGER,optional = false) //急加载，属性是否允许为null

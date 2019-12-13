@@ -7,9 +7,9 @@
 
     <!-- 数据源配置 -->
     <!--druid.xml 配置-->
-    <import resource="classpath:META-INF/spring/datasource/spring-druid.xml"/>
+    <!--<import resource="classpath:META-INF/spring/datasource/spring-druid.xml"/>-->
     <!--c3p0.xml 配置-->
-    <!--<import resource="classpath:META-INF/spring/datasource/spring-c3p0.xml"/>-->
+    <import resource="classpath:META-INF/spring/datasource/spring-c3p0.xml"/>
 
     <!--指定配置文件的位置-->
     <context:property-placeholder location="classpath:properties/hibernate-jpa.properties" ignore-unresolvable="true"/>
@@ -18,7 +18,8 @@
     <bean id="hibernateJpaVendorAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
         <property name="showSql" value="${adapter.show_sql}"/>
         <property name="generateDdl" value="${adapter.generate_ddl}"/>
-        <property name="databasePlatform" value="${hibernate.dialect}"/>
+        <!--关系数据库驱动方言，不写自动识别-->
+        <!--<property name="databasePlatform" value="${hibernate.dialect}"/>-->
     </bean>
 
     <!-- 定义实体管理器工厂 Jpa配置 LocalContainerEntityManagerFactoryBean这个选项Spring扮演了容器的角色。完全掌管JPA -->
@@ -32,8 +33,8 @@
         <!-- 指定JPA属性；如Hibernate中指定是否显示SQL的是否显示、方言等 -->
         <property name="jpaProperties">
             <props>
-                <!--关系数据库驱动方言-->
-                <prop key="hibernate.dialect">${hibernate.dialect}</prop>
+                <!--关系数据库驱动方言，不写自动识别-->
+                <!--<prop key="hibernate.dialect">${hibernate.dialect}</prop>-->
                 <!--控制台是否打印sql语句-->
                 <prop key="hibernate.show_sql">${hibernate.show_sql}</prop>
                 <!--sql语句格式化-->

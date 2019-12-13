@@ -6,8 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 /**
- * Company: 上海数慧系统技术有限公司
- * Department: 数据中心
  * Date: 2019-12-12 17:16
  * Author: zhengja
  * Email: zhengja@dist.com.cn
