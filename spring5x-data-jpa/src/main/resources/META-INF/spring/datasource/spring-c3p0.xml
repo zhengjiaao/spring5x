@@ -11,16 +11,16 @@
     <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
 
         <!--配置mysql -->
-        <!--<property name="driverClass" value="${mysql.jdbc.driverClassName}" />
+        <property name="driverClass" value="${mysql.jdbc.driverClassName}" />
         <property name="jdbcUrl" value="${mysql.jdbc.url}" />
         <property name="user" value="${mysql.jdbc.username}" />
-        <property name="password" value="${mysql.jdbc.password}" />-->
+        <property name="password" value="${mysql.jdbc.password}" />
 
         <!--配置oracle -->
-        <property name="driverClass" value="${oracle.jdbc.driverClassName}" />
+        <!--<property name="driverClass" value="${oracle.jdbc.driverClassName}" />
         <property name="jdbcUrl" value="${oracle.jdbc.url}" />
         <property name="user" value="${oracle.jdbc.username}" />
-        <property name="password" value="${oracle.jdbc.password}" />
+        <property name="password" value="${oracle.jdbc.password}" />-->
 
         <!--c3p0公共属性配置-->
         <!-- 数据库连接池中的最大的数据库连接数,建议在开发环境中设置小一点,够用即可 -->

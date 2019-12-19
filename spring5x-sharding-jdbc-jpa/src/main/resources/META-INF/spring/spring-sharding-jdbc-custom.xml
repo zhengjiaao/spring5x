@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:sharding="http://shardingsphere.apache.org/schema/shardingsphere/sharding"
+       xmlns:bean="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://shardingsphere.apache.org/schema/shardingsphere/sharding
+       http://shardingsphere.apache.org/schema/shardingsphere/sharding/sharding.xsd
+       http://www.springframework.org/schema/util
+       http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <!--******************自定义分库分表策略********************-->
+
+    <!--策略： 精确分片算法、范围分片算法、行表达式算法 -->
+    <!-- 分库策略  精确分片算法 -->
+    <!--<bean id="preciseDatabaseStrategy" class="com.jihao.algorithm.PreciseModuleDatabaseShardingAlgorithm"/>-->
+    <!-- 分库策略  范围分片算法 -->
+    <!--<bean id="rangeDatabaseStrategy" class="com.jihao.algorithm.RangeModuleDatabaseShardingAlgorithm"/>-->
+    <!-- 分表策略  精确分片算法 -->
+    <!--<bean id="preciseTableStrategy" class="com.jihao.algorithm.PreciseModuleTableShardingAlgorithm"/>-->
+    <!-- 分表策略  范围分片算法-->
+    <!--<bean id="rangeTableStrategy" class="com.jihao.algorithm.RangeModuleTableShardingAlgorithm"/>-->
+
+    <sharding:standard-strategy id="databaseStrategy" sharding-column="user_id"
+                                precise-algorithm-ref="preciseDatabaseStrategy"
+                                range-algorithm-ref="rangeDatabaseStrategy"/>
+    <!-- 分表策略 -->
+    <sharding:standard-strategy id="tableStrategy" sharding-column="user_id"
+                                precise-algorithm-ref="preciseTableStrategy" range-algorithm-ref="rangeTableStrategy"/>
+
+    <!-- 行表达式算法 -->
+    <sharding:inline-strategy id="databaseStrategy" sharding-column="user_id"
+                              algorithm-expression="db_${user_id % 2}"/>
+    <!--<sharding:inline-strategy id="orderTableStrategy" sharding-column="order_id"
+                              algorithm-expression="t_order_$->{order_id % 2}"/>
+    <sharding:inline-strategy id="orderItemTableStrategy" sharding-column="order_item_id"
+                              algorithm-expression="t_order_item_$->{order_item_id % 2}"/>-->
+
+
+<!--    <sharding:data-source id="shardingDataSource">
+        <sharding:sharding-rule data-source-names="ms_master,ms_master_1,ms_master_2">
+            <sharding:table-rules>
+                <sharding:table-rule logic-table="t_order" actual-data-nodes="ms_master_$->{1..2}.t_order_$->{1..3}" database-strategy-ref="databaseStrategy" table-strategy-ref="tableStrategy"/>
+                <sharding:table-rule logic-table="t_order_item" actual-data-nodes="ms_master_$->{1..2}.t_order_item_$->{1..3}" database-strategy-ref="databaseStrategy" table-strategy-ref="tableStrategy"/>
+            </sharding:table-rules>
+        </sharding:sharding-rule>
+    </sharding:data-source>-->
+
+    <bean:properties id="properties">
+        <prop key="worker.id">123</prop>
+    </bean:properties>
+
+    <!--主键生成器：默认使用雪花算法生成递增趋势id-->
+    <sharding:key-generator id="orderKeyGenerator" type="SNOWFLAKE" column="order_id" props-ref="properties"/>
+    <sharding:key-generator id="itemKeyGenerator" type="SNOWFLAKE" column="order_item_id" props-ref="properties"/>
+
+    <!--分片数据源-->
+    <sharding:data-source id="shardingDataSource">
+        <!--分片规则(分库分表)，默认数据源db_1，不需要分片的数据表放到这个db_1数据源中-->
+        <sharding:sharding-rule data-source-names="db_1,db_2" default-data-source-name="db_1">
+            <!--定义表规则-->
+            <sharding:table-rules>
+                <!--给表配置 数据库策略和主键id生成器-->
+                <sharding:table-rule logic-table="t_order" database-strategy-ref="databaseStrategy"
+                                     key-generator-ref="orderKeyGenerator"/>
+                <sharding:table-rule logic-table="t_order_item" database-strategy-ref="databaseStrategy"
+                                     key-generator-ref="itemKeyGenerator"/>
+            </sharding:table-rules>
+            <!--logic-tables逻辑表名，如果真实表为空，则把逻辑表名作为真实表名-->
+            <sharding:binding-table-rules>
+                <!-- 配置绑定表(分片规则相同，一般为主表子表的关系)，若不是绑定表不用配置，否则全路由不会走笛卡尔积 -->
+                <sharding:binding-table-rule logic-tables="t_order,t_order_item"/>
+            </sharding:binding-table-rules>
+            <sharding:broadcast-table-rules>
+                <sharding:broadcast-table-rule table="t_address"/>
+            </sharding:broadcast-table-rules>
+        </sharding:sharding-rule>
+    </sharding:data-source>
+
+</beans>

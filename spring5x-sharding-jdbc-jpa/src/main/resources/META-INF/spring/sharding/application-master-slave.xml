@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:master-slave="http://shardingsphere.apache.org/schema/shardingsphere/masterslave"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans 
+                        http://www.springframework.org/schema/beans/spring-beans.xsd
+                        http://shardingsphere.apache.org/schema/shardingsphere/masterslave
+                        http://shardingsphere.apache.org/schema/shardingsphere/masterslave/master-slave.xsd">
+    <!--<context:annotation-config />
+    <context:component-scan base-package="com.zja.*"/>-->
+
+    <!--druid公共配置-->
+    <import resource="classpath:META-INF/spring/druid-common.xml"/>
+
+    <!--主库-->
+    <bean id="demo_ds_master" parent="dataSource" init-method="init" destroy-method="close">
+        <!--配置mysql -->
+        <property name="url" value="${mysql.jdbc.url3}"/>
+        <property name="username" value="${mysql.jdbc.username}"/>
+        <property name="password" value="${mysql.jdbc.password}"/>
+        <property name="validationQuery" value="${mysql.jdbc.validationQuery}"/>
+        <property name="driverClassName" value="${mysql.jdbc.driverClassName}"/>
+    </bean>
+    <!--从库-->
+    <bean id="demo_ds_slave_0" parent="dataSource" init-method="init" destroy-method="close">
+        <property name="url" value="${mysql.jdbc.url4}"/>
+        <property name="username" value="${mysql.jdbc.username}"/>
+        <property name="password" value="${mysql.jdbc.password}"/>
+        <property name="validationQuery" value="${mysql.jdbc.validationQuery}"/>
+        <property name="driverClassName" value="${mysql.jdbc.driverClassName}"/>
+    </bean>
+    <bean id="demo_ds_slave_1" parent="dataSource" init-method="init" destroy-method="close">
+        <property name="url" value="${mysql.jdbc.url5}"/>
+        <property name="username" value="${mysql.jdbc.username}"/>
+        <property name="password" value="${mysql.jdbc.password}"/>
+        <property name="validationQuery" value="${mysql.jdbc.validationQuery}"/>
+        <property name="driverClassName" value="${mysql.jdbc.driverClassName}"/>
+    </bean>
+
+    <!--前提，mysql需要配置主从复制-->
+
+    <!--随机策略-->
+    <master-slave:load-balance-algorithm id="randomStrategy" type="RANDOM" />
+    <!--配置主从数据源，使用随机策略-->
+    <master-slave:data-source id="masterSlaveDataSource" master-data-source-name="demo_ds_master" slave-data-source-names="demo_ds_slave_0, demo_ds_slave_1" strategy-ref="randomStrategy" />
+
+</beans>

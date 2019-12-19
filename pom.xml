@@ -35,6 +35,8 @@
         <module>spring5x-dubbo-service</module>
         <module>spring5x-dubbo-web</module>
         <module>spring5x-data-jpa</module>
+        <module>spring5x-sharding-jdbc-jpa</module>
+        <!--<module>spring5x-sharding-jdbc-mybatis</module>-->
     </modules>
 
     <properties>

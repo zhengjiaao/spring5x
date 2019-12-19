@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context-4.1.xsd">
+
+    <!--指定配置文件的位置-->
+    <context:property-placeholder location="classpath:properties/jdbc.properties" ignore-unresolvable="true"/>
+
+    <!-- druid数据源公共配置 -->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+
+        <!--配置mysql-->
+        <!--<property name="url" value="${mysql.jdbc.url}"/>
+        <property name="username" value="${mysql.jdbc.username}"/>
+        <property name="password" value="${mysql.jdbc.password}"/>
+        <property name="validationQuery" value="${mysql.jdbc.validationQuery}"/>
+        <property name="driverClassName" value="${mysql.jdbc.driverClassName}"/>-->
+
+
+        <!-- 配置初始化大小、最小、最大连连接数量 -->
+        <property name="initialSize" value="10"/>
+        <property name="minIdle" value="10"/>
+        <property name="maxActive" value="200"/>
+
+        <!-- 配置获取连接等待超时的时间 -->
+        <property name="maxWait" value="60000"/>
+
+        <!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+        <property name="timeBetweenEvictionRunsMillis" value="60000"/>
+
+        <!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+        <property name="minEvictableIdleTimeMillis" value="600000"/>
+        <!-- 配置一个连接在池中最大生存的时间，单位是毫秒 -->
+        <property name="maxEvictableIdleTimeMillis" value="900000"/>
+
+        <!--建议配置为 true，不影响性能，并且保证安全性。申请连接的时候检测，
+        如果空闲时间大于 timeBetweenEvictionRunsMillis，执行 validationQuery 检测连接是否有效。-->
+        <property name="testWhileIdle" value="true"/>
+        <!--申请连接时执行 validationQuery 检测连接是否有效，做了这个配置会降低性能。-->
+        <property name="testOnBorrow" value="false"/>
+        <!--归还连接时执行 validationQuery 检测连接是否有效，做了这个配置会降低性能。-->
+        <property name="testOnReturn" value="false"/>
+
+        <!--连接池中的 minIdle 数量以内的连接，空闲时间超过 minEvictableIdleTimeMillis，则会执行 keepAlive 操作。-->
+        <property name="keepAlive" value="true"/>
+        <property name="phyMaxUseCount" value="100000"/>
+
+        <!-- 配置监控统计拦截的 filters Druid 连接池的监控信息主要是通过 StatFilter 采集的，
+        采集的信息非常全面，包括 SQL 执行、并发、慢查、执行时间区间分布等-->
+        <!--<property name="filters" value="stat,wall"/>-->
+        <property name="filters" value="stat"/>
+    </bean>
+
+    <!--主库-->
+    <!--<bean id="db_1" parent="dataSource" init-method="init" destroy-method="close">
+        &lt;!&ndash;配置mysql &ndash;&gt;
+        <property name="url" value="${mysql.jdbc.url1}"/>
+        <property name="username" value="${mysql.jdbc.username}"/>
+        <property name="password" value="${mysql.jdbc.password}"/>
+        <property name="validationQuery" value="${mysql.jdbc.validationQuery}"/>
+        <property name="driverClassName" value="${mysql.jdbc.driverClassName}"/>
+    </bean>-->
+    <!--从库-->
+    <!--<bean id="db_2" parent="dataSource" init-method="init" destroy-method="close">
+        &lt;!&ndash;配置mysql &ndash;&gt;
+        <property name="url" value="${mysql.jdbc.url2}"/>
+        <property name="username" value="${mysql.jdbc.username}"/>
+        <property name="password" value="${mysql.jdbc.password}"/>
+        <property name="validationQuery" value="${mysql.jdbc.validationQuery}"/>
+        <property name="driverClassName" value="${mysql.jdbc.driverClassName}"/>
+    </bean>-->
+
+    <!-- jdbcTemplate -->
+    <!--<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>-->
+</beans>

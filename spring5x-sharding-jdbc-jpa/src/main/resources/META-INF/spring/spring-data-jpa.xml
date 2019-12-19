@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/data/jpa
+       https://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
+
+    <!--############### Sharding-jdbc配置 ###############-->
+
+    <!--主从数据库：需要配置mysql数据库主从复制，获取从节点数据不存在抛异常-->
+    <!--<import resource="classpath:META-INF/spring/sharding/application-master-slave.xml"/>-->
+    <!--分库：只分库，不分表，效果友好-->
+    <!--<import resource="classpath:META-INF/spring/sharding/application-sharding-databases.xml"/>-->
+    <!--分库分表：效果友好-->
+    <!--<import resource="classpath:META-INF/spring/sharding/application-sharding-databases-tables.xml"/>-->
+    <!--主从分库分表:未测试-->
+    <!--<import resource="classpath:META-INF/spring/sharding/application-sharding-master-slave.xml"/>-->
+    <!--同库分表：只分表，不分库，效果友好-->
+    <!--<import resource="classpath:META-INF/spring/sharding/application-sharding-tables.xml"/>-->
+
+    <!--**************自定义分库分表算法**************-->
+    <!--分库：自定义分库策略-->
+    <!--分库：只分库，不分表-->
+    <!--<import resource="classpath:META-INF/spring/custom/custom-sharding-database.xml"/>-->
+    <!--分库分表：分库同时分表-->
+    <import resource="classpath:META-INF/spring/custom/custom-sharding-datebase-tables.xml"/>
+    <!--同库分表：只分表，不分库-->
+    <!--<import resource="classpath:META-INF/spring/custom/custom-sharding-tables.xml"/>-->
+
+    <!--指定配置文件的位置-->
+    <context:property-placeholder location="classpath:properties/hibernate-jpa.properties" ignore-unresolvable="true"/>
+
+    <!--Start jpa Config #########-->
+
+    <!-- 配置JPA适配器,实现厂商的特定属性-->
+    <bean id="hibernateJpaVendorAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+        <property name="showSql" value="${adapter.show_sql}"/>
+        <property name="generateDdl" value="${adapter.generate_ddl}"/>
+        <!--关系数据库驱动方言，不写自动识别-->
+        <!--<property name="databasePlatform" value="${hibernate.dialect}"/>-->
+    </bean>
+
+    <!-- 定义实体管理器工厂 Jpa配置 LocalContainerEntityManagerFactoryBean这个选项Spring扮演了容器的角色。完全掌管JPA -->
+    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <!-- 指定数据源 -->
+        <property name="dataSource" ref="shardingDataSource"/>
+        <!--<property name="dataSource" ref="masterSlaveDataSource"/>-->
+
+        <!-- 指定Jpa持久化实现厂商类,这里以Hibernate为例 -->
+        <property name="jpaVendorAdapter" ref="hibernateJpaVendorAdapter"/>
+        <!-- 指定Entity实体类包路径 -->
+        <property name="packagesToScan" value="${hibernate.scan.package}"/>
+        <!-- 指定JPA属性；如Hibernate中指定是否显示SQL的是否显示、方言等 -->
+        <property name="jpaProperties">
+            <props>
+                <!--关系数据库驱动方言，不写自动识别-->
+                <!--<prop key="hibernate.dialect">${hibernate.dialect}</prop>-->
+                <!--控制台是否打印sql语句-->
+                <prop key="hibernate.show_sql">${hibernate.show_sql}</prop>
+                <!--sql语句格式化-->
+                <prop key="hibernate.format_sql">${hibernate.format_sql}</prop>
+                <!--启动更新表结构，none不用此功能-->
+                <prop key="hibernate.hbm2ddl.auto">${hibernate.hbm2ddl.auto}</prop>
+                <!--<prop key="hibernate.hbm2ddl.auto">create-drop</prop>-->
+                <!--<prop key="hibernate.hbm2ddl.auto">none</prop>-->
+                <!-- 建表的命名规则： My_NAME->MyName-->
+                <prop key="hibernate.ejb.naming_strategy">${hibernate.ejb.naming_strategy}</prop>
+            </props>
+        </property>
+    </bean>
+
+    <!--扫描dao包-->
+    <!--<jpa:repositories base-package="com.zja.dao" entity-manager-factory-ref="entityManagerFactory" transaction-manager-ref="transactionManager" />-->
+    <jpa:repositories base-package="com.zja.dao"/>
+
+    <!-- Jpa 事务配置 -->
+    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="entityManagerFactory"/>
+    </bean>
+
+    <!--XML配置事务声明方式 开启注解声明事务 -->
+    <tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true"/>
+
+    <!--End jpa Config ########-->
+
+</beans>

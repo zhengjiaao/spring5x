@@ -68,7 +68,7 @@ public class UserEntityController {
     public Object getDataSortPage(int page,int size){
         Sort sort =new Sort(Sort.Direction.DESC,"age");
         //page 当前页，size 每页显示多少条数据，sort 排序方式
-        Pageable pageable = PageRequest.of(2,3,sort);
+        Pageable pageable = PageRequest.of(page,size,sort);
         Page<UserEntity> entityPage = userEntityDao.findAll(pageable);
         List<UserEntity> userEntityList = entityPage.getContent();
         System.out.println(userEntityList);
