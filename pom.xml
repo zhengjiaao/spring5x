@@ -31,6 +31,7 @@
         <module>spring5x-hibernate5-base</module>
         <module>spring5x-hibernate5-cfg</module>
         <module>spring5x-hibernate5-senior</module>
+        <module>spring5x-java8</module>
         <module>spring5x-dubbo-api</module>
         <module>spring5x-dubbo-service</module>
         <module>spring5x-dubbo-web</module>
