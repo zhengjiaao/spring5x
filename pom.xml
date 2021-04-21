@@ -15,6 +15,7 @@
         <module>spring5x-base</module>
         <module>spring5x-email</module>
         <module>spring5x-task</module>
+        <module>spring5x-test</module>
         <module>spring5x-websocket</module>
         <module>spring5x-swagger2</module>
         <module>spring5x-springmvc</module>
