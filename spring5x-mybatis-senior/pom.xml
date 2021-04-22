@@ -212,7 +212,7 @@
         <dependency>
             <groupId>org.mybatis</groupId>
             <artifactId>mybatis</artifactId>
-            <version>3.5.2</version>
+            <version>3.5.6</version>
         </dependency>
         <!--Mybatis-PageHelper分页插件:目前支持Oracle,Mysql,MariaDB,SQLite,Hsqldb,PostgreSQL等等常用数据库分页-->
         <dependency>
