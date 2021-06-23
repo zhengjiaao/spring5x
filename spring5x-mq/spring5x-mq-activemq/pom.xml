@@ -9,10 +9,10 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
     <groupId>com.zja</groupId>
-    <artifactId>spring5x-activemq</artifactId>
+    <artifactId>spring5x-mq-activemq</artifactId>
     <packaging>war</packaging>
 
-    <name>spring5x-activemq</name>
+    <name>${project.artifactId}</name>
 
     <!--说明：spring5.x-base模块是spring5.x基础框架，其它模块都是以此模块为基础扩展的-->
     <properties>
@@ -160,7 +160,7 @@
     </dependencies>
 
     <build>
-        <finalName>spring5x-activemq</finalName>
+        <finalName>${project.artifactId}</finalName>
         <plugins>
             <!--maven的编译插件-->
             <plugin>

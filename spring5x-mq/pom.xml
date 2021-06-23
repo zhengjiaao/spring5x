@@ -16,10 +16,10 @@
     <version>1.0-SNAPSHOT</version>
 
     <modules>
-        <module>spring5x-activemq</module>
-        <module>spring5x-rabbitmq</module>
-        <module>spring5x-rocketmq</module>
-        <module>spring5x-pulsar</module>
+        <module>spring5x-mq-activemq</module>
+        <module>spring5x-mq-rabbitmq</module>
+        <module>spring5x-mq-rocketmq</module>
+        <module>spring5x-mq-pulsar</module>
     </modules>
 
     <properties>

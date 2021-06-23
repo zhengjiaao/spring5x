@@ -8,13 +8,11 @@
         <artifactId>spring5x-mq</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
+
     <groupId>com.zja</groupId>
-    <artifactId>spring5x-rocketmq</artifactId>
+    <artifactId>spring5x-mq-pulsar</artifactId>
     <packaging>war</packaging>
 
-    <name>spring5x-rocketmq</name>
-
-    <!--说明：spring5.x-base模块是spring5.x基础框架，其它模块都是以此模块为基础扩展的-->
     <properties>
         <!--spring5.x 至少需要jdk1.8及以上版本-->
         <spring.version>5.0.9.RELEASE</spring.version>
@@ -26,10 +24,8 @@
         <mavne.surefire.plugin.version>2.19.1</mavne.surefire.plugin.version>
         <maven-war-plugin.version>2.6</maven-war-plugin.version>
         <servlet.version>4.0.1</servlet.version>
+        <pulsar.version>2.8.0</pulsar.version>
 
-        <!--junit5-->
-        <junit5.version>5.1.0</junit5.version>
-        <junit5-platform.version>1.1.0</junit5-platform.version>
     </properties>
 
     <dependencies>
@@ -52,6 +48,12 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <!--hibernate或jpa所需依赖,不然会找不到session工厂或transaction -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-orm</artifactId>
             <version>${spring.version}</version>
         </dependency>
         <!-- spring的jdbc开发所需jar包：tx，jdbc -->
@@ -153,72 +155,29 @@
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
-
-        <!-- junit5 -->
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>${junit5.version}</version>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>org.junit.platform</groupId>
             <artifactId>junit-platform-runner</artifactId>
-            <version>${junit5-platform.version}</version>
+            <version>1.1.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.junit.platform</groupId>
-            <artifactId>junit-platform-console-standalone</artifactId>
-            <version>${junit5-platform.version}</version>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>5.6.0-M1</version>
             <scope>test</scope>
         </dependency>
 
-        <!--spring5.x 集成swagger2-->
         <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
-            <version>2.9.2</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>jackson-annotations</artifactId>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>spring-context</artifactId>
-                    <groupId>org.springframework</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>spring-beans</artifactId>
-                    <groupId>org.springframework</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>spring-aop</artifactId>
-                    <groupId>org.springframework</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>slf4j-api</artifactId>
-                    <groupId>org.slf4j</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger-ui</artifactId>
-            <version>2.9.2</version>
-        </dependency>
-
-        <!--RocketMQ 消息中间价-->
-        <dependency>
-            <groupId>org.apache.rocketmq</groupId>
-            <artifactId>rocketmq-client</artifactId>
-            <version>4.2.0</version>
+            <groupId>org.apache.pulsar</groupId>
+            <artifactId>pulsar-client</artifactId>
+            <version>${pulsar.version}</version>
         </dependency>
 
     </dependencies>
 
     <build>
-        <finalName>spring5x-rocketmq</finalName>
+        <finalName>${project.artifactId}</finalName>
         <plugins>
             <!--maven的编译插件-->
             <plugin>

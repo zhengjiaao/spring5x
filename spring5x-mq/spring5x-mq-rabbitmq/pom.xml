@@ -8,11 +8,13 @@
         <artifactId>spring5x-mq</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-
     <groupId>com.zja</groupId>
-    <artifactId>spring5x-pulsar</artifactId>
+    <artifactId>spring5x-mq-rabbitmq</artifactId>
     <packaging>war</packaging>
 
+    <name>${project.artifactId}</name>
+
+    <!--说明：spring5.x-base模块是spring5.x基础框架，其它模块都是以此模块为基础扩展的-->
     <properties>
         <!--spring5.x 至少需要jdk1.8及以上版本-->
         <spring.version>5.0.9.RELEASE</spring.version>
@@ -24,8 +26,6 @@
         <mavne.surefire.plugin.version>2.19.1</mavne.surefire.plugin.version>
         <maven-war-plugin.version>2.6</maven-war-plugin.version>
         <servlet.version>4.0.1</servlet.version>
-        <pulsar.version>2.8.0</pulsar.version>
-
     </properties>
 
     <dependencies>
@@ -42,22 +42,14 @@
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
-            <artifactId>spring-oxm</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
             <version>${spring.version}</version>
         </dependency>
-        <!--hibernate或jpa所需依赖,不然会找不到session工厂或transaction -->
         <dependency>
             <groupId>org.springframework</groupId>
-            <artifactId>spring-orm</artifactId>
+            <artifactId>spring-oxm</artifactId>
             <version>${spring.version}</version>
         </dependency>
-        <!-- spring的jdbc开发所需jar包：tx，jdbc -->
-        <!-- spring的事务管理所需的jar：tx -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-tx</artifactId>
@@ -68,7 +60,6 @@
             <artifactId>spring-jdbc</artifactId>
             <version>${spring.version}</version>
         </dependency>
-        <!-- spring web 整合 spring MVC所需jar：webmvc -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
@@ -120,10 +111,6 @@
                     <artifactId>jackson-annotations</artifactId>
                     <groupId>com.fasterxml.jackson.core</groupId>
                 </exclusion>
-                <exclusion>
-                    <artifactId>jackson-core</artifactId>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -140,44 +127,30 @@
             <scope>test</scope>
         </dependency>
 
-        <!--日志，修复日志-->
+        <!--日志-->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-nop</artifactId>
             <version>1.7.28</version>
         </dependency>
 
-        <!-- 使用lombok实现JavaBean的get、set、toString、hashCode、equals等方法的自动生成  -->
+        <!--spring rabbitmq 整合依赖-->
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.2</version>
-            <scope>provided</scope>
-            <optional>true</optional>
+            <groupId>org.springframework.amqp</groupId>
+            <artifactId>spring-rabbit</artifactId>
+            <version>2.1.10.RELEASE</version>
         </dependency>
-        <dependency>
-            <groupId>org.junit.platform</groupId>
-            <artifactId>junit-platform-runner</artifactId>
-            <version>1.1.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>5.6.0-M1</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.pulsar</groupId>
-            <artifactId>pulsar-client</artifactId>
-            <version>${pulsar.version}</version>
-        </dependency>
+        <!--rabbitmq 传输对象序列化依赖了这个包-->
+        <!--<dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.9.8</version>
+        </dependency>-->
 
     </dependencies>
 
     <build>
-        <finalName>spring5x-pulsar</finalName>
+        <finalName>${project.artifactId}</finalName>
         <plugins>
             <!--maven的编译插件-->
             <plugin>
