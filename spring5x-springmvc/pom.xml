@@ -29,7 +29,7 @@
         <!--spring5.x集成swagger2-->
         <springfox.version>2.9.2</springfox.version>
         <!--spring5.x 集成log4j2日志-->
-        <log4j.version>2.11.2</log4j.version>
+        <log4j.version>2.16.0</log4j.version>
     </properties>
 
     <dependencies>
