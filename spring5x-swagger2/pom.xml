@@ -17,7 +17,7 @@
         <!--项目多环境配置-->
         <profiles.dir>src/main/profiles</profiles.dir>
         <!--spring5.x 至少需要jdk1.8及以上版本-->
-        <spring.version>5.0.9.RELEASE</spring.version>
+        <spring.version>5.2.22.RELEASE</spring.version>
         <!--jdk必须 >=1.8-->
         <jdk.version>1.8</jdk.version>
         <!--maven 版本-->
