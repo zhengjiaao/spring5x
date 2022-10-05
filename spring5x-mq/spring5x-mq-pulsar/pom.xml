@@ -24,7 +24,7 @@
         <mavne.surefire.plugin.version>2.19.1</mavne.surefire.plugin.version>
         <maven-war-plugin.version>2.6</maven-war-plugin.version>
         <servlet.version>4.0.1</servlet.version>
-        <pulsar.version>2.8.0</pulsar.version>
+        <pulsar.version>2.8.4</pulsar.version>
 
     </properties>
 
